@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
     <link rel="stylesheet" href="index.css">
+    <script>const exports = {};</script>
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
+    <script defer src="../dist/index_render.js"></script>
+    <h1>Cultisk</h1>
+    <p id="output"></p>
+    <button id="test-rpc-btn">Run hello world</button>
+    <button id="pw-manager-btn">Open Password Manager</button>
   </body>
 </html>

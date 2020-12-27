@@ -2,14 +2,15 @@
   "name": "cultisk",
   "productName": "cultisk",
   "version": "1.0.0",
-  "description": "My Electron application description",
-  "main": "dist/index.js",
+  "description": "Your personal data security toolkit",
+  "main": "dist/app.js",
   "scripts": {
     "start": "tsc && electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts ."
+    "postinstall": "electron-builder install-app-deps",
+    "lint": "eslint --ext .ts .",
+    "build:watch": "tsc --watch"
   },
   "keywords": [],
   "author": {
@@ -52,12 +53,16 @@
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
-    "electron": "11.1.1",
+    "electron": "7.3.0",
+    "electron-builder": "^22.9.1",
     "eslint": "^7.16.0",
     "eslint-plugin-import": "^2.22.1",
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "@types/node": "12.12.21",
+    "electron-squirrel-startup": "^1.0.0",
+    "zeromq": "5.2.0",
+    "zerorpc": "^0.9.8"
   }
 }
