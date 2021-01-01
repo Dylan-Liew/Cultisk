@@ -79,7 +79,7 @@ This guide assumes you are using Bit 64 version of Windows.
 * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
 * Run `npm install` in the project root folder
 * Create a python venv and activate it
-* Install all the required modules from `requirements.txt`
+* Install all the required modules from `requirements.txt` `py -m pip install -r requirements.txt`
 * Run the application by running the following commands
   * `npm start`
   * `py main.py`
