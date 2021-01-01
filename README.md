@@ -26,8 +26,8 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 
 ```text
 start
- |
- V
+ | 
+ V 
 +--------------------+
 |                    | start
 |  electron          +-------------> +------------------+
@@ -75,13 +75,12 @@ This guide assumes you are using Bit 64 version of Windows.
 
 * Install [NodeJS](https://nodejs.org/en/download/), [Git](https://git-scm.com/downloads), [Python](https://www.python.org/downloads/) and [OpenSSL v1.0.2](https://web.archive.org/web/20200427093430/https://slproweb.com/download/Win64OpenSSL-1_0_2u.exe)
 * Navigate to the project root folder
-* Installing required package for NodeJS
-  * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
-  * Run `npm install` in the project root folder
 * Create and activate a python venv
   * Run `python -m venv venv` to create a venv
   * Run `venv/Scripts/activate.bat` to activate the venv
-* Install all required modules 
+* Install required packages/modules
+  * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
+  * Run `npm install` in the project root folder
   * Run `pip install -r requirements.txt` 
   * **NOTE:** To update `requirements.txt` after installing a new package, run the following command `pip freeze > requirements.txt`
 * Run the application by running the following commands
