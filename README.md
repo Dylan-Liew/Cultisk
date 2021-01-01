@@ -83,7 +83,7 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `venv/Scripts/activate.bat` to activate the venv
 * Install all required modules 
   * Run `pip install -r requirements.txt` 
- **NOTE:** To update `requirements.txt`, run the following command `pip freeze > requirements.txt`
+  > **NOTE:** To update `requirements.txt`, run the following command `pip freeze > requirements.txt`
 * Run the application by running the following commands
-   * `npm start`
-   * `py main.py`
+  * `npm start`
+  * `py main.py`
