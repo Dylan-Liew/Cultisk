@@ -4,7 +4,7 @@
 
 ### Description
 
-An Electron desktop application, Data Security Toolkit.
+A Data Security Toolkit Electron desktop application.
 Backend is done using Python. 
 Communication between Electron App and Python backend is achieved using a JSON-RPC, Client/Server model
 
@@ -17,7 +17,7 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 * [Cassandra](https://github.com/Cassandra-Fu)
 
 ### Technologies:
-* Python >3.7
+* Python > 3.7
 * Electron 7.3
 * NodeJS 12.18.4
 * OpenSSL 1.0.2u
@@ -26,8 +26,8 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 
 ```text
 start
- |
- V
+ | 
+ V 
 +--------------------+
 |                    | start
 |  electron          +-------------> +------------------+
@@ -43,10 +43,9 @@ start
 ```
 
 ### Project Structure
-The structure of this project is
 
 ```text
-.
+
 |-- cultiskpy (Python code, includes Logic for the RPC server)
     |-- PasswordManager (Individual Feature as a Python Module)
         |-- __init__.py (turns folder into a python module
@@ -71,15 +70,19 @@ The structure of this project is
 ```
   
 ### Developer Environment Setup
-Recommended IDEs: Pycharm Professional/Visual Studio Code  
+Recommended IDEs: Pycharm / Visual Studio Code  
 This guide assumes you are using Bit 64 version of Windows.
 
 * Install [NodeJS](https://nodejs.org/en/download/), [Git](https://git-scm.com/downloads), [Python](https://www.python.org/downloads/) and [OpenSSL v1.0.2](https://web.archive.org/web/20200427093430/https://slproweb.com/download/Win64OpenSSL-1_0_2u.exe)
 * Navigate to the project root folder
-* Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
-* Run `npm install` in the project root folder
-* Create a python venv and activate it
-* Install all the required modules from `requirements.txt`
+* Create and activate a python venv
+  * Run `python -m venv venv` to create a venv
+  * Run `venv/Scripts/activate.bat` to activate the venv
+* Install required packages/modules
+  * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
+  * Run `npm install` in the project root folder
+  * Run `pip install -r requirements.txt` 
+  * **NOTE:** To update `requirements.txt` after installing a new package, run the following command `pip freeze > requirements.txt`
 * Run the application by running the following commands
   * `npm start`
   * `py main.py`
