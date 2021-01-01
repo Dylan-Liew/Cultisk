@@ -8,13 +8,13 @@ const PasswordConfirmInput = document.getElementById("password-confirm-input") a
 const SubmitPasswordBtn = document.getElementById("submit-password-btn")
 
 SubmitPasswordBtn.onclick = (): void => {
-    const MasterPassword = PasswordInput.value
-    const MasterPasswordConfirm = PasswordConfirmInput.value
-    if (MasterPassword === MasterPasswordConfirm) {
-        ipc.send("set-master-password", MasterPassword)
-    } else {
-        dialog.showErrorBox("Password doesn't match", "The Master password don't match, please enter again.")
-        PasswordConfirmInput.value = ""
-        PasswordInput.value = ""
-    }
+  const MasterPassword = PasswordInput.value
+  const MasterPasswordConfirm = PasswordConfirmInput.value
+  if (MasterPassword === MasterPasswordConfirm) {
+    ipc.send("set-master-password", MasterPassword)
+  } else {
+    dialog.showErrorBox("Password doesn't match", "The Master password don't match, please enter again.")
+    PasswordConfirmInput.value = ""
+    PasswordInput.value = ""
+  }
 }

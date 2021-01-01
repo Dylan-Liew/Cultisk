@@ -5,17 +5,27 @@ from sqlalchemy.exc import DatabaseError
 import os.path
 import json
 
-from .models import Base, Password, Note
+from .models import Base, Password, Note, Card
 
 
-def create_session(connect_url) -> Session:
-    engine = create_engine(connect_url)
-    s = sessionmaker(bind=engine)
-    s = s()
-    return s
+def gen_connect_url(password: str, cipher="aes-256-cfb", kdf_iter=100000) -> str:
+    return f"sqlite+pysqlcipher://:{password}@/PasswordManager/pw_manager.db?cipher={cipher}&kdf_iter={kdf_iter}"
 
 
 class Logic:
+
+    password = None
+
+    def _open_session(self, input_password=None) -> Session:
+        if self.__class__.password is not None:
+            password = self.__class__.password
+        else:
+            password = input_password
+        url = gen_connect_url(password)
+        engine = create_engine(url)
+        s = sessionmaker(bind=engine)
+        s = s()
+        return s
 
     @staticmethod
     def password_manager_start():
@@ -28,25 +38,26 @@ class Logic:
             output["error_code"] = "DB_MISSING"
             return json.dumps(output)
 
-    @staticmethod
-    def password_manager_create_db(password):
+    def password_manager_create_db(self, password):
+        self.__class__.password = password
         output = {}
-        url = f"sqlite+pysqlcipher://:{password}@/PasswordManager/pw_manager.db?cipher=aes-256-cfb&kdf_iter=100000"
+        url = gen_connect_url(password)
         engine = create_engine(url)
         Base.metadata.create_all(engine)
         output["success"] = True
         return json.dumps(output)
 
-    @staticmethod
-    def password_manager_main(password):
+    def password_manager_main(self, password):
         output = {}
-        url = f"sqlite+pysqlcipher://:{password}@/PasswordManager/pw_manager.db?cipher=aes-256-cfb&kdf_iter=100000"
-        session = create_session(url)
+        session = self._open_session(password)
         try:
             note_result = session.query(Note).all()
+            card_result = session.query(Card).all()
             password_result = session.query(Password).all()
+            self.__class__.password = password
             note_data = []
             password_data = []
+            card_data = []
             note_row: Note
             for note_row in note_result:
                 note_data.append({
@@ -63,16 +74,140 @@ class Logic:
                     "password": password_row.password,
                     "totp_secret": password_row.totp_secret,
                     "favorite": password_row.favorite,
+                    "url": password_row.url,
                     "deleted": password_row.deleted
+                })
+            card_row: Card
+            for card_row in card_result:
+                card_data.append({
+                    "id": card_row.id,
+                    "number": card_row.number,
+                    "ccv": card_row.ccv,
+                    "expiry_moth": card_row.expiry_month,
+                    "expiry_year": card_row.expiry_year,
+                    "favorite": card_row.favorite,
+                    "deleted": card_row.deleted
                 })
             output["data"] = {
                 "notes": note_data,
-                "passwords": password_data
+                "passwords": password_data,
+                "cards": card_data
             }
             output["success"] = True
-            return json.dumps(output)
         except DatabaseError:
             output["error_code"] = "PASSWORD_ERR"
             output["error_message"] = "The password is wrong or the database file is corrupted"
             output["success"] = False
-            return json.dumps(output)
+        session.close()
+        return json.dumps(output)
+
+    def create_password_entry(self, data):
+        output = {}
+        data = json.loads(data)
+        session = self._open_session()
+        pass_obj = Password(**data)
+        session.add(pass_obj)
+        session.commit()
+        data["id"] = pass_obj.id
+        output["success"] = True
+        output["data"] = data
+        session.close()
+        return json.dumps(output)
+
+    def create_note_entry(self, data):
+        output = {}
+        data = json.loads(data)
+        session = self._open_session()
+        note_obj = Note(**data)
+        session.add(note_obj)
+        session.commit()
+        data["id"] = note_obj.id
+        output["success"] = True
+        output["data"] = data
+        session.close()
+        return json.dumps(output)
+
+    def create_card_entry(self, data):
+        output = {}
+        data = json.loads(data)
+        session = self._open_session()
+        card_obj = Card(**data)
+        session.add(card_obj)
+        session.commit()
+        data["id"] = card_obj.id
+        output["success"] = True
+        output["data"] = data
+        session.close()
+        return json.dumps(output)
+
+    def _edit_entry(self, obj, data):
+        session = self._open_session()
+        c_obj = session.query(obj).filter(id=int(data["id"]))
+        del data["id"]
+        for key in data:
+            setattr(c_obj, key.lower(), data.get(key.lower()))
+        session.commit()
+        session.close()
+        return True
+
+    def edit_card_entry(self, data):
+        data = json.loads(data)
+        output = {
+            "data": data
+        }
+        if self._edit_entry(Card, data):
+            output["success"] = True
+        return json.dumps(output)
+
+    def edit_password_entry(self, data):
+        data = json.loads(data)
+        output = {
+            "data": data
+        }
+        if self._edit_entry(Password, data):
+            output["success"] = True
+        return json.dumps(output)
+
+    def edit_note_entry(self, data):
+        data = json.loads(data)
+        output = {
+            "data": data
+        }
+        if self._edit_entry(Note, data):
+            output["success"] = True
+        return json.dumps(output)
+
+    def _delete_entry(self, obj, data):
+        session = self._open_session()
+        c_obj = session.query(obj).filter(id=int(data["id"]))
+        c_obj.deleted = True
+        session.commit()
+        session.close()
+        return True
+
+    def delete_card_entry(self, data):
+        data = json.loads(data)
+        output = {
+            "deleted": True
+        }
+        if self._delete_entry(Card, data):
+            output["success"] = True
+        return json.dumps(output)
+
+    def delete_password_entry(self, data):
+        data = json.loads(data)
+        output = {
+            "deleted": True
+        }
+        if self._delete_entry(Password, data):
+            output["success"] = True
+        return json.dumps(output)
+
+    def delete_note_entry(self, data):
+        data = json.loads(data)
+        output = {
+            "deleted": True
+        }
+        if self._delete_entry(Note, data):
+            output["success"] = True
+        return json.dumps(output)

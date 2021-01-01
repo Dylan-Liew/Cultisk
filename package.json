@@ -62,6 +62,7 @@
   "dependencies": {
     "@types/node": "12.12.21",
     "electron-squirrel-startup": "^1.0.0",
+    "lodash": "4.17.20",
     "zeromq": "5.2.0",
     "zerorpc": "^0.9.8"
   }
