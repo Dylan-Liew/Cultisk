@@ -90,3 +90,6 @@ out/
 
 # TSC
 dist/
+
+# IDE config
+.idea
