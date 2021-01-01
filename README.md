@@ -73,7 +73,8 @@ start
 Recommended IDEs: Pycharm / Visual Studio Code  
 This guide assumes you are using Bit 64 version of Windows.
 
-* Install [NodeJS](https://nodejs.org/en/download/), [Git](https://git-scm.com/downloads), [Python](https://www.python.org/downloads/) and [OpenSSL v1.0.2](https://web.archive.org/web/20200427093430/https://slproweb.com/download/Win64OpenSSL-1_0_2u.exe)
+* Install [NodeJS](https://nodejs.org/en/download/), [Python](https://www.python.org/downloads/) and [OpenSSL v1.0.2](https://web.archive.org/web/20200427093430/https://slproweb.com/download/Win64OpenSSL-1_0_2u.exe)， [Visual Studio] (https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16) 
+* Under Visual Studio Build Tools found at Visual Studio Installer, install Visual C++ build tools, MFC & ATL
 * Run Command Prompt as administrator and navigate to the project root folder
 * Create and activate a python venv
   * Run `python -m venv venv` to create a venv
