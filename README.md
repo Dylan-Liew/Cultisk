@@ -79,7 +79,6 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `python -m venv venv` to create a venv
   * Run `"venv/Scripts/activate.bat"` to activate the venv
 * Install required packages/modules
-  * Run `npm install --global windows-build-tools` to install required build-tools
   * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
   * Run `npm install` in the project root folder to install neccessary packages
   * Run `pip install -r requirements.txt` 
