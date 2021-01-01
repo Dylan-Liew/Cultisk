@@ -52,24 +52,30 @@ start
         |-- *.db 
     |-- BackupManager
         ....
-    | -- EmailFilter
+    |-- EmailFilter
         ....
-    | -- AntiVirus
+    |-- AntiVirus
         ....
-    | -- VulnScanner 
+    |-- VulnScanner 
         ....
     ....
     |-- main.py
-    
-|-- src (Electron app src files)
-    |-- pw_manager (src files for feature, HTML/CSS/TS)
-    
-    |-- types (custom Typescript types declaration)
+|-- src 
+    |-- pw_manager 
+        .... (HTML/CSS/TS)
+    |-- backup_manager
+        .... (HTML/CSS/TS)
+    |-- email_filter
+        .... (HTML/CSS/TS)
+    |-- anti_virus
+        .... (HTML/CSS/TS)
+    |-- vuln_scanner
+        .... (HTML/CSS/TS)
+    |-- types (Typescript types declaration)
     |-- app.ts (Main process TS file)
     |-- index.css (Main Renderer css)
     |-- index_render.ts (Main Renderer TS file)
 |-- dist (compiled JS code is here)
-
 |-- .eslintrc.json (ESlint config)
 |-- package.json (NodeJS config)
 |-- tsconfig.json (TS config)
