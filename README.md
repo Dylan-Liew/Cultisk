@@ -45,9 +45,9 @@ start
 ### Project Structure
 
 ```text
-
-|-- cultiskpy (Python code, includes Logic for the RPC server)
-    |-- PasswordManager (Individual Feature as a Python Module)
+.
+|-- cultiskpy (Python code, includes individual features and Logic for the RPC server)
+    |-- PasswordManager 
         |-- __init__.py (turns folder into a python module
                          Contains Feature Logic for the RPC server)
         |-- *.db (Your feature's DB file, if any)
