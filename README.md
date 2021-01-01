@@ -48,21 +48,28 @@ start
 .
 |-- cultiskpy (Python code, includes individual features and Logic for the RPC server)
     |-- PasswordManager 
-        |-- __init__.py (turns folder into a python module
-                         Contains Feature Logic for the RPC server)
-        |-- *.db (Your feature's DB file, if any)
+        |-- __init__.py 
+        |-- *.db 
+    |-- BackupManager
+        ....
+    | -- EmailFilter
+        ....
+    | -- AntiVirus
+        ....
+    | -- VulnScanner 
+        ....
     ....
-    |-- main.py (File to run to start the ZeroRPC server
-                 Import Feature Logic here)
-|
+    |-- main.py
+    
 |-- src (Electron app src files)
     |-- pw_manager (src files for feature, HTML/CSS/TS)
+    
     |-- types (custom Typescript types declaration)
     |-- app.ts (Main process TS file)
     |-- index.css (Main Renderer css)
     |-- index_render.ts (Main Renderer TS file)
 |-- dist (compiled JS code is here)
-|
+
 |-- .eslintrc.json (ESlint config)
 |-- package.json (NodeJS config)
 |-- tsconfig.json (TS config)
