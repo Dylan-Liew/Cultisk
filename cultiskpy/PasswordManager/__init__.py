@@ -29,25 +29,30 @@ class Logic:
 
     @staticmethod
     def password_manager_start():
+        print("< <Password Manager> launched")
         output = {}
         if os.path.isfile("PasswordManager/pw_manager.db"):
             output["success"] = True
-            return json.dumps(output)
         else:
             output["success"] = False
             output["error_code"] = "DB_MISSING"
-            return json.dumps(output)
+            print("> Database missing!")
+        print(f"> {output}")
+        return json.dumps(output)
 
     def password_manager_create_db(self, password):
+        print("< <Password Manager> create new database")
         self.__class__.password = password
         output = {}
         url = gen_connect_url(password)
         engine = create_engine(url)
         Base.metadata.create_all(engine)
         output["success"] = True
+        print(f"> {output}")
         return json.dumps(output)
 
     def password_manager_main(self, password):
+        print("< <Password Manager> Decrypt database")
         output = {}
         session = self._open_session(password)
         try:
@@ -94,50 +99,53 @@ class Logic:
                 "cards": card_data
             }
             output["success"] = True
+            print("> Decryption OK")
         except DatabaseError:
             output["error_code"] = "PASSWORD_ERR"
             output["error_message"] = "The password is wrong or the database file is corrupted"
             output["success"] = False
+            print(f"> Decryption Failed")
         session.close()
+        print(f"> {output}")
         return json.dumps(output)
 
+    def _create_entry(self, obj, data):
+        session = self._open_session()
+        n_obj = obj(**data)
+        session.add(n_obj)
+        session.commit()
+        data["id"] = n_obj.id
+        session.close()
+        return data
+
     def create_password_entry(self, data):
+        print("< <Password Manager> Create Password entry")
         output = {}
         data = json.loads(data)
-        session = self._open_session()
-        pass_obj = Password(**data)
-        session.add(pass_obj)
-        session.commit()
-        data["id"] = pass_obj.id
+        data = self._create_entry(Password, data)
         output["success"] = True
         output["data"] = data
-        session.close()
+        print(f"> Entry created {output}")
         return json.dumps(output)
 
     def create_note_entry(self, data):
+        print("< <Password Manager> Create Note entry")
         output = {}
         data = json.loads(data)
-        session = self._open_session()
-        note_obj = Note(**data)
-        session.add(note_obj)
-        session.commit()
-        data["id"] = note_obj.id
+        data = self._create_entry(Note, data)
         output["success"] = True
         output["data"] = data
-        session.close()
+        print(f"> Entry created {output}")
         return json.dumps(output)
 
     def create_card_entry(self, data):
+        print("< <Password Manager> Create Card entry")
         output = {}
         data = json.loads(data)
-        session = self._open_session()
-        card_obj = Card(**data)
-        session.add(card_obj)
-        session.commit()
-        data["id"] = card_obj.id
+        data = self._create_entry(Card, data)
         output["success"] = True
         output["data"] = data
-        session.close()
+        print(f"> Entry created {output}")
         return json.dumps(output)
 
     def _edit_entry(self, obj, data):
@@ -151,30 +159,36 @@ class Logic:
         return True
 
     def edit_card_entry(self, data):
+        print("< <Password Manager> Edit Card entry")
         data = json.loads(data)
         output = {
             "data": data
         }
         if self._edit_entry(Card, data):
             output["success"] = True
+        print(f"> Entry edited {output}")
         return json.dumps(output)
 
     def edit_password_entry(self, data):
+        print("< <Password Manager> Edit Password entry")
         data = json.loads(data)
         output = {
             "data": data
         }
         if self._edit_entry(Password, data):
             output["success"] = True
+        print(f"> Entry edited {output}")
         return json.dumps(output)
 
     def edit_note_entry(self, data):
+        print("< <Password Manager> Edit Note entry")
         data = json.loads(data)
         output = {
             "data": data
         }
         if self._edit_entry(Note, data):
             output["success"] = True
+        print(f"> Entry edited {output}")
         return json.dumps(output)
 
     def _delete_entry(self, obj, data):
@@ -186,28 +200,34 @@ class Logic:
         return True
 
     def delete_card_entry(self, data):
+        print("< <Password Manager> Delete Card entry")
         data = json.loads(data)
         output = {
             "deleted": True
         }
         if self._delete_entry(Card, data):
             output["success"] = True
+        print(f"> Entry deleted")
         return json.dumps(output)
 
     def delete_password_entry(self, data):
+        print("< <Password Manager> Delete Password entry")
         data = json.loads(data)
         output = {
             "deleted": True
         }
         if self._delete_entry(Password, data):
             output["success"] = True
+        print(f"> Entry deleted")
         return json.dumps(output)
 
     def delete_note_entry(self, data):
+        print("< <Password Manager> Delete Note entry")
         data = json.loads(data)
         output = {
             "deleted": True
         }
         if self._delete_entry(Note, data):
             output["success"] = True
+        print(f"> Entry deleted")
         return json.dumps(output)

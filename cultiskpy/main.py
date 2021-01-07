@@ -4,7 +4,8 @@ from PasswordManager import Logic as PasswordRPC
 
 class TestRPC:
 
-    def hello(self, name):
+    @staticmethod
+    def hello(name):
         return "Hello, %s" % name
 
 
@@ -14,6 +15,10 @@ class CultiskRPC(TestRPC, PasswordRPC):
         super(CultiskRPC, self).__init__()
 
 
+print("Server started on localhost:4242")
+print("URI: tcp://localhost:4242")
+print("LOG")
 s = zerorpc.Server(CultiskRPC(), pool_size=7)
 s.bind("tcp://0.0.0.0:4242")
 s.run()
+
