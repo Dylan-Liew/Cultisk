@@ -109,6 +109,7 @@ This guide assumes you are using Bit 64 version of Windows.
     * Download the sqlcipher DLL [here](https://1drv.ms/u/s!AtgS340NL-Ukh58UFgmOuQKEEs2P-A?e=pgAjE3)
     * Move the DLL to Python's DLL folder
       `C:\Users\<username>\AppData\Local\Programs\Python\<Python version>\DLLs`
+    * **NOTE:** If it doesn't work, move the DLL to System32
   
 * Run the application by running the following commands
   * `py main.py`
