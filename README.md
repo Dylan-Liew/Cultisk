@@ -100,7 +100,7 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
   * Run `npm install` in the project root folder to install necessary packages
   * Run `pip install -r requirements.txt` 
-  * > **NOTE:** To update `requirements.txt` after installing a new package, run the following command `pip freeze > requirements.txt`
+  > **NOTE:** To update `requirements.txt` after installing a new package, run the following command `pip freeze > requirements.txt`
   * Building and installing pysqlcipher3
     * Run `git clone https://github.com/sqlcipher/sqlcipher.git` to clone the repo to the current working directory
     * cd into the sqlcipher repo
