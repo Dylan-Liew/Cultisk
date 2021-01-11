@@ -1,5 +1,5 @@
 import electron = require('electron')
-
+const totp = require('totp-generator')
 const zerorpc = require("zerorpc")
 const ipc = electron.ipcRenderer
 
@@ -22,7 +22,6 @@ const RPCTestBtn = document.getElementById("test-rpc-btn")
 const RPCOutput = document.getElementById("output")
 
 RPCTestBtn.onclick = (): void => {
-  client.invoke("start", [], (error: string, res: string, more: never) => {
-    const ResObj = JSON.parse(res)
-  });
+  const token = totp('JBSWY3DPEHPK3PXP')
+  RPCOutput.innerText = token
 }

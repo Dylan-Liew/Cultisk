@@ -231,3 +231,4 @@ class Logic:
             output["success"] = True
         print(f"> Entry deleted")
         return json.dumps(output)
+

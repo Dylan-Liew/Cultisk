@@ -21,4 +21,3 @@ print("LOG")
 s = zerorpc.Server(CultiskRPC(), pool_size=7)
 s.bind("tcp://0.0.0.0:4242")
 s.run()
-
