@@ -102,8 +102,16 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `pip install -r requirements.txt` 
   * **NOTE:** To update `requirements.txt` after installing a new package, run the following command `pip freeze > requirements.txt`
   * Building and installing pysqlcipher3
-    * Download pysqlcipher3 repo [here](https://1drv.ms/u/s!AtgS340NL-Ukh58HtMGambt7TZG-1g?e=n42EdD) and extract it
-    * Activate the python venv and navigate to the directory
+    * Run `git clone https://github.com/sqlcipher/sqlcipher.git` to clone the repo to the current working directory
+    * cd into the sqlcipher repo
+    * Search for **x64 Native Tools Command Prompt for VS 2017** and open it
+    * In the command prompt opened, navigate to your current working directory and run `nmake /f Makefile.msc`.
+    * The build attempt will fail, it is normal. We only need **sqlite3.h** and **sqlite3.c** file.
+    * Run `cd ..`
+    * Run `git clone https://github.com/rigglemania/pysqlcipher3.git` to clone the repo to the current working directory
+    * Create **amalgamation** directory and copy both **sqlite3.h** and **sqlite3.c** to it.
+    * In the **amalgamation** directory, create **sqlcipher** directory and copy both **sqlite3.h** and **sqlite3.c** to the newly created directory as well.
+    * Activate the python venv and navigate to the pysqlcipher3 repo's directory
     * Run `python setup.py build_amalgamation`
     * Run `python setup.py install`
     * Download the sqlcipher DLL [here](https://1drv.ms/u/s!AtgS340NL-Ukh58UFgmOuQKEEs2P-A?e=pgAjE3)
