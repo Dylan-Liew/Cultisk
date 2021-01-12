@@ -95,7 +95,7 @@ This guide assumes you are using Bit 64 version of Windows.
   
 * Under Visual Studio Build Tools 2019 found at Visual Studio Installer, install C++ Build Tools with the following options shown below, 
 ![C++ Build Tools](https://i.imgur.com/MpTLz3p.png)
-* Create,activate and configure python venv
+* Create,activate and configure Python venv
   * Run `python -m venv venv` to create a python venv
   * Run `"venv/Scripts/activate.bat"` to activate the venv
   * Run `pip install -r requirements.txt` 
@@ -123,7 +123,7 @@ This guide assumes you are using Bit 64 version of Windows.
     * Run `python setup.py build_amalgamation`
     * Run `python setup.py install`
     
-* Install required packages/modules
+* Install required packages for Electron App
   * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
   * Run `npm install` in the project root folder to install necessary packages
   
