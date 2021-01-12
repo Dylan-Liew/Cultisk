@@ -100,13 +100,15 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `python -m venv venv` to create a python venv
   * Run `"venv/Scripts/activate.bat"` to activate the venv
   * Run `pip install -r requirements.txt` 
-  * **NOTE:** To update `requirements.txt` after installing a new package, run the following command `pip freeze > requirements.txt`
+> **NOTE:** To update `requirements.txt` after installing a new package
+> 1. Navigate to the project root folder 
+> 2. Assuming your venv is activated else activate with `"venv/Scripts/activate.bat"`
+> 3. Run the following command `pip freeze > requirements.txt`
   * Building and installing pysqlcipher3
     * Run `git clone https://github.com/sqlcipher/sqlcipher.git` to clone the repository to the current working directory
     * Download the sqlcipher DLL [here](https://1drv.ms/u/s!AtgS340NL-Ukh58UFgmOuQKEEs2P-A?e=pgAjE3)
     * Move the DLL to Python's DLL folder
       `C:\Users\<username>\AppData\Local\Programs\Python\<Python version>\DLLs`
-    * **NOTE:** If it doesn't work, move the DLL to System32
     * Search for **x64 Native Tools Command Prompt for VS 2019** and open it
     * Navigate to your current working directory 
     * Navigate to the sqlcipher directory with `cd sqlcipher` 
