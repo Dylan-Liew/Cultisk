@@ -112,8 +112,7 @@ This guide assumes you are using Bit 64 version of Windows.
     * Search for **x64 Native Tools Command Prompt for VS 2019** and open it
     * Navigate to your current working directory 
     * Navigate to the sqlcipher directory with `cd sqlcipher` 
-    * Run `nmake /f Makefile.msc`
-    * **NOTE:** The build attempt will fail, it is normal.
+    * Run `nmake /f Makefile.msc`, the build attempt will **FAIL**, it is normal.
     * Navigate to the previous directory with `cd ..` 
     * Run `git clone https://github.com/rigglemania/pysqlcipher3.git` to clone the repository to the current working directory
     * Navigate to the pysqlcipher3 directory with `cd pysqlcipher3` 
