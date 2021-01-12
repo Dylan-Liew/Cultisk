@@ -117,7 +117,7 @@ This guide assumes you are using Bit 64 version of Windows.
     * Run `git clone https://github.com/rigglemania/pysqlcipher3.git` to clone the repository to the current working directory
     * Navigate to the pysqlcipher3 directory with `cd pysqlcipher3` 
     * Create **amalgamation** directory with `mkdir amalgamation`
-    * Copy both **sqlite3.h** and **sqlite3.c** from sqlcipher to amalgamation with `copy ..\qlcipher\sqlite3.h amalgamation` and `copy ..\sqlcipher\sqlite3.c amalgamation`
+    * Copy both **sqlite3.h** and **sqlite3.c** from sqlcipher to amalgamation with `copy ..\sqlcipher\sqlite3.h amalgamation` and `copy ..\sqlcipher\sqlite3.c amalgamation`
     * Navigate to amalgamation directory with `cd amalgamation`
     * Create **sqlcipher** directory with `mkdir sqlcipher`
     * Copy both **sqlite3.h** and **sqlite3.c** from ../sqlcipher to sqlcipher with `copy ..\..\sqlcipher\sqlite3.h sqlcipher` and `copy ..\..\sqlcipher\sqlite3.c sqlcipher`
