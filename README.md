@@ -129,7 +129,6 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
   * Run `npm install` in the project root folder to install necessary packages
   
-* Run the application by running the following commands
-  * **NOTE:** Must follow the order in different terminal
+* Run the application by running the following commands in the order as stated and different terminal
   * `py main.py` under cultiskpy directory
   * `npm start`
