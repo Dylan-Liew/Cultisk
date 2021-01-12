@@ -94,7 +94,7 @@ This guide assumes you are using Bit 64 version of Windows.
   [Git](https://git-scm.com/downloads)
   
 * Under Visual Studio Build Tools 2019 found at Visual Studio Installer, install C++ Build Tools with the following options shown below, 
-![C++ Build Tools](https://i.imgur.com/6t5rr36.png)
+![C++ Build Tools](https://i.imgur.com/MpTLz3p.png)
 * Create,activate and configure python venv
   * Run `python -m venv venv` to create a python venv
   * Run `"venv/Scripts/activate.bat"` to activate the venv
