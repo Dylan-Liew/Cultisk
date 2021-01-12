@@ -102,7 +102,7 @@ This guide assumes you are using Bit 64 version of Windows.
   * Run `pip install -r requirements.txt` 
 > **NOTE:** To update `requirements.txt` after installing a new package
 > 1. Navigate to the project root folder 
-> 2. Assuming your venv is activated else activate with `"venv/Scripts/activate.bat"`
+> 2. Your venv should be activated else activate with `"venv/Scripts/activate.bat"`
 > 3. Run the following command `pip freeze > requirements.txt`
   * Building and installing pysqlcipher3
     * Run `git clone https://github.com/sqlcipher/sqlcipher.git` to clone the repository to the current working directory
