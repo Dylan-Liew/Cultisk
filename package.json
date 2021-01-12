@@ -20,7 +20,26 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "ignore": [
+          "/src/pycalc$",
+          "\\.git(ignore|config)",
+          "\\.vscode",
+          "\\.idea",
+          "Docker$",
+          ".eslintrc.json",
+          "/package-lock\\.json",
+          "Pipfile($|\\.lock)",
+          "/(api_pythermal|api|prtail)\\.spec",
+          "/bin$",
+          "/build$",
+          "/out2$",
+          "/Output$",
+          "/dist",
+          "/README\\.md",
+          "/cultiskpy$"
+        ]
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",

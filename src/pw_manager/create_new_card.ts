@@ -25,5 +25,6 @@ CreateEntryBtn.onclick = (): void => {
     expiry_year: expiry_year,
   }
 
+
   ipc.send("password_manager_entry", "create", "card", EntryData)
 }
