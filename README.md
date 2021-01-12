@@ -121,7 +121,7 @@ This guide assumes you are using Bit 64 version of Windows.
     * Navigate to amalgamation directory with `cd amalgamation`
     * Create **sqlcipher** directory with `mkdir sqlcipher`
     * Copy both **sqlite3.h** and **sqlite3.c** from ../sqlcipher to sqlcipher with `copy ..\..\sqlcipher\sqlite3.h sqlcipher` and `copy ..\..\sqlcipher\sqlite3.c sqlcipher`
-    * Navigate to the pysqlcipher3 directory with `cd ..\..\`
+    * Navigate to the pysqlcipher3 directory with `cd ..`
     * Run `python setup.py build_amalgamation`
     * Run `python setup.py install`
     
