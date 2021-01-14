@@ -128,6 +128,10 @@ This guide assumes you are using Bit 64 version of Windows.
 * Install required packages for Electron App
   * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
   * Run `npm install` in the project root folder to install necessary packages
+    
+* Clean up
+  * Run `rmdir pysqlcipher3 /s /q`
+  * Run `rmdir sqlcipher /s /q`
   
 * Run the application by running the following commands in the order as stated and different terminal
   * `py cultiskpy\main.py` under cultiskpy directory
