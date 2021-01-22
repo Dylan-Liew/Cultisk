@@ -11,5 +11,5 @@ CreateEntryBtn.onclick = (): void => {
   const EntryData: { content: string } = {
     content: content,
   }
-  ipc.send("password_manager_create_new_entry", "create", "note", EntryData)
+  ipc.send("password_manager_entry", "create", "note", EntryData)
 }

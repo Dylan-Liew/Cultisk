@@ -25,5 +25,5 @@ CreateEntryBtn.onclick = (): void => {
     EntryData.url = URL
   }
 
-  ipc.send("password_manager_create_new_entry", "create", "password", EntryData)
+  ipc.send("password_manager_entry", "create", "password", EntryData)
 }

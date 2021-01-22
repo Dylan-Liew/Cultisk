@@ -1,23 +1,14 @@
-import zerorpc
-from PasswordManager import Logic as PasswordRPC
+import asyncio
+import websockets
 
 
-class TestRPC:
-
-    @staticmethod
-    def hello(name):
-        return "Hello, %s" % name
-
-
-class CultiskRPC(TestRPC, PasswordRPC):
-
-    def __init__(self):
-        super(CultiskRPC, self).__init__()
+async def echo(websocket, path):
+    async for message in websocket:
+        print(path)
+        await websocket.send(message)
 
 
-print("Server started on localhost:4242")
-print("URI: tcp://localhost:4242")
-print("LOG")
-s = zerorpc.Server(CultiskRPC(), pool_size=7)
-s.bind("tcp://0.0.0.0:4242")
-s.run()
+start_server = websockets.serve(echo, "localhost", 4000)
+
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()

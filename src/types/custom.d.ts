@@ -29,7 +29,7 @@ interface PasswordManagerData {
   passwords: PasswordObj[];
 }
 
-declare namespace NodeJS  {
+declare namespace NodeJS {
   interface Global {
     LastPasswordManagerData: PasswordManagerData;
   }
