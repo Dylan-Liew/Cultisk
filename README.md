@@ -135,4 +135,4 @@ This guide assumes you are using Bit 64 version of Windows.
   
 * Run the application by running the following commands in the order as stated and different terminal
   * `py cultiskpy\main.py` under cultiskpy directory
-  * `npm start`
+  * `npm run electron:serve`
