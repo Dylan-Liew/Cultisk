@@ -39,6 +39,12 @@ interface RPCResponse {
   success: boolean;
   error_code?: string;
   error_message?: string;
-  data?: PasswordManagerData | PasswordObj | NoteObj | CardObj;
+  data?: PasswordManagerData | PasswordObj | NoteObj | CardObj ;
   deleted?: boolean;
+}
+
+interface ScanResultObj {
+    mal_detected: number;
+    files_scanned: number;
+    scanned_list: list;
 }
