@@ -1,8 +1,9 @@
 import zerorpc
 from SoftwareUpdater import Logic as SoftwareRPC
+from Antivirus import Scanner as AvRPC
 
 
-class CultiskRPC(SoftwareRPC):
+class CultiskRPC(SoftwareRPC, AvRPC):
 
     def __init__(self):
         super(CultiskRPC, self).__init__()

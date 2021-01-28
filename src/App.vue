@@ -5,6 +5,7 @@
       <router-link to="/">Home</router-link>
       <router-link to="/password-manager">Password Manager</router-link>
       <router-link to="/software-updater">Software Updater</router-link>
+      <router-link to="/anti-virus">Anti-Virus</router-link>
     </div>
     <router-view/>
   </div>

@@ -31,6 +31,11 @@ const routes: Array<RouteConfig> = [
     name: 'Software Updater',
     component: () => import(/* webpackChunkName: "software-updater" */ '../views/SoftwareUpdater/SoftwareUpdater.vue'),
   },
+  {
+    path: '/anti-virus',
+    name: 'Anti Virus',
+    component: () => import(/* webpackChunkName: "software-updater" */ '../views/AntiVirus/AntiVirus.vue'),
+  },
 ];
 
 const router = new VueRouter({
