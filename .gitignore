@@ -26,3 +26,12 @@ pnpm-debug.log*
 
 # Ignore old code
 /old_code
+
+# venv
+venv/
+
+# pysqlcipher3
+pysqlcipher3/
+
+# sqlcipher
+sqlcipher3/
