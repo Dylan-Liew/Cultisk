@@ -1,0 +1,1 @@
+{"mal_detected": 0, "files_scanned": 1, "scanned_list": [{"FilePath": "C:\\Users\\Dylan\\Downloads\\controlled_test\\tes.exe", "malicious": false}]}

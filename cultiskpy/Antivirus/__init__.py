@@ -5,7 +5,7 @@ import hashlib
 import win32api, win32con
 import requests
 import json
-
+import threading
 from threading import Thread
 import time
 import schedule
@@ -22,7 +22,7 @@ class AVHandler(FileSystemEventHandler):
         self.scanner = Scanner
 
     def on_created(self, event):
-        self.scanner.scan()
+        self.scanner.av_scan()
         print("on_created", event.src_path)
 
 
@@ -33,7 +33,8 @@ class scheduler(Thread):
         self.scanner = Scanner
 
     def run(self):
-        schedule.every(2).minutes.do(self.scanner.scan)
+        print("< <Scheduled Scan> Running")
+        schedule.every(20).minutes.do(self.scanner.av_scan)
         while self.running:
             schedule.run_pending()
             time.sleep(1)
@@ -59,24 +60,26 @@ class detection(Thread):
         return drives
 
     def watch_drives(self, on_change: Callable[[dict], None] = print, poll_interval: int = 1):
-        print("< <USB Detector> Running")
-
         def _watcher():
             prev = None
             while True:
-                print("test")
                 drives = self.get_drives()
                 if prev != drives:
                     on_change(drives)
                     prev = drives
-                    self.scanner.scan()
+                    self.scanner.av_scan()
                     print("Changed")
                 sleep(poll_interval)
 
+        t = threading.Thread(target=_watcher)
+        t.start()
+        t.join()
+
     def run(self):
+        print("< <USB Detector> Running")
         while self.running:
             self.watch_drives(on_change=print)
-            time.sleep(2)
+            time.sleep(1)
 
 
 class downloader(Thread):
@@ -97,6 +100,7 @@ class downloader(Thread):
             return os.path.join(os.path.expanduser('~'), 'downloads')
 
     def run(self):
+        print("< <Download Folder Scan> Running")
         download_scanner = Scanner()
         event_handler = AVHandler(download_scanner)
         observer = Observer()
@@ -115,7 +119,7 @@ class Scanner:
         # self.directory = "C:\\Users\\willi\\Downloads\\controlled_test"
         self.directory = self.get_download_path() + '\\controlled_test'
         # self.vt_api_key = config("VT_API_KEY")
-        self.vt_api_key = os.getenv("VT_API_KEY")
+        self.vt_api_key = "***REMOVED***"
         self.toaster = ToastNotifier()
 
     def get_download_path(self):
@@ -219,7 +223,7 @@ class Scanner:
                     else:
                         return False
 
-    def scan(self, directory=None, mal_detected=0, files_scanned=0, scanned_list=[]):
+    def av_scan(self, directory=None, mal_detected=0, files_scanned=0, scanned_list=[]):
         directory = self.directory
         print(directory)
         exes = self.get_exe_files(directory)
@@ -228,18 +232,19 @@ class Scanner:
             print("Scanning ", exe)
             if self.vt_file_exist(exe):
                 self.mal_file(exe)
-                scanned_list.append((exe, 'malicious'))
+                scanned_list.append({"FilePath": exe, "malicious": True})
             else:
                 if self.vt_upload_file(exe):
                     self.mal_file(exe)
-                    scanned_list.append((exe, 'malicious'))
-            scanned_items = []
+
+                    scanned_list.append({"FilePath": exe, "malicious": True})
+            malicious_items = []
             for item in scanned_list:
-                scanned_items.append(item[0])
-            if exe not in scanned_items:
-                scanned_list.append((exe, 'safe'))
+                malicious_items.append(item["FilePath"])
+            if exe not in malicious_items:
+                scanned_list.append({"FilePath": exe, "malicious": False})
         for item in scanned_list:
-            if item[1] == 'malicious':
+            if item["malicious"]:
                 mal_detected += 1
         result = {
             'mal_detected': mal_detected,
