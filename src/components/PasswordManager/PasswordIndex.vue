@@ -20,7 +20,11 @@
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item"><span class="font-weight-bold">Website Name:</span><br>{{ selected.wname }}</li>
                   <li class="list-group-item"><span class="font-weight-bold">Username:</span><br>{{ selected.username }}</li>
-                  <li class="list-group-item"><span class="font-weight-bold">Password:</span><br>{{ selected.password }}</li>
+                  <li class="list-group-item"><span class="font-weight-bold">
+                    Password:</span><br>
+                    <input class="password-field float-left" type="password" :value="selected.password" id="password" disabled>
+                    <button class="btn float-right" v-on:click="masking"><i class="fa fa-eye" id="mask-button"></i></button>
+                  </li>
                 </ul>
               </div>
           </b-col>
@@ -29,11 +33,26 @@
   </div>
 </template>
 
+<style scoped>
+.p-entries{
+  width: 70%;
+  margin: auto;
+}
+.password-field{
+  border: none;
+  background: white;
+}
+button:focus{
+  outline: none;
+  box-shadow: none;
+}
+</style>
+
 <script lang="ts">
 import Vue from 'vue';
 
 export default Vue.extend({
-  username: 'TableSingle',
+  name: 'TableSingle',
   data: () => ({
     selected: {},
     people: [
@@ -116,13 +135,18 @@ export default Vue.extend({
     onSelect(item) {
       this.selected = item;
     },
+    masking() {
+      const x = document.getElementById('password');
+      if (x.type === 'password') {
+        x.type = 'text';
+        document.getElementById('mask-button').classList.add('fa-eye-slash');
+        document.getElementById('mask-button').classList.remove('fa-eye');
+      } else {
+        x.type = 'password';
+        document.getElementById('mask-button').classList.add('fa-eye');
+        document.getElementById('mask-button').classList.remove('fa-eye-slash');
+      }
+    },
   },
 });
 </script>
-
-<style scoped>
-.p-entries{
-  width: 70%;
-  margin: auto;
-}
-</style>
