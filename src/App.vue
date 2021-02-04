@@ -13,6 +13,9 @@
   </div>
 </template>
 <style>
+body{
+  background-color: #222222 !important;
+}
 #view {
   padding-left: 50px;
 }

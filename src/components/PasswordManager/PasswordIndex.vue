@@ -1,30 +1,28 @@
 <template>
   <div class="index">
     <b-container class="position-fixed">
-        <b-row class="bv-example-row">
-          <b-col class="p-entry-container" cols="4" >
-              <md-table class="mt-2" md-height="590px" v-model="people" md-card @md-selected="onSelect" md-fixed-header>
+        <b-row>
+          <b-col cols="6" >
+              <md-table class="p-entries mt-2" md-height="590px" v-model="people" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
                 <md-table-cell md-label="Passwords Manager" md-sort-by="id">
-                    <span class="font-weight-bold">{{item.id}}</span><br>
-                    {{item.name}}
+                    <span class="font-weight-bold">{{item.wname}}</span><br>
+                    {{item.username}}
                 </md-table-cell>
               </md-table-row>
             </md-table>
           </b-col>
-          <b-col cols="8">
-              <div class="card" style="width: 18rem;">
-                <div class="card-header">
-                  Featured
-                </div>
+          <b-col cols="6">
+              <div class="card" style="width: 50%; margin:100px auto;">
+                  <div class="card-header">
+                    Item Information
+                  </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Cras justo odio</li>
-                  <li class="list-group-item">Dapibus ac facilisis in</li>
-                  <li class="list-group-item">Vestibulum at eros</li>
+                  <li class="list-group-item"><span class="font-weight-bold">Website Name:</span><br>{{ selected.wname }}</li>
+                  <li class="list-group-item"><span class="font-weight-bold">Username:</span><br>{{ selected.username }}</li>
+                  <li class="list-group-item"><span class="font-weight-bold">Password:</span><br>{{ selected.password }}</li>
                 </ul>
               </div>
-            <p>Selected:</p>
-            {{ selected }}
           </b-col>
         </b-row>
     </b-container>
@@ -35,85 +33,85 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'TableSingle',
+  username: 'TableSingle',
   data: () => ({
     selected: {},
     people: [
       {
-        id: 'www.google.com',
-        name: 'test@gmail.com',
-        email: 'text',
+        wname: 'www.google.com',
+        username: 'test@gmail.com',
+        password: 'text',
       },
       {
-        id: 2,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 2,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 3,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 3,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 4,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 4,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 5,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 5,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 6,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 6,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 7,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 7,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 8,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 8,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 9,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 9,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 10,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 10,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 11,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 11,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 12,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 12,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 13,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 13,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
       {
-        id: 14,
-        name: 'Shawna Dubbin',
-        email: 'text',
+        wname: 14,
+        username: 'Shawna Dubbin',
+        password: 'text',
       },
     ],
   }),
   methods: {
-    getClass: ({ id }) => ({
-      'md-primary': id,
+    getClass: ({ wname }) => ({
+      'md-primary': wname,
     }),
     onSelect(item) {
       this.selected = item;
@@ -123,4 +121,8 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.p-entries{
+  width: 70%;
+  margin: auto;
+}
 </style>
