@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Index from '@/components/AntiVirusIndex.vue'; // @ is an alias to /src
+import Index from '@/components/AntiVirus/AntiVirusIndex.vue'; // @ is an alias to /src
 /*
 import electron = require('electron')
 const dialog = electron.remote.dialog
@@ -54,7 +54,7 @@ ipc.on("av_result", (event, data: ScanResultObj) => {
 })
 */
 
-//Anti virus
+// Anti virus
 
 // client.invoke(("scan"), (error: string, res: string) => {
 //     const ResObj: ScanResultObj = JSON.parse(res)

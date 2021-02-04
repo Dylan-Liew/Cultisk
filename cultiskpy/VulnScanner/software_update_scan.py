@@ -1,9 +1,7 @@
-import json
 import winreg
 import re
-from .web_scraper import Google_Search, Version_Info_Lookup
+from .web_scraper import Filehippo_Search, Version_Info_Lookup
 from multiprocessing.pool import ThreadPool as Pool
-from win10toast import ToastNotifier
 
 # Filter Variables
 filter_publishers = ["NVIDIA Corporation", "Microsoft Corporation", "Microsoft",
@@ -16,7 +14,7 @@ filter_words = ["Service", "Connector", "Update", "Python",
                 "Refresh Manager", "Installer", "Run Time",
                 "Database", "Driver", "SDK", "ODBC", "Support",
                 "Notifier", "Examples", "Documents", "Windows",
-                "Options"]
+                "Options", "Microsoft", "Driver"]
 
 
 def filter_software(software):
@@ -42,7 +40,7 @@ def clean_name(name):
     cleaned_name = cleaned_name.replace('-', ' ')
     cleaned_name = cleaned_name.replace('  ', ' ')
     # Remove text in brackets
-    cleaned_name = re.sub(r'\(.*?\)', "", cleaned_name)
+    cleaned_name = re.sub("\(.*?\)", "", cleaned_name)
     # Remove leading and trailing whitespaces.
     cleaned_name = cleaned_name.strip()
     return cleaned_name
@@ -50,29 +48,29 @@ def clean_name(name):
 
 def get_software_list(hive, flag):
     # Establishes a connection to a predefined registry handle
-    reg = winreg.ConnectRegistry(None, hive)
+    aReg = winreg.ConnectRegistry(None, hive)
     # Opens the specified key
-    key = winreg.OpenKey(reg, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+    aKey = winreg.OpenKey(aReg, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
                           0, winreg.KEY_READ | flag)
     # The number of sub keys this key has
-    subkey_count = winreg.QueryInfoKey(key)[0]
+    count_subkey = winreg.QueryInfoKey(aKey)[0]
     software_list = []
 
-    for i in range(subkey_count):
+    for i in range(count_subkey):
         software = {}
         try:
             # Subkey Name
-            subkey_name = winreg.EnumKey(key, i)
-            if "Steam App" not in subkey_name:
+            asubkey_name = winreg.EnumKey(aKey, i)
+            if "Steam App" not in asubkey_name:
                 # Open Subkey
-                subkey = winreg.OpenKey(key, subkey_name)
-                software['name'] = clean_name(winreg.QueryValueEx(subkey, "DisplayName")[0])
+                asubkey = winreg.OpenKey(aKey, asubkey_name)
+                software['name'] = clean_name(winreg.QueryValueEx(asubkey, "DisplayName")[0])
                 try:
-                    software['version'] = winreg.QueryValueEx(subkey, "DisplayVersion")[0]
+                    software['version'] = winreg.QueryValueEx(asubkey, "DisplayVersion")[0]
                 except EnvironmentError:
                     software['version'] = 'undefined'
                 try:
-                    software['publisher'] = winreg.QueryValueEx(subkey, "Publisher")[0]
+                    software['publisher'] = winreg.QueryValueEx(asubkey, "Publisher")[0]
                 except EnvironmentError:
                     software['publisher'] = 'undefined'
                 if filter_software(software):
@@ -82,23 +80,26 @@ def get_software_list(hive, flag):
     return software_list
 
 
-# winreg.KEY_WOW64_64KEY
-# Indicates that an application on 64-bit Windows should operate on the 64-bit registry view.
-# winreg.KEY_WOW64_32KEY
-# Indicates that an application on 64-bit Windows should operate on the 32-bit registry view.
-# winreg.HKEY_CURRENT_USER
-# the preferences of the current user
+# Search for download link using MultiProcessing
+def worker(software):
+    result = Filehippo_Search(software['name'])
+    if result:
+        software["title"] = result["title"]
+        software["link"] = result["link"]
+        software['lat_version'], software['download_link'] = Version_Info_Lookup(result["link"])
 
-# software_list = get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + \
-#                 get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY) + \
-#                 get_software_list(winreg.HKEY_CURRENT_USER, 0)
 
-class Logic:
-    def get_software(self):
-        print("< <Software Updater> Get User software")
-        output = {
-            "data": get_software_list(winreg.HKEY_CURRENT_USER, 0),
-            "success": True
-        }
-        print(f"> {output}")
-        return json.dumps(output)
+def software_update_scan():
+    # software_list = get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + \
+    #                 get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY) + \
+    #                 get_software_list(winreg.HKEY_CURRENT_USER, 0)
+    software_list = get_software_list(winreg.HKEY_CURRENT_USER, 0)
+    pool_size = 3
+    pool = Pool(pool_size)
+    for software in software_list:
+        pool.apply_async(worker, (software,))
+    pool.close()
+    pool.join()
+    return software_list
+
+

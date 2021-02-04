@@ -1,50 +1,76 @@
-interface EventObj {
+import { Commit } from 'vuex';
+import { Server } from 'vue-cli-plugin-electron-builder';
+
+export declare module 'vue-material/dist/components';
+interface Entry {
   [index: string];
   id: number;
   favorite: boolean;
   deleted: boolean;
 }
-interface NoteObj extends EventObj {
-  content: string;
-}
 
-interface PasswordObj extends EventObj {
+export interface PasswordEntry extends Entry {
   username: string;
   password: string;
   totp_secret?: string;
   url?: string;
 }
 
-interface CardObj extends EventObj {
+export interface CardEntry extends Entry {
+  name: string;
+  brand: 'Visa' | 'Mastercard' | 'Amex';
   number: string;
   ccv: string;
   expiry_month: number;
   expiry_year: number;
 }
 
-interface PasswordManagerData {
+export interface PasswordManagerData {
   [index: string];
   notes: NoteObj[];
-  cards: CardObj[];
-  passwords: PasswordObj[];
+  cards: CardEntry[];
+  passwords: PasswordEntry[];
 }
 
-declare namespace NodeJS {
-  interface Global {
-    LastPasswordManagerData: PasswordManagerData;
-  }
+export interface SoftwareInfo {
+  name: string;
+  version: string;
+  publisher: string;
+  title: string;
+  link: string;
+  lat_version: string;
+  download_link: string;
 }
 
-interface RPCResponse {
-  success: boolean;
-  error_code?: string;
-  error_message?: string;
-  data?: PasswordManagerData | PasswordObj | NoteObj | CardObj ;
-  deleted?: boolean;
-}
-
-interface ScanResultObj {
+export interface ScanResultObj {
     mal_detected: number;
     files_scanned: number;
-    scanned_list: list;
+    scanned_list: object;
+}
+
+export interface CommitFunction {
+    commit: Commit;
+}
+
+export interface CommitStateFunction<T> extends CommitFunction {
+    state: T;
+}
+
+export interface ServerResponse {
+  success: boolean;
+}
+
+export interface OAuthRequestCallbackResponse extends ServerResponse {
+  authenticated: boolean;
+  jwt: string;
+  guser_id: string;
+}
+
+export interface RefreshTokenResponse extends ServerResponse {
+  authenticated: boolean;
+  jwt: string;
+}
+
+export interface PasswordManagerDataResponse extends ServerResponse {
+  data: PasswordManagerData | PasswordEntry | NoteObj | CardEntry;
 }

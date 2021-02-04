@@ -1,6 +1,5 @@
 <template>
-  <div class="index">
-    <p>Websocket demo</p>
+  <div>
   </div>
 </template>
 
@@ -8,7 +7,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'WebsocketDemoIndex',
+  name: 'EmailFilter',
 });
 </script>
 

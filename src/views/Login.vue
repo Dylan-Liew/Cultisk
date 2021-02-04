@@ -1,7 +1,5 @@
 <template>
-  <div class="home">
-    <Index/>
-  </div>
+
 </template>
 
 <script lang="ts">
@@ -9,9 +7,13 @@ import Vue from 'vue';
 import Index from '@/components/Index.vue';
 
 export default Vue.extend({
-  name: 'Main',
+  name: 'Login',
   components: {
     Index,
   },
 });
 </script>
+
+<style scoped>
+
+</style>

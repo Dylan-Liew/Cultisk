@@ -21,6 +21,8 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'max-len': 0,
+    "@typescript-eslint/camelcase": 'off',
     'linebreak-style': ['error', 'windows'],
+    '@typescript-eslint/no-var-requires': 0
   },
 };

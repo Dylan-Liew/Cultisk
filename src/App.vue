@@ -1,35 +1,134 @@
 <template>
   <div id="app">
-    <!-- This part is the nav bar basically, appear in every route -->
-    <div id="nav">
-      <router-link to="/">Home</router-link>
-      <router-link to="/password-manager">Password Manager</router-link>
-      <router-link to="/software-updater">Software Updater</router-link>
-      <router-link to="/anti-virus">Anti-Virus</router-link>
+    <div id="view" :class="[{'collapsed' : collapsed}]">
+      <router-view/>
     </div>
-    <router-view/>
+    <sidebar-menu
+      class="sidebar"
+      :menu="menu"
+      :collapsed="collapsed"
+      @item-click="onItemClick"
+      @collapse="onCollapse"
+    />
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+export default {
+  name: 'Cultisk',
+  data() {
+    return {
+      menu: [
+        {
+          header: true,
+          title: 'Cultisk',
+        },
+        {
+          href: '/',
+          title: 'Home',
+          icon: 'fa fa-home',
+        },
+        {
+          title: 'Password Manager',
+          icon: 'fa fa-key',
+          child: [
+            {
+              href: '/password-manager',
+              title: 'View Password',
+              icon: 'fa fa-unlock-alt',
+            },
+            {
+              href: '/password-manager/add-password',
+              title: 'Add Password',
+              icon: 'fa fa-file-alt',
+            },
+            {
+              href: '/password-manager/credit-cards',
+              title: 'Credit Cards',
+              icon: 'fa fa-plus',
+            },
+            {
+              href: '/password-manager/change-master-pass',
+              title: 'Change Master Password',
+              icon: 'fa fa-edit',
+            },
+            {
+              href: '/password-manager/password-generator',
+              title: 'Password Generator',
+              icon: 'fa fa-random',
+            },
+          ],
+        },
 
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+        {
+          href: '/software-updater',
+          title: 'Software Updater',
+          icon: 'fa fa-clipboard-check',
+        },
+        {
+          title: 'Anti Virus',
+          icon: 'fa fa-shield-virus',
+          child: [
+            {
+              href: '/anti-virus',
+              title: 'Anti Virus Scan',
+              icon: 'fa fa-virus',
+            },
+            {
+              href: '/anti-virus/scheduled-scan',
+              title: 'Scheduled Scan',
+              icon: 'fa fa-clock',
+            },
+          ],
+        },
+        {
+          title: 'Backup',
+          icon: 'fa fa-database',
+          child: [
+            {
+              href: '/backup/',
+              title: 'View Backup',
+              icon: 'fa fa-server',
+            },
+            {
+              href: '/backup/upload-files',
+              title: 'Upload Files',
+              icon: 'fa fa-upload',
+            },
+            {
+              href: '/backup/scheduled-backup-settings',
+              title: 'Scheduled Backup Settings',
+              icon: 'fa fa-calendar-week',
+            },
+          ],
+        },
+        {
+          title: 'Email Filtering',
+          icon: 'fa fa-filter',
+          child: [
+            {
+              href: '/email-filtering',
+              title: 'View Filtered Email',
+              icon: 'fa fa-list',
+            },
+            {
+              href: '/email-filtering/whitelist-management',
+              title: 'Whitelist Management',
+              icon: 'fa fa-list-alt',
+            },
+          ],
+        },
+      ],
+      collapsed: true,
+    };
+  },
+  methods: {
+    onItemClick() {
+      /*  pass; */
+    },
+    onCollapse(c) {
+      this.collapsed = c;
+    },
+  },
+};
+</script>

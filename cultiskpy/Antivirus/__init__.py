@@ -5,7 +5,6 @@ import hashlib
 import win32api, win32con
 import requests
 import json
-from decouple import config
 
 vt_api_key = config("VT_API_KEY")
 

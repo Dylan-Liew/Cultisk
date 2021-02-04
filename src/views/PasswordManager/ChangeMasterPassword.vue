@@ -1,6 +1,5 @@
 <template>
-  <div class="index">
-    <p>Software updater</p>
+  <div>
   </div>
 </template>
 
@@ -8,7 +7,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'SoftwareIndex',
+  name: 'Password-Manager-ChangeMasterPassword',
 });
 </script>
 
