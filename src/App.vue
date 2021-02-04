@@ -14,7 +14,7 @@
 </template>
 <style>
 #view {
-  padding-left: 350px;
+  padding-left: 50px;
 }
 #view.collapsed {
   padding-left: 50px;
@@ -33,7 +33,9 @@
   font-size: 1.2em;
   text-align: center;
 }
-
+a {
+  text-decoration: none !important;
+}
 .v-sidebar-menu .vsm-title{
   color: #fff;
 }
