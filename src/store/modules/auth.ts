@@ -46,6 +46,9 @@ async function CheckAppAuthenticationStatus(AppID: string) {
   auth_check_url.searchParams.append('app_id', AppID);
   const CallbackResponse = await axios.get(auth_check_url.toString());
   const CallbackData: OAuthRequestCallbackResponse = CallbackResponse.data;
+  if (CallbackResponse.status === 404) {
+    return false;
+  }
   return CallbackData;
 }
 
