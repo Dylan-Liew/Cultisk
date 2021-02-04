@@ -1,5 +1,3 @@
-const pbkdf2 = require('pbkdf2');
-const aesjs = require('aes-js');
 const crypto = require('crypto');
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
@@ -22,11 +20,11 @@ interface KeySettings {
   keylen: number;
 }
 
-function GenerateKey(password: string, settings: KeySettings) {
-}
+// function GenerateKey(password: string, settings: KeySettings) {
+// }
 
-async function Encrypt(key: Buffer, plainText: string) {
-}
+// async function Encrypt(key: Buffer, plainText: string) {
+// }
 
 const getters = {
 };

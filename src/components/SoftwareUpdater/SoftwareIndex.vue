@@ -15,7 +15,7 @@
       <md-table class="w-80 div-center shadow" v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
         <md-table-toolbar>
           <div class="md-toolbar-section-start">
-            <h1 class="md-title">Softwares</h1>
+            <h1 class="md-title">Software Update Scan</h1>
           </div>
           <md-field md-clearable class="md-toolbar-secton-end">
             <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />

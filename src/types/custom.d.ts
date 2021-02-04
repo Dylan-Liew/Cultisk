@@ -42,6 +42,11 @@ export interface SoftwareInfo {
   download_link: string;
 }
 
+export interface AVInfo{
+  FilePath: string;
+  malicious: boolean;
+}
+
 export interface ScanResultObj {
     mal_detected: number;
     files_scanned: number;

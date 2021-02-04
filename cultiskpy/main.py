@@ -21,7 +21,7 @@ Scanner = AvRPC()
 detection_scanner = AvRPC()
 
 url_detect = MaliciousUrlDetect()
-scheduling = scheduler(Scanner)
+# scheduling = scheduler(Scanner)
 usb_detect = detection(detection_scanner)
 download = downloader()
 
@@ -29,10 +29,10 @@ print("Server started on localhost:4242")
 print("URI: tcp://localhost:4242")
 print("LOG")
 
+download.start()
 usb_detect.start()
 url_detect.start()
-scheduling.start()
-download.start()
+# scheduling.start()
 
 s = zerorpc.Server(CultiskRPC(), pool_size=7, heartbeat=10000)
 s.bind("tcp://0.0.0.0:4242")
