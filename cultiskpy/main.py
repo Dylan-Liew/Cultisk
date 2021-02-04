@@ -1,6 +1,9 @@
 import zerorpc
 from SoftwareUpdater import Logic as SoftwareRPC
 from Antivirus import Scanner as AvRPC
+from Antivirus import *
+from VulnScanner import Scanner as SoftwareUpdateRPC
+from VulnScanner import *
 
 
 class HelloRPC:
