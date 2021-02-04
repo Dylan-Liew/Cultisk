@@ -19,12 +19,9 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/PasswordManager.vue'),
   },
   {
-    path: '/password-manager/web-socket-demo',
-    name: 'Password Manager - websocket demo',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/WebSocketDemo.vue'),
+    path: '/password-manager/add-password',
+    name: 'Add Password',
+    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/AddPassword.vue'),
   },
   {
     path: '/software-updater',
@@ -34,7 +31,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/anti-virus',
     name: 'Anti Virus',
-    component: () => import(/* webpackChunkName: "software-updater" */ '../views/AntiVirus/AntiVirus.vue'),
+    component: () => import(/* webpackChunkName: "anti-virus" */ '../views/AntiVirus/AntiVirus.vue'),
   },
 ];
 

@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueSidebarMenu from 'vue-sidebar-menu';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';

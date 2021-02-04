@@ -1,5 +1,4 @@
 import zerorpc
-from SoftwareUpdater import Logic as SoftwareRPC
 from Antivirus import Scanner as AvRPC
 from Antivirus import *
 from VulnScanner import Scanner as SoftwareUpdateRPC
@@ -11,10 +10,12 @@ class HelloRPC:
     def hello(self):
         return json.dumps({"success": True})
 
-class CultiskRPC(SoftwareRPC, AvRPC):
+
+class CultiskRPC(SoftwareUpdateRPC, AvRPC, HelloRPC):
 
     def __init__(self):
         super(CultiskRPC, self).__init__()
+
 
 Scanner = AvRPC()
 detection_scanner = AvRPC()

@@ -12,6 +12,32 @@
     />
   </div>
 </template>
+<style>
+#view {
+  padding-left: 350px;
+}
+#view.collapsed {
+  padding-left: 50px;
+}
+
+.sidebar.v-sidebar-menu .vsm-arrow:after {
+  content: "\f105";
+  font-family: "Font Awesome 5 Free", serif;
+  color: #fff;
+}
+.sidebar.v-sidebar-menu .collapse-btn:after {
+  content: "\f337";
+  font-family: "Font Awesome 5 Free", serif;
+}
+.v-sidebar-menu .vsm-header{
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.v-sidebar-menu .vsm-title{
+  color: #fff;
+}
+</style>
 
 <script>
 export default {
