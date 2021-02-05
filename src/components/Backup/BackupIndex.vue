@@ -36,10 +36,6 @@
   width: 70%;
   margin: auto;
 }
-.password-field{
-  border: none;
-  background: white;
-}
 button:focus{
   outline: none;
   box-shadow: none;
@@ -96,18 +92,6 @@ export default Vue.extend({
     }),
     onSelect(item) {
       this.selected = item;
-    },
-    masking() {
-      const x = document.getElementById('password');
-      if (x.type === 'password') {
-        x.type = 'text';
-        document.getElementById('mask-button').classList.add('fa-eye-slash');
-        document.getElementById('mask-button').classList.remove('fa-eye');
-      } else {
-        x.type = 'password';
-        document.getElementById('mask-button').classList.add('fa-eye');
-        document.getElementById('mask-button').classList.remove('fa-eye-slash');
-      }
     },
   },
 });

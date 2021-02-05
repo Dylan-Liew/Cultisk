@@ -32,6 +32,7 @@ class MaliciousUrlDetect(Thread):
             with contextlib.redirect_stdout(f):
                 packets = sniff(filter="udp port53", session=IPSession, count=1, prn=dns_qry, store=False)
             output = (f.getvalue())[2:-3]
+            print(output)
             if output != "" and not output.endswith(".local"):
                 if output in data:
                     print("< <Malicious Url Detector> Malicious URL Detected", output)
