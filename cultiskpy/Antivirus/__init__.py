@@ -2,16 +2,12 @@ import os
 import vt
 from win10toast import ToastNotifier
 import hashlib
-import win32api, win32con
 import requests
 import json
-import threading
 from threading import Thread
 import time
 import schedule
-import re
 import subprocess
-from time import sleep
 from dataclasses import dataclass
 from typing import Callable, List
 from watchdog.observers import Observer
@@ -46,7 +42,6 @@ class DeviceListener:
     """
     Listens to Win32 `WM_DEVICECHANGE` messages
     and trigger a callback when a device has been plugged in or out
-
     See: https://docs.microsoft.com/en-us/windows/win32/devio/wm-devicechange
     """
     WM_DEVICECHANGE_EVENTS = {
@@ -71,9 +66,7 @@ class DeviceListener:
         """
         Create a window for listening to messages
         https://docs.microsoft.com/en-us/windows/win32/learnwin32/creating-a-window#creating-the-window
-
         See also: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindoww
-
         :return: window hwnd
         """
         wc = win32gui.WNDCLASS()
@@ -148,25 +141,30 @@ class DeviceListener:
         [Drive(letter='C:', drive_type='Local Disk'), ...]
         """
 
-
+"""
 class detection(Thread):
     def __init__(self, Scanner):
         Thread.__init__(self)
         self.running = True
         self.scanner = Scanner
 
-    def on_devices_changed(self, drives: List[Drive]):
-        removable_drives = [d for d in drives if d.is_removable]
-        print(f'Connected removable drives: {removable_drives}')
-        for drive in removable_drives:
-            self.scanner.av_scan(directory=drive)
-
     def run(self):
         print("< <USB Detector> Running")
         while self.running:
-            listener = DeviceListener(on_change=self.on_devices_changed)
+            # listener = DeviceListener(on_change=self.on_devices_changed)
             # listener.start()
             time.sleep(1)
+"""
+
+def on_devices_changed(drives: List[Drive]):
+    removable_drives = [d for d in drives if d.is_removable]
+    print(f'Connected removable drives: {removable_drives}')
+    for drive in removable_drives:
+        print("drive: ", drive, type(drive))
+        print("drive letter: ", drive.letter, type(drive.letter))
+        usb_scanner = Scanner()
+        usb_scanner.av_scan(directory=drive.letter)
+
 
 
 class AVHandler(FileSystemEventHandler):
@@ -366,4 +364,3 @@ class Scanner:
         }
         print(f"> {result}")
         return json.dumps(result)
-
