@@ -3,7 +3,7 @@
     <b-container class="position-fixed">
         <b-row>
           <b-col cols="6" >
-              <md-table class="p-entries mt-2" md-height="590px" v-model="people" md-card @md-selected="onSelect" md-fixed-header>
+              <md-table class="p-entries mt-2" md-height="590px" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
                 <md-table-cell md-label="Passwords Manager" md-sort-by="id">
                     <span class="font-weight-bold">{{item.wname}}</span><br>
@@ -55,7 +55,7 @@ export default Vue.extend({
   name: 'TableSingle',
   data: () => ({
     selected: {},
-    people: [
+    passwords: [
       {
         wname: 'www.google.com',
         username: 'test@gmail.com',
