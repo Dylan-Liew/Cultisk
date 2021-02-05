@@ -12,19 +12,11 @@ import schedule
 import re
 import subprocess
 from time import sleep
-from typing import Callable
+from dataclasses import dataclass
+from typing import Callable, List
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-
-
-class AVHandler(FileSystemEventHandler):
-    def __init__(self, Scanner):
-        self.scanner = Scanner
-
-    def on_created(self, event):
-        self.scanner.av_scan()
-        print("on_created", event.src_path)
-
+import win32api, win32con, win32gui
 
 class scheduler(Thread):
     def __init__(self, Scanner):
@@ -40,46 +32,151 @@ class scheduler(Thread):
             time.sleep(1)
 
 
+@dataclass
+class Drive:
+    letter: str
+    drive_type: str
+
+    @property
+    def is_removable(self) -> bool:
+        return self.drive_type == 'Removable Disk'
+
+
+class DeviceListener:
+    """
+    Listens to Win32 `WM_DEVICECHANGE` messages
+    and trigger a callback when a device has been plugged in or out
+
+    See: https://docs.microsoft.com/en-us/windows/win32/devio/wm-devicechange
+    """
+    WM_DEVICECHANGE_EVENTS = {
+        0x0019: ('DBT_CONFIGCHANGECANCELED', 'A request to change the current configuration (dock or undock) has been canceled.'),
+        0x0018: ('DBT_CONFIGCHANGED', 'The current configuration has changed, due to a dock or undock.'),
+        0x8006: ('DBT_CUSTOMEVENT', 'A custom event has occurred.'),
+        0x8000: ('DBT_DEVICEARRIVAL', 'A device or piece of media has been inserted and is now available.'),
+        0x8001: ('DBT_DEVICEQUERYREMOVE', 'Permission is requested to remove a device or piece of media. Any application can deny this request and cancel the removal.'),
+        0x8002: ('DBT_DEVICEQUERYREMOVEFAILED', 'A request to remove a device or piece of media has been canceled.'),
+        0x8004: ('DBT_DEVICEREMOVECOMPLETE', 'A device or piece of media has been removed.'),
+        0x8003: ('DBT_DEVICEREMOVEPENDING', 'A device or piece of media is about to be removed. Cannot be denied.'),
+        0x8005: ('DBT_DEVICETYPESPECIFIC', 'A device-specific event has occurred.'),
+        0x0007: ('DBT_DEVNODES_CHANGED', 'A device has been added to or removed from the system.'),
+        0x0017: ('DBT_QUERYCHANGECONFIG', 'Permission is requested to change the current configuration (dock or undock).'),
+        0xFFFF: ('DBT_USERDEFINED', 'The meaning of this message is user-defined.'),
+    }
+
+    def __init__(self, on_change: Callable[[List[Drive]], None]):
+        self.on_change = on_change
+
+    def _create_window(self):
+        """
+        Create a window for listening to messages
+        https://docs.microsoft.com/en-us/windows/win32/learnwin32/creating-a-window#creating-the-window
+
+        See also: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindoww
+
+        :return: window hwnd
+        """
+        wc = win32gui.WNDCLASS()
+        wc.lpfnWndProc = self._on_message
+        wc.lpszClassName = self.__class__.__name__
+        wc.hInstance = win32api.GetModuleHandle(None)
+        class_atom = win32gui.RegisterClass(wc)
+        return win32gui.CreateWindow(class_atom, self.__class__.__name__, 0, 0, 0, 0, 0, 0, 0, wc.hInstance, None)
+
+    def start(self):
+        print(f'Listening to drive changes')
+        hwnd = self._create_window()
+        print(f'Created listener window with hwnd={hwnd:x}')
+        print(f'Listening to messages')
+        win32gui.PumpMessages()
+
+    def _on_message(self, hwnd: int, msg: int, wparam: int, lparam: int):
+        """
+        hwnd		our window's handle
+        msg		    WM_DEVICECHANGE message
+        wparam		DBT_DEVICEREMOVECOMPLETE event
+        lparam		pointer (memory address) to event info
+        """
+        if msg != win32con.WM_DEVICECHANGE:
+            return 0
+        event, description = self.WM_DEVICECHANGE_EVENTS[wparam]
+        print(f'Received message: {event} = {description}')
+        if event in ('DBT_DEVICEARRIVAL'):
+            print('A device has been plugged in')
+            self.on_change(self.list_drives())
+        # elif event in ('DBT_DEVICEREMOVECOMPLETE'):
+        #     logger.info('A device has been plugged out')
+        #     self.on_change(self.list_drives())
+        return 0
+
+    @staticmethod
+    def list_drives() -> List[Drive]:
+        """
+        Get a list of drives using WMI
+        :return: list of drives
+        """
+        proc = subprocess.run(
+            args=[
+                'powershell',
+                '-noprofile',
+                '-command',
+                'Get-WmiObject -Class Win32_LogicalDisk | Select-Object deviceid,drivetype | ConvertTo-Json'
+            ],
+            text=True,
+            stdout=subprocess.PIPE
+        )
+        if proc.returncode != 0 or not proc.stdout.strip():
+            print('Failed to enumerate drives')
+            return []
+        devices = json.loads(proc.stdout)
+
+        drive_types = {
+            0: 'Unknown',
+            1: 'No Root Directory',
+            2: 'Removable Disk',
+            3: 'Local Disk',
+            4: 'Network Drive',
+            5: 'Compact Disc',
+            6: 'RAM Disk',
+        }
+
+        return [Drive(
+            letter=d['deviceid'],
+            drive_type=drive_types[d['drivetype']]
+        ) for d in devices]
+        """
+        [Drive(letter='C:', drive_type='Local Disk'), ...]
+        """
+
+
 class detection(Thread):
     def __init__(self, Scanner):
         Thread.__init__(self)
         self.running = True
         self.scanner = Scanner
 
-    def get_drives(self) -> dict:
-        output = subprocess.getoutput('wmic logicaldisk get name,volumename')
-        drives = {}
-        for line in output.splitlines()[1:]:
-            if not line.strip():
-                continue
-            try:
-                letter, label = re.split(r'\s+', line.strip(), 1)
-            except:
-                letter, label = line, ''
-            drives[letter.strip(':')] = label
-        return drives
-
-    def watch_drives(self, on_change: Callable[[dict], None] = print, poll_interval: int = 1):
-        def _watcher():
-            prev = None
-            while True:
-                drives = self.get_drives()
-                if prev != drives:
-                    on_change(drives)
-                    prev = drives
-                    self.scanner.av_scan()
-                    print("Changed")
-                sleep(poll_interval)
-
-        t = threading.Thread(target=_watcher)
-        t.start()
-        t.join()
+    def on_devices_changed(self, drives: List[Drive]):
+        removable_drives = [d for d in drives if d.is_removable]
+        print(f'Connected removable drives: {removable_drives}')
+        for drive in removable_drives:
+            self.scanner.av_scan(directory=drive)
 
     def run(self):
         print("< <USB Detector> Running")
         while self.running:
-            self.watch_drives(on_change=print)
+            listener = DeviceListener(on_change=self.on_devices_changed)
+            # listener.start()
             time.sleep(1)
+
+
+class AVHandler(FileSystemEventHandler):
+    def __init__(self, Scanner, directory):
+        self.scanner = Scanner
+        self.directory = directory
+
+    def on_created(self, event):
+        self.scanner.av_scan(directory=self.directory)
+        print("on_created", event.src_path)
 
 
 class downloader(Thread):
@@ -101,10 +198,11 @@ class downloader(Thread):
 
     def run(self):
         print("< <Download Folder Scan> Running")
+        download_path = self.get_download_path()
         download_scanner = Scanner()
-        event_handler = AVHandler(download_scanner)
+        event_handler = AVHandler(download_scanner, download_path)
         observer = Observer()
-        observer.schedule(event_handler, path=self.get_download_path(), recursive=False)
+        observer.schedule(event_handler, path=download_path, recursive=False)
         observer.start()
         while self.running:
             try:
@@ -253,9 +351,9 @@ class Scanner:
         }
         print(f"> {result}")
 
-        file = open('result.txt', 'a')
-        file.write(json.dumps(result) + '\n')
-        file.close()
+        # file = open('result.txt', 'w')
+        # file.write(json.dumps(result) + '\n')
+        # file.close()
 
         return json.dumps(result)
 
@@ -268,3 +366,4 @@ class Scanner:
         }
         print(f"> {result}")
         return json.dumps(result)
+

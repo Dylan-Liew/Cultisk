@@ -27,7 +27,7 @@ download = downloader()
 
 print("Server started on localhost:4242")
 print("URI: tcp://localhost:4242")
-print("LOG")
+print("===LOG===")
 
 download.start()
 usb_detect.start()
