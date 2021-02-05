@@ -14,6 +14,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import win32api, win32con, win32gui
 
+
 class scheduler(Thread):
     def __init__(self, Scanner):
         Thread.__init__(self)
@@ -156,6 +157,7 @@ class detection(Thread):
             time.sleep(1)
 """
 
+
 def on_devices_changed(drives: List[Drive]):
     removable_drives = [d for d in drives if d.is_removable]
     print(f'Connected removable drives: {removable_drives}')
@@ -164,7 +166,6 @@ def on_devices_changed(drives: List[Drive]):
         print("drive letter: ", drive.letter, type(drive.letter))
         usb_scanner = Scanner()
         usb_scanner.av_scan(directory=drive.letter)
-
 
 
 class AVHandler(FileSystemEventHandler):

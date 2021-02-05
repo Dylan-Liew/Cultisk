@@ -28,7 +28,8 @@
             <md-table-cell md-label="Version" md-sort-by="version">{{ item.version }}</md-table-cell>
             <md-table-cell md-label="Publisher" md-sort-by="publisher">{{ item.publisher }}</md-table-cell>
             <md-table-cell md-label="Latest Version" md-sort-by="lat_version">{{ item.lat_version }}</md-table-cell>
-            <md-table-cell md-label="Download Link" md-sort-by="download_link">{{ item.download_link }}</md-table-cell>
+            <md-table-cell md-label="Download Link" md-sort-by="download_link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
+<!--              {{ item.download_link }}-->
           </md-table-row>
         </md-table>
   </div>

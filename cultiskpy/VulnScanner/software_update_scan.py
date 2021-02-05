@@ -100,6 +100,10 @@ def software_update_scan():
         pool.apply_async(worker, (software,))
     pool.close()
     pool.join()
-    return software_list
+    new_list = []
+    for i in software_list:
+        if i['download_link'] != "undefined":
+            new_list.append(i)
+    return new_list
 
 

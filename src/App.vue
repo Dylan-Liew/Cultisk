@@ -117,7 +117,7 @@ export default {
           icon: 'fa fa-database',
           child: [
             {
-              href: '/backup/',
+              href: '/backup',
               title: 'View Backup',
               icon: 'fa fa-server',
             },
