@@ -35,3 +35,6 @@ pysqlcipher3/
 
 # sqlcipher
 sqlcipher3/
+
+# usless results file
+cultiskpy/*.txt

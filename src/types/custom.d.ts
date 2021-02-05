@@ -32,6 +32,10 @@ export interface CommitStateFunction<T> extends CommitFunction {
     state: T;
 }
 
+export interface CommitRootStateFunction<T> extends CommitFunction {
+  rootState: T;
+}
+
 export interface ServerResponse {
   success: boolean;
 }
@@ -47,9 +51,10 @@ export interface RefreshTokenResponse extends ServerResponse {
   jwt: string;
 }
 
-interface Entry {
+export interface Entry {
   [index: string];
   uuid: string;
+  name: string;
   type: string;
   favorite: boolean;
   deleted: boolean;
@@ -63,7 +68,6 @@ export interface PasswordEntry extends Entry {
 }
 
 export interface CardEntry extends Entry {
-  name: string;
   brand: string;
   number: string;
   ccv: string;
@@ -77,6 +81,14 @@ export interface PasswordManagerData {
   passwords: PasswordEntry[];
 }
 
-export interface PasswordManagerServerResponse extends ServerResponse {
-  data: PasswordManagerData | PasswordEntry | CardEntry;
+export interface PasswordManagerAllDataResponse extends ServerResponse {
+  data: PasswordManagerData;
+}
+
+export interface PasswordManagerCardsResponse extends ServerResponse {
+  data: CardEntry[];
+}
+
+export interface PasswordManagerPasswordResponse extends ServerResponse {
+  data: PasswordEntry[];
 }

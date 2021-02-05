@@ -6,7 +6,7 @@
               <md-table class="p-entries mt-2" md-height="590px" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
                 <md-table-cell md-label="Passwords Manager" md-sort-by="id">
-                    <span class="font-weight-bold">{{item.wname}}</span><br>
+                    <span class="font-weight-bold">{{item.name}}</span><br>
                     {{item.username}}
                 </md-table-cell>
               </md-table-row>
@@ -18,12 +18,19 @@
                     Item Information
                   </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item"><span class="font-weight-bold">Website Name:</span><br>{{ selected.wname }}</li>
+                  <li class="list-group-item"><span class="font-weight-bold">Account Name:</span><br>{{ selected.name }}</li>
                   <li class="list-group-item"><span class="font-weight-bold">Username:</span><br>{{ selected.username }}</li>
                   <li class="list-group-item"><span class="font-weight-bold">
                     Password:</span><br>
                     <input class="password-field float-left" type="password" :value="selected.password" id="password" disabled>
                     <button class="btn float-right" v-on:click="masking"><i class="fa fa-eye" id="mask-button"></i></button>
+                  </li>
+                  <li class="list-group-item" v-if="selected.url">
+                    <span class="font-weight-bold">URL:</span>
+                    <br>{{ selected.url }}
+                  </li>
+                  <li class="list-group-item" v-if="selected.otpSecret"><span class="font-weight-bold">TOTP secret:</span>
+                    <br>{{ selected.otpSecret }}
                   </li>
                 </ul>
               </div>
@@ -57,75 +64,63 @@ export default Vue.extend({
     selected: {},
     passwords: [
       {
-        wname: 'www.google.com',
+        uuid: '593bfd33-56d9-45f1-b2cf-2fd297316225',
+        name: 'My Google account',
         username: 'test@gmail.com',
         password: 'text',
+        url: 'www.google.com',
       },
       {
-        wname: 2,
-        username: 'Shawna Dubbin',
+        uuid: '8eaa423b-2a63-42cb-a977-b38515e85da6',
+        name: 'My facebook account',
+        username: 'test@gmail.com',
         password: 'text',
+        otpSecret: '5567890f',
+        url: 'www.facebook.com',
       },
       {
-        wname: 3,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
       {
-        wname: 4,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
       {
-        wname: 5,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
       {
-        wname: 6,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
       {
-        wname: 7,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
       {
-        wname: 8,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
       {
-        wname: 9,
-        username: 'Shawna Dubbin',
-        password: 'text',
+        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
+        name: 'My Online Account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
       },
-      {
-        wname: 10,
-        username: 'Shawna Dubbin',
-        password: 'text',
-      },
-      {
-        wname: 11,
-        username: 'Shawna Dubbin',
-        password: 'text',
-      },
-      {
-        wname: 12,
-        username: 'Shawna Dubbin',
-        password: 'text',
-      },
-      {
-        wname: 13,
-        username: 'Shawna Dubbin',
-        password: 'text',
-      },
-      {
-        wname: 14,
-        username: 'Shawna Dubbin',
-        password: 'text',
-      },
+
     ],
   }),
   methods: {

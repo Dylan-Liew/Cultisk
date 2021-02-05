@@ -1,8 +1,8 @@
-const { CronJob } = require('cron');
-const fs = require('fs');
-const readline = require('readline');
-const path = require('path');
-const { upload } = require('./azureAPI.ts');
+import { CronJob } from 'cron';
+import * as fs from 'fs';
+import * as readline from 'readline';
+import * as path from 'path';
+import { upload } from './azureAPI';
 /*
 Every 5 mins trigger backup
 Every 30 mins trigger request OAuth
@@ -35,10 +35,6 @@ const AuthJob = new CronJob('0 */30 * * * *', (() => {
   console.log('Auth Request', Date().toLocaleLowerCase());
 }), null, true, 'Asia/Singapore');
 
-function getNextBackupDate() {
-  return BackupJob.nextDates();
+export function getNextBackupDate() {
+  return BackupJob.nextDates(5);
 }
-
-module.exports = {
-  getNextBackupDate,
-};

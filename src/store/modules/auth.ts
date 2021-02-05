@@ -1,6 +1,11 @@
 import axios from 'axios';
 import os from 'os';
-import { CommitFunction, OAuthRequestCallbackResponse, RefreshTokenResponse } from '@/types/custom.d';
+import {
+  CommitFunction,
+  CommitStateFunction,
+  OAuthRequestCallbackResponse,
+  RefreshTokenResponse,
+} from '@/types/custom.d';
 import open from 'open';
 /* eslint no-shadow: ["error", { "allow": ["state", "getters"] }],
 prefer-destructuring: "off" */
@@ -10,6 +15,7 @@ const DOMAIN_NAME = 'http://127.0.0.1:5000';
 const state = {
   authenticated: false,
   timeout: false,
+  expired: false,
   token: '',
   GUserID: '',
   appID: '',
@@ -18,6 +24,7 @@ const state = {
 interface State {
   authenticated: boolean;
   timeout: boolean;
+  expired: boolean;
   token: string;
   GUserID: string;
   appID: string;
@@ -81,7 +88,7 @@ const actions = {
       //   clearInterval(interval);
       //   return CallbackData;
       // }
-      if (attempt === 1000) {
+      if (attempt === 700) {
         clearInterval(interval);
         commit('AuthenticationTimeout');
       }
@@ -91,14 +98,34 @@ const actions = {
   async CheckAppAuthenticated({ commit }: CommitFunction, AppID: string) {
     commit('SetAppID', AppID);
     const response = await CheckAppAuthenticationStatus(AppID);
-    if (response.authenticated && response.success) {
-      commit('SetToken', response.jwt);
-      commit('SetGUserID', response.guser_id);
-      commit('AppAuthenticated');
+    if (response) {
+      commit('AppAuthenticated', response);
+    } else {
+      await AuthenticateApp(AppID);
+      let attempt = 0;
+      const interval = setInterval(async () => {
+        const callback_url = new URL('/callback/app-auth/', `${DOMAIN_NAME}`);
+        callback_url.searchParams.append('app_id', AppID);
+        const CallbackResponse = await axios.get(callback_url.toString());
+        const CallbackData: OAuthRequestCallbackResponse = CallbackResponse.data;
+        if (CallbackData.authenticated && CallbackData.success) {
+          clearInterval(interval);
+          commit('AppAuthenticated', CallbackData);
+        }
+        // if (!CallbackData.authenticated) {
+        //   clearInterval(interval);
+        //   return CallbackData;
+        // }
+        if (attempt === 700) {
+          clearInterval(interval);
+          commit('AuthenticationTimeout');
+        }
+        attempt += 1;
+      }, 700);
     }
   },
-  async RefreshAppToken({ commit }: CommitFunction, { getters }) {
-    const AppID = getters.appID;
+  async RefreshAppToken({ commit }: CommitFunction, { state }: CommitStateFunction<State>) {
+    const AppID = state.appID;
     const data: RefreshTokenResponse = await RefreshAppToken(AppID);
     commit('SetToken', data.jwt);
   },
@@ -111,12 +138,17 @@ const mutations = {
   SetToken: (state: State, token: string): void => {
     state.token = token;
   },
-  SetGUserID: (state: State, userID: string): void => {
-    state.GUserID = userID;
-  },
-  AppAuthenticated: (state: State): void => {
+  AppAuthenticated: (state: State, AuthData: OAuthRequestCallbackResponse): void => {
     state.authenticated = true;
     state.timeout = false;
+    state.expired = false;
+    state.GUserID = AuthData.guser_id;
+    state.token = AuthData.jwt;
+  },
+  AuthenticationExpired: (state: State): void => {
+    state.authenticated = false;
+    state.timeout = false;
+    state.expired = true;
   },
   AuthenticationTimeout: (state: State): void => {
     state.timeout = true;

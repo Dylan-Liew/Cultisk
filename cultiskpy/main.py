@@ -20,9 +20,8 @@ class CultiskRPC(SoftwareUpdateRPC, AvRPC, HelloRPC):
 Scanner = AvRPC()
 detection_scanner = AvRPC()
 
-url_detect = MaliciousUrlDetect()
 # scheduling = scheduler(Scanner)
-download = downloader()
+# download = downloader()
 
 
 print("Server started on localhost:4242")
@@ -32,8 +31,7 @@ print("===LOG===")
 # usb_detector = DeviceListener(on_change=on_devices_changed)
 # usb_detector.start()
 
-download.start()
-url_detect.start()
+# download.start()
 
 # scheduling.start()
 

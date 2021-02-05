@@ -178,10 +178,11 @@ class AVHandler(FileSystemEventHandler):
         print("on_created", event.src_path)
 
 
-class downloader(Thread):
-    def __init__(self):
+class DownloadScanner(Thread):
+    def __init__(self, thread_id):
         Thread.__init__(self)
         self.running = True
+        self.thread_id = thread_id
 
     def get_download_path(self):
         """Returns the default downloads path for linux or windows"""
