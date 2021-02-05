@@ -33,7 +33,7 @@ texttable==1.6.3
 typing-extensions==3.7.4.3
 tzlocal==2.1
 urllib3==1.26.2
-vt==3.1.3.7
+vt-py==0.6.1
 watchdog==1.0.2
 websockets==8.1
 win10toast==0.9
