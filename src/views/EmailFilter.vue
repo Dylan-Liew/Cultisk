@@ -1,12 +1,14 @@
 <template>
-  <div></div>
+  <div>
+    <router-view/>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Password-Manager-PasswordGenerator',
+  name: 'EmailFilter',
 });
 </script>
 

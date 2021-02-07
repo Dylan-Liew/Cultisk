@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="master-password-change">
+    <p>User change password</p>
   </div>
 </template>
 

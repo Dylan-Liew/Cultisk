@@ -1,82 +1,184 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
-import Home from '../views/Home.vue';
+import Home from '@/views/Home.vue';
+import SoftwareUpdater from '@/views/SoftwareUpdater.vue';
+import Welcome from '@/views/Welcome.vue';
+import OAuth from '@/components/Welcome/OAuth.vue';
+import OAuthExpired from '@/components/Error/OAuthExpired.vue';
+import SetupPasswordManager from '@/components/Welcome/SetupPasswordManager.vue';
+import Error from '@/views/Error.vue';
+import AntiVirus from '@/views/AntiVirus.vue';
+import AntiVirusIndex from '@/components/AntiVirus/AntiVirusIndex.vue';
+import ScheduledScanSettings from '@/components/Settings/ScheduledScanSettings.vue';
+import DeletedFilesIndex from '@/components/AntiVirus/DeletedFilesIndex.vue';
+import PasswordManager from '@/views/PasswordManager/PasswordManager.vue';
+import CardCreate from '@/components/PasswordManager/CardCreate.vue';
+import PasswordCreate from '@/components/PasswordManager/PasswordCreate.vue';
+import CardEdit from '@/components/PasswordManager/CardEdit.vue';
+import PasswordEdit from '@/components/PasswordManager/PasswordEdit.vue';
+import CardDetails from '@/components/PasswordManager/CardDetails.vue';
+import PasswordDetails from '@/components/PasswordManager/PasswordDetails.vue';
+import WebScannerDashboard from '@/views/PasswordManager/WebScannerDashboard.vue';
+import Backup from '@/views/Backup.vue';
+import EmailFilter from '@/views/EmailFilter.vue';
+import EmailIndex from '@/components/EmailFilter/EmailIndex.vue';
+import WhitelistManagement from '@/components/EmailFilter/WhitelistManagement.vue';
+import Settings from '@/views/Settings.vue';
+import SettingsIndex from '@/components/Settings/SettingsIndex.vue';
+import ChangeMasterPassword from '@/components/Settings/ChangeMasterPassword.vue';
+import ScheduledBackupSettings from '@/components/Settings/ScheduledBackupSettings.vue';
+import VaultAltAuth from '@/components/Settings/VaultAltAuth.vue';
 
 Vue.use(VueRouter);
+
+// Hello Page
+// - Hello Please(OAuth)
+// - Check OAuth Display Master Password Form
+//
+// Home (OAuth)
+// - Welcome (Animation)
+// - Show Last Scanned
+// - Quick Scan (Software Scan, Antivirus Scan) (Navigate To New Page) (Not Yet)
+// - Features Explanation with Route
+//
+// Anti Virus (last scan time)
+// - Scan - Select file/Folder to scan
+// - List of Deleted Files (Shows Only, Filter by Time)
+//
+// Software Updater
+// - Scan - Download
+//
+// Password Manager (Require Master password Password)
+// - Password  Manager - Password Generator (All/Favourite)
+// - Password/Emails Leaked Dashboard
+// - Credit Cards
+//
+// Backup
+// - View Backups (Snapshots) - Upload File - Download
+//
+// Email Filtering
+// - View Filtered Email (Untrash)
+// - Whitelist Management - Add Whitelist
+//
+// Settings
+// - Change Master password (Password Strength Checker)
+// - Alternative Authentication Method Settings
+// - Scheduled Backup Settings
+// - AV scheduling (Try)
 
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
+    name: 'home',
     component: Home,
   },
   {
-    path: '/password-manager',
+    path: '/error/',
+    name: 'error page',
+    component: Error,
+    children: [
+      // OAuthExpired will be rendered inside Error's <router-view>
+      // when /error/oauth is matched
+      { path: 'oauth', component: OAuthExpired },
+    ],
+  },
+  {
+    path: '/welcome/',
+    name: 'welcome',
+    component: Welcome,
+    children: [
+      // OAuth will be rendered inside Welcome <router-view>
+      // when /welcome/oauth is matched
+      { path: 'oauth', component: OAuth },
+
+      { path: 'password-manager', component: SetupPasswordManager },
+    ],
+  },
+  {
+    path: '/anti-virus/',
+    name: 'Antivirus Home',
+    component: AntiVirus,
+    children: [
+      // AntiVirusIndex will be rendered inside Antivirus <router-view>
+      // when /anti-virus/ is matched
+      { path: '', component: AntiVirusIndex },
+      { path: 'deleted-files', component: DeletedFilesIndex },
+    ],
+  },
+  {
+    path: '/software-updater/',
+    component: SoftwareUpdater,
+    name: 'Software Updater Home',
+  },
+  {
+    path: '/password-manager/',
+    component: PasswordManager,
     name: 'Password Manager',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/PasswordManager.vue'),
+    children: [
+      {
+        name: 'Card creation',
+        path: 'card-create',
+        component: CardCreate,
+      },
+      {
+        name: 'Card creation',
+        path: 'password-create',
+        component: PasswordCreate,
+      },
+      {
+        name: 'Card edit',
+        path: 'card-edit/:uuid',
+        component: CardEdit,
+      },
+      {
+        name: 'Password Edit',
+        path: 'password-edit/:uuid',
+        component: PasswordEdit,
+      },
+      {
+        name: 'Card details',
+        path: 'card/:uuid',
+        component: CardDetails,
+      },
+      {
+        name: 'Password Details',
+        path: 'password/:uuid',
+        component: PasswordDetails,
+      },
+    ],
   },
   {
-    path: '/password-manager/add-password',
-    name: 'Add Password',
-    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/AddPassword.vue'),
+    path: 'dark-web-dash',
+    name: 'Dashboard Dark web',
+    component: WebScannerDashboard,
   },
   {
-    path: '/password-manager/credit-cards',
-    name: 'Credit Cards',
-    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/CreditCards.vue'),
-  },
-  {
-    path: '/password-manager/password-generator',
-    name: 'Password Generator',
-    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/PasswordGenerator.vue'),
-  },
-  {
-    path: '/password-manager/change-master-pass',
-    name: 'Change Master Password',
-    component: () => import(/* webpackChunkName: "password-manager" */ '../views/PasswordManager/ChangeMasterPassword.vue'),
-  },
-  {
-    path: '/software-updater',
-    name: 'Software Updater',
-    component: () => import(/* webpackChunkName: "software-updater" */ '../views/SoftwareUpdater/SoftwareUpdater.vue'),
-  },
-  {
-    path: '/anti-virus',
-    name: 'Anti Virus',
-    component: () => import(/* webpackChunkName: "anti-virus" */ '../views/AntiVirus/AntiVirus.vue'),
-  },
-  {
-    path: '/anti-virus/scheduled-scan',
-    name: 'Scheduled Scan',
-    component: () => import(/* webpackChunkName: "anti-virus" */ '../views/AntiVirus/ScheduledScan.vue'),
-  },
-  {
-    path: '/backup',
     name: 'Backup',
-    component: () => import(/* webpackChunkName: "backup" */ '../views/Backup/Backup.vue'),
+    path: '/backup/',
+    component: Backup,
   },
   {
-    path: '/backup/upload-files',
-    name: 'Upload Files',
-    component: () => import(/* webpackChunkName: "backup" */ '../views/Backup/Uploadfiles.vue'),
+    path: '/email-filter/',
+    name: 'Email Filter Home',
+    component: EmailFilter,
+    children: [
+      // EmailIndex will be rendered inside EmailFilter <router-view>
+      // when /email-filter/ is matched
+      { path: '', component: EmailIndex },
+      { path: 'whitelist', component: WhitelistManagement },
+    ],
   },
   {
-    path: '/backup/scheduled-backup-settings',
-    name: 'Scheduled Backup Settings',
-    component: () => import(/* webpackChunkName: "backup" */ '../views/Backup/ScheduledBackupSettings.vue'),
-  },
-  {
-    path: '/email-filtering',
-    name: 'Email Filtering',
-    component: () => import(/* webpackChunkName: "email-filtering" */ '../views/EmailFiltering/EmailFilter.vue'),
-  },
-  {
-    path: '/email-filtering/whitelist-management',
-    name: 'Whitelist Management',
-    component: () => import(/* webpackChunkName: "email-filtering" */ '../views/EmailFiltering/WhitelistManagement.vue'),
+    path: '/settings/',
+    name: 'App settings',
+    component: Settings,
+    children: [
+      { path: '', component: SettingsIndex },
+      { path: 'antivirus-schedule', component: ScheduledScanSettings },
+      { path: 'password-manager-master-change', component: ChangeMasterPassword },
+      { path: 'backup-schedule', component: ScheduledBackupSettings },
+      { path: 'password-manager-alt', component: VaultAltAuth },
+    ],
   },
 ];
 

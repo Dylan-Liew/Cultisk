@@ -1,13 +1,14 @@
 <template>
-  <div>
-  </div>
+<div class="settings-index">
+  <p>Show settings available</p>
+</div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Password-Manager-AddPassword',
+  name: 'Settings Index',
 });
 </script>
 

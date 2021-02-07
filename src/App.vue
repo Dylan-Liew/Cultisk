@@ -4,15 +4,16 @@
       <router-view/>
     </div>
     <sidebar-menu
+      v-if="navStatus"
       class="sidebar"
       :menu="menu"
       :collapsed="collapsed"
       @item-click="onItemClick"
-      @collapse="onCollapse"
-    />
+      @collapse="onCollapse"/>
   </div>
 </template>
-<style>
+<style scoped>
+/*You put CSS that applies to all things rendered in the <router-view>*/
 body{
   background-color: #222222 !important;
 }
@@ -44,11 +45,18 @@ a {
 }
 </style>
 
-<script>
+<script lang="ts">
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Cultisk',
   data() {
     return {
+      // Use object to define Vue Router to: prop
+      // e.g. { name: 'user', params: { test: 'hi' } }
+      // Template /user/:test
+      // Generated URL /users/hi/
+      // name = name of route, defined in router, params = parameter of route
       menu: [
         {
           header: true,
@@ -161,5 +169,6 @@ export default {
       this.collapsed = c;
     },
   },
+  computed: mapGetters(['navStatus']),
 };
 </script>

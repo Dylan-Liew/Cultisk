@@ -18,10 +18,12 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 * [Cassandra](https://github.com/Cassandra-Fu)
 
 ### Technologies:
-* Python > 3.7
-* Electron 7.3
+* Python > 3.8
+* Electron ~ 11.0.0
 * NodeJS 12.18.4
-* VueJS ~2
+* VueJS ~ 2
+* Vuex ~ 2
+* Vue-router ~ 2
 
 ### Application Architecture
 
@@ -93,8 +95,10 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
   [Git](https://git-scm.com/downloads)
     
 * Install required packages for Electron App
-  * Run `npm install git+https://github.com/willy00/zerorpc-node.git` to install zeroRPC
   * Run `npm install` in the project root folder to install necessary packages
+  
+* Install required modules for Cultisk Py
+  * Run `pip install -r requirements.txt`
   
 * Run the application by running the following commands in the order as stated and different terminal
   * `py cultiskpy\main.py` under cultiskpy directory

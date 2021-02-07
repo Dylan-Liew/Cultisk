@@ -10,6 +10,7 @@ import {
 } from '@/types/custom.d';
 import axios from 'axios';
 import generatePassword from 'password-generator';
+import GenerateClient from '@/helpers/request';
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
 const state = {
@@ -19,12 +20,19 @@ const state = {
     iterations: 10000,
   },
   key: null,
-  expiry: null,
-
+  lastUnlocked: null,
+  unlocked: false,
+  alternativeAuth: {
+    pin: false,
+  },
 };
 
 interface KeySettings {
   iterations: number;
+}
+
+interface AlternativeAuth {
+  pin: boolean;
 }
 
 interface EntryStore extends Entry {
@@ -44,7 +52,9 @@ interface State {
   cards: CardEntryStore[];
   KeySettings: KeySettings;
   key: WordArray;
-  expiry: number;
+  lastUnlocked: number;
+  unlocked: boolean;
+  alternativeAuth: AlternativeAuth;
 }
 
 interface RootState extends State {
@@ -66,17 +76,6 @@ function Encrypt(key: WordArray, plainText: WordArray) {
 function Decrypt(key: WordArray, cipherText: string) {
   const decrypted = Aes.decrypt(cipherText, key);
   return decrypted.toString(utf8);
-}
-
-function GenerateClient(jwt: string) {
-  return axios.create({
-    baseURL: 'http://127.0.0.1:5000',
-    headers: {
-      post: {
-        authorization: `Bearer ${jwt}`,
-      },
-    },
-  });
 }
 
 interface PasswordGeneratorOptions {
@@ -102,12 +101,13 @@ function isStrongEnough(password: string, generatorOptions: PasswordGeneratorOpt
   return password.length >= minLength && !nr && uc && lc && n && sc;
 }
 
+// TODO: Update getters & mutator for Password Manager Store.
+// TODO: Add isUnlocked getter
 const getters = {
   allPasswords: (state: State) => state.passwords,
   allCards: (state: State) => state.cards,
   KeySettings: (state: State) => state.KeySettings,
   key: (state: State) => state.key,
-  expiry: (state: State) => state.expiry,
   getCardByUUID: (state: State) => (uuid: string) => {
     const entries = state.cards;
     const result: CardEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];

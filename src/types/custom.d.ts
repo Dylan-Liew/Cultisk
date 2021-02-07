@@ -85,10 +85,16 @@ export interface PasswordManagerAllDataResponse extends ServerResponse {
   data: PasswordManagerData;
 }
 
-export interface PasswordManagerCardsResponse extends ServerResponse {
-  data: CardEntry[];
+export interface PasswordManagerDataResponse extends ServerResponse {
+  data: CardEntry[] | PasswordEntry[];
 }
 
-export interface PasswordManagerPasswordResponse extends ServerResponse {
-  data: PasswordEntry[];
+export interface SpamFilterData {
+  sender: string;
+  message: string;
+  subject: string;
+}
+
+export interface SpamFilterDataResponse extends ServerResponse {
+  data: SpamFilterData[];
 }

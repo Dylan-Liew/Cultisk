@@ -1,21 +1,18 @@
 <template>
   <div>
-    <Index/>
+    <router-view/>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import Index from '@/components/AntiVirus/AntiVirusIndex.vue'; // @ is an alias to /src
 
 export default Vue.extend({
   name: 'AntiVirus',
-  components: {
-    Index,
-  },
 });
 </script>
 
 <style scoped>
+/*You put CSS that applies to all things rendered in the <router-view>/component*/
 
 </style>

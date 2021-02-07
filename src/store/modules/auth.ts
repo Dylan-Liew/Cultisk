@@ -12,8 +12,9 @@ prefer-destructuring: "off" */
 
 const DOMAIN_NAME = 'http://127.0.0.1:5000';
 
+// TODO: change default value for authenticated to false after development is done.
 const state = {
-  authenticated: false,
+  authenticated: true,
   timeout: false,
   expired: false,
   token: '',
@@ -53,9 +54,6 @@ async function CheckAppAuthenticationStatus(AppID: string) {
   auth_check_url.searchParams.append('app_id', AppID);
   const CallbackResponse = await axios.get(auth_check_url.toString());
   const CallbackData: OAuthRequestCallbackResponse = CallbackResponse.data;
-  if (CallbackResponse.status === 404) {
-    return false;
-  }
   return CallbackData;
 }
 
@@ -69,7 +67,7 @@ async function RefreshAppToken(AppID: string) {
 }
 
 const actions = {
-  async SetupApp({ commit }: CommitFunction, AppID: string) {
+  async SetupOAuth({ commit }: CommitFunction, AppID: string) {
     commit('SetAppID', AppID);
     await AuthenticateApp(AppID);
     let attempt = 0;
@@ -80,9 +78,7 @@ const actions = {
       const CallbackData: OAuthRequestCallbackResponse = CallbackResponse.data;
       if (CallbackData.authenticated && CallbackData.success) {
         clearInterval(interval);
-        commit('AppAuthenticated');
-        commit('SetToken', CallbackData.jwt);
-        commit('SetGUserID', CallbackData.guser_id);
+        commit('AppAuthenticated', CallbackData);
       }
       // if (!CallbackData.authenticated) {
       //   clearInterval(interval);
@@ -97,31 +93,17 @@ const actions = {
   },
   async CheckAppAuthenticated({ commit }: CommitFunction, AppID: string) {
     commit('SetAppID', AppID);
-    const response = await CheckAppAuthenticationStatus(AppID);
-    if (response) {
-      commit('AppAuthenticated', response);
-    } else {
-      await AuthenticateApp(AppID);
-      let attempt = 0;
-      const interval = setInterval(async () => {
-        const callback_url = new URL('/callback/app-auth/', `${DOMAIN_NAME}`);
-        callback_url.searchParams.append('app_id', AppID);
-        const CallbackResponse = await axios.get(callback_url.toString());
-        const CallbackData: OAuthRequestCallbackResponse = CallbackResponse.data;
-        if (CallbackData.authenticated && CallbackData.success) {
-          clearInterval(interval);
-          commit('AppAuthenticated', CallbackData);
-        }
-        // if (!CallbackData.authenticated) {
-        //   clearInterval(interval);
-        //   return CallbackData;
-        // }
-        if (attempt === 700) {
-          clearInterval(interval);
-          commit('AuthenticationTimeout');
-        }
-        attempt += 1;
-      }, 700);
+    let response = null;
+    try {
+      response = await CheckAppAuthenticationStatus(AppID);
+    } catch (err) {
+      if (err.response.status === 401) {
+        commit('AuthenticationExpired');
+      }
+    } finally {
+      if (response) {
+        commit('AppAuthenticated', response);
+      }
     }
   },
   async RefreshAppToken({ commit }: CommitFunction, { state }: CommitStateFunction<State>) {

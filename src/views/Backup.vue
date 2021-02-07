@@ -1,5 +1,6 @@
 <template>
   <div class="index">
+    <!--    Modal that open Upload files, import Upload files component then put inside-->
     <b-container class="position-fixed">
         <b-row>
           <b-col cols="6" >
@@ -60,7 +61,7 @@ button:focus{
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'BackupIndex',
+  name: 'BackupMain',
   data: () => ({
     selected: {},
     files: [

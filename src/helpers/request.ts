@@ -1,2 +1,12 @@
 import axios from 'axios';
-import os from 'os';
+
+export default function GenerateClient(jwt: string) {
+  return axios.create({
+    baseURL: 'http://127.0.0.1:5000',
+    headers: {
+      post: {
+        authorization: `Bearer ${jwt}`,
+      },
+    },
+  });
+}

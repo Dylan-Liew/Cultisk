@@ -1,16 +1,14 @@
 <template>
-
+<div class="settings-index">
+  <p>Show settings available</p>
+</div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import Index from '@/components/Index.vue';
 
 export default Vue.extend({
-  name: 'Login',
-  components: {
-    Index,
-  },
+  name: 'Settings Index',
 });
 </script>
 

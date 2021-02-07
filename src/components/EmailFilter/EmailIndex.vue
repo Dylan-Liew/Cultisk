@@ -49,6 +49,7 @@ button:focus{
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapGetters, mapActions } from 'vuex';
 
 export default Vue.extend({
   name: 'EmailIndex',
@@ -73,6 +74,7 @@ export default Vue.extend({
     ],
   }),
   methods: {
+    ...mapActions(['RetrieveSpamFilterInfo']),
     getClass: ({ subject }) => ({
       'md-primary': subject,
     }),
@@ -80,5 +82,6 @@ export default Vue.extend({
       this.selected = item;
     },
   },
+  computed: mapGetters(['allEmails']),
 });
 </script>

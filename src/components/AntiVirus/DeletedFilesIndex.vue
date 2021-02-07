@@ -1,18 +1,14 @@
 <template>
   <div>
-    <Index/>
+    <p>Files deleted by Antivirus shown here</p>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import Index from '@/components/Backup/BackupIndex.vue'; // @ is an alias to /src
 
 export default Vue.extend({
-  name: 'Backup',
-  components: {
-    Index,
-  },
+  name: 'Deleted Files',
 });
 </script>
 
