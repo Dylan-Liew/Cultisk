@@ -129,8 +129,7 @@ export function downloadFile(name: string) {
               } else {
                 console.log('Pipeline finish');
               }
-            },
-          );
+            });
         },
       )
       .catch((e) => console.log(e));
