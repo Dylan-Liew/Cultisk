@@ -20,7 +20,7 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 ### Technologies:
 * Python > 3.8
 * Electron ~ 11.0.0
-* NodeJS 12.18.4
+* NodeJS 14
 * VueJS ~ 2
 * Vuex ~ 2
 * Vue-router ~ 2

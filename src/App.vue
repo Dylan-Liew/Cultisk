@@ -45,7 +45,7 @@ a {
 }
 </style>
 
-<script lang="ts">
+<script>
 import { mapGetters } from 'vuex';
 
 export default {
@@ -172,3 +172,10 @@ export default {
   computed: mapGetters(['navStatus']),
 };
 </script>
+
+<style lang="scss">
+$color: red;
+p {
+  color: $color;
+}
+</style>
