@@ -1,4 +1,4 @@
-from Antivirus import *
+from cultiskpy.Antivirus import *
 
 downloader_thread = DownloadScanner(1)
 downloader_thread.start()

@@ -8,6 +8,7 @@ from threading import Thread
 import time
 import schedule
 import subprocess
+from datetime import datetime
 from dataclasses import dataclass
 from typing import Callable, List
 from watchdog.observers import Observer
@@ -269,8 +270,14 @@ class Scanner:
     def mal_file(self, full_file_path):
         # os.remove(full_file_path)
         print("Removed  ", full_file_path)
-        string = "The virus is " + full_file_path + " and has been removed"
-        self.toaster.show_toast("virus detected", string, icon_path="../static/media/cultisk.ico", duration=3)
+        time_now = datetime.now()
+        dt_string = time_now.strftime("%d/%m/%Y %H:%M:%S") # 10/02/2021 22:17:10
+        one_line = full_file_path + "," + dt_string
+        file = open('result.txt', 'a')
+        file.write(one_line + '\n')
+        file.close()
+        # string = "The virus is " + full_file_path + " and has been removed"
+        # self.toaster.show_toast("virus detected", string, icon_path="../static/media/cultisk.ico", duration=3)
 
     def vt_file_exist(self, full_file_path):
         file_hash = self.md5_file(full_file_path)
@@ -322,6 +329,7 @@ class Scanner:
                         return False
 
     def av_scan(self, directory=None, mal_detected=0, files_scanned=0, scanned_list=[]):
+        no_malware = True
         directory = self.directory
         print(directory)
         exes = self.get_exe_files(directory)
@@ -334,16 +342,25 @@ class Scanner:
             else:
                 if self.vt_upload_file(exe):
                     self.mal_file(exe)
-
                     scanned_list.append({"FilePath": exe, "malicious": True})
-            malicious_items = []
+            malicious_items = [] # store malicious file path
             for item in scanned_list:
                 malicious_items.append(item["FilePath"])
-            if exe not in malicious_items:
+            if exe not in malicious_items: # append non malicious file path
                 scanned_list.append({"FilePath": exe, "malicious": False})
         for item in scanned_list:
-            if item["malicious"]:
-                mal_detected += 1
+            if item['malicious']:
+                no_malware = False
+                break
+        if no_malware:
+            string = "Scanned " + self.directory + "\n" + self.directory + " Drive is safe"
+            self.toaster.show_toast("Anti Virus scan", string, icon_path="../static/media/cultisk.ico", duration=3)
+        else:
+            for item in scanned_list:
+                if item["malicious"]:
+                    mal_detected += 1
+                    string = "Scanned " + self.directory + "\n" + item['FilePath'] + " malicious file in " + self.directory + " Drive deleted"
+                    self.toaster.show_toast("Anti Virus scan", string, icon_path="../static/media/cultisk.ico", duration=3)
         result = {
             'mal_detected': mal_detected,
             'files_scanned': files_scanned,

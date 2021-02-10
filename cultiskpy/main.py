@@ -1,8 +1,8 @@
 import zerorpc
-from Antivirus import Scanner as AvRPC
-from Antivirus import *
-from VulnScanner import Scanner as SoftwareUpdateRPC
-from VulnScanner import *
+from cultiskpy.Antivirus import Scanner as AvRPC
+from cultiskpy.Antivirus import *
+from cultiskpy.VulnScanner import Scanner as SoftwareUpdateRPC
+from cultiskpy.VulnScanner import *
 
 
 class HelloRPC:
