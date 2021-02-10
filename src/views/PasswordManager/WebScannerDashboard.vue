@@ -11,7 +11,7 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex'; // @ is an alias to /src
 
 export default Vue.extend({
-  name: 'DarkWeb Scanner',
+  name: 'DarkWebScanner',
   computed: mapGetters(['isUnlocked']),
 });
 </script>

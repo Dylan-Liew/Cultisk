@@ -8,27 +8,42 @@
       class="sidebar"
       :menu="menu"
       :collapsed="collapsed"
+      :show-one-child="showOneChild"
+      theme="test"
       @item-click="onItemClick"
       @collapse="onCollapse"/>
   </div>
 </template>
-<style scoped>
+<style lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
+/* TODO: Remove the p: color white before presentation */
+p, h1 {
+  color: white;
+}
+@import "~vue-material/dist/theme/engine"; // Import the theme engine
+
+@include md-register-theme("test", (
+  primary: md-get-palette-color(green, A200), // The primary color of your application
+  accent: md-get-palette-color(pink, 500) // The accent or secondary color
+));
+
+@import "~vue-material/dist/theme/all"; // Apply the theme
 body{
   background-color: #222222 !important;
 }
 #view {
   padding-left: 50px;
 }
+
 #view.collapsed {
   padding-left: 50px;
 }
 
-.sidebar.v-sidebar-menu .vsm-arrow:after {
-  content: "\f105";
-  font-family: "Font Awesome 5 Free", serif;
-  color: #fff;
-}
+//.sidebar.v-sidebar-menu .vsm-arrow:after {
+//  content: "\f105";
+//  font-family: "Font Awesome 5 Free", serif;
+//  color: #fff;
+//}
 .sidebar.v-sidebar-menu .collapse-btn:after {
   content: "\f337";
   font-family: "Font Awesome 5 Free", serif;
@@ -40,9 +55,9 @@ body{
 a {
   text-decoration: none !important;
 }
-.v-sidebar-menu .vsm-title{
-  color: #fff;
-}
+//.v-sidebar-menu .vsm-title{
+//  color: #ffffff;
+//}
 </style>
 
 <script>
@@ -72,7 +87,7 @@ export default {
           icon: 'fa fa-key',
           child: [
             {
-              href: '/password-manager',
+              href: '/password-manager/',
               title: 'View Password',
               icon: 'fa fa-unlock-alt',
             },
@@ -146,12 +161,12 @@ export default {
           icon: 'fa fa-filter',
           child: [
             {
-              href: '/email-filtering',
+              href: '/email-filter/',
               title: 'View Filtered Email',
               icon: 'fa fa-list',
             },
             {
-              href: '/email-filtering/whitelist-management',
+              href: '/email-filter/whitelist',
               title: 'Whitelist Management',
               icon: 'fa fa-list-alt',
             },
@@ -159,6 +174,7 @@ export default {
         },
       ],
       collapsed: true,
+      showOneChild: true,
     };
   },
   methods: {
@@ -172,10 +188,3 @@ export default {
   computed: mapGetters(['navStatus']),
 };
 </script>
-
-<style lang="scss">
-$color: red;
-p {
-  color: $color;
-}
-</style>

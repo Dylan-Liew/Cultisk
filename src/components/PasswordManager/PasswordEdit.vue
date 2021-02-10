@@ -12,6 +12,6 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Password Edit',
+  name: 'PasswordEdit',
 });
 </script>

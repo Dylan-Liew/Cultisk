@@ -20,19 +20,16 @@ class CultiskRPC(SoftwareUpdateRPC, AvRPC, HelloRPC):
 Scanner = AvRPC()
 detection_scanner = AvRPC()
 
-# scheduling = scheduler(Scanner)
-# download = downloader()
-
 
 print("Server started on localhost:4242")
-print("URI: tcp://localhost:4242")
-print("===LOG===")
+print("URL: tcp://localhost:4242")
+print("========== LOGS ==========")
 
+# scheduling = scheduler(Scanner)
+# download = downloader()
 # usb_detector = DeviceListener(on_change=on_devices_changed)
 # usb_detector.start()
-
 # download.start()
-
 # scheduling.start()
 
 s = zerorpc.Server(CultiskRPC(), pool_size=7, heartbeat=10000)
