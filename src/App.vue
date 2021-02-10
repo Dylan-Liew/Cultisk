@@ -8,6 +8,7 @@
       class="sidebar"
       :menu="menu"
       :collapsed="collapsed"
+      :show-one-child="showOneChild"
       @item-click="onItemClick"
       @collapse="onCollapse"/>
   </div>
@@ -20,6 +21,7 @@ body{
 #view {
   padding-left: 50px;
 }
+
 #view.collapsed {
   padding-left: 50px;
 }
@@ -159,6 +161,7 @@ export default {
         },
       ],
       collapsed: true,
+      showOneChild: true,
     };
   },
   methods: {
