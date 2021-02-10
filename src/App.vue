@@ -15,6 +15,10 @@
 </template>
 <style lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
+/* TODO: Remove the p: color white before presentation */
+p {
+  color: white;
+}
 body{
   background-color: #222222 !important;
 }
