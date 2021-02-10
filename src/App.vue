@@ -12,7 +12,7 @@
       @collapse="onCollapse"/>
   </div>
 </template>
-<style scoped lang="scss">
+<style lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
 body{
   background-color: #222222 !important;
