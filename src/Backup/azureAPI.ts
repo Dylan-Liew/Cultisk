@@ -10,7 +10,7 @@ import { match } from 'assert';
 
 const connectStr = process.env.AZURE_STORAGE_CONNECTION_STRING!;
 const blobServiceClient = StorageBlob.BlobServiceClient.fromConnectionString(connectStr);
-const containerClient = blobServiceClient.getContainerClient('test');
+const containerClient = blobServiceClient.getContainerClient(process.env.CONTAINER_NAME!);
 
 function md5File(filePath: string) {
   return new Promise((resolve, reject) => {
@@ -43,6 +43,8 @@ async function walk(dir: string) {
 }
 
 export async function upload(filePath: string) {
+  let status = false;
+  let msg = 'Unknown error. Contact vendor for information.';
   const normPath: string = path.normalize(filePath);
   if (fs.existsSync(normPath) && fs.lstatSync(normPath).isDirectory()) {
     const listFile: string[] = await walk(normPath);
@@ -51,22 +53,47 @@ export async function upload(filePath: string) {
       // eslint-disable-next-line no-await-in-loop
       await upload(value);
     }
-  } else if (fs.existsSync(normPath) && fs.lstatSync(normPath).isFile()) {
+    let batchResults = [];
+    batchResults = await Promise.all(listFile.map((file) => upload(file)));
+    const results: { success: boolean; message: string; file: string }[] = batchResults.reduce((all, file) => all.concat(file));
+    return results;
+  }
+  if (fs.existsSync(normPath) && fs.lstatSync(normPath).isFile()) {
     if (await blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).exists()) {
       const localHash = await md5File(normPath);
       const cloudProperties = await blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).getProperties();
       const cloudMd5: Buffer = Buffer.from(cloudProperties.contentMD5!);
       const cloudHash = cloudMd5.toString('hex');
       if (localHash !== cloudHash) {
-        await blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).createSnapshot();
-        await blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).uploadFile(normPath);
+        status = true;
+        msg = 'Existing file update finished, snapshot of previous version created.';
+        blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).createSnapshot()
+          .catch((err) => {
+            status = false;
+            msg = 'Failed to create snapshot. Please check your internet connection and contact vendor.';
+          });
+        blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).uploadFile(normPath)
+          .catch((err) => {
+            status = false;
+            msg = 'Failed to update existing file. Please check your internet connection and contact vendor.';
+          });
+      } else {
+        status = true;
+        msg = 'File already exists and has no changes.';
       }
     } else {
-      const resp = await blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).uploadFile(normPath);
+      status = true;
+      msg = 'File upload finished.';
+      blobServiceClient.getContainerClient('test').getBlockBlobClient(normPath).uploadFile(normPath)
+        .catch((err) => {
+          status = false;
+          msg = 'File upload failed. Check internet connection.';
+        });
     }
   } else {
-    console.log(`File does not exist${normPath}`);
+    msg = 'Path does not exists or the program cannot access the file. Check file permissions.';
   }
+  return [{ success: status, message: msg, file: filePath }];
 }
 
 export async function getFileJSON(folder = '') {
@@ -115,6 +142,8 @@ export async function getBlobSnapshots(name: string) {
 }
 
 export function downloadFile(name: string) {
+  let status = false;
+  let msg = 'Unknown error occured.';
   try {
     containerClient.getBlobClient(name).download()
       .then(
@@ -126,8 +155,11 @@ export function downloadFile(name: string) {
             (err) => {
               if (err) {
                 console.log(err);
+                msg = 'Program cannot download file in path specified.';
               } else {
                 console.log('Pipeline finish');
+                status = true;
+                msg = 'File download completed.';
               }
             });
         },
@@ -135,10 +167,14 @@ export function downloadFile(name: string) {
       .catch((e) => console.log(e));
   } catch (err) {
     console.log(err);
+    msg = err.toString();
   }
+  return { success: status, message: msg, file: name };
 }
 
 export async function downloadSnapshot(name: string, snapshot: string) {
+  let status = false;
+  let msg = 'Unknown error occured.';
   containerClient.getBlobClient(name).withSnapshot(snapshot).download()
     .then(
       (resp) => {
@@ -154,20 +190,39 @@ export async function downloadSnapshot(name: string, snapshot: string) {
           (err) => {
             if (err) {
               console.log(err);
+              msg = 'Program cannot download file in path specified.';
             } else {
               console.log('Pipeline finish');
+              status = true;
+              msg = 'File download completed.';
             }
           },
         );
       },
     )
     .catch((e) => console.log(e));
+  return {
+    success: status,
+    message: msg,
+    file: name,
+    snapshotID: snapshot,
+  };
 }
 
 export function deleteFile(name: string) {
+  let status = false;
+  let msg = 'Unknown error.';
   containerClient.getBlobClient(name).deleteIfExists({ deleteSnapshots: 'include' })
-    .then((resp) => console.log(resp))
-    .catch((err) => console.log(err));
+    .then((resp) => {
+      console.log(resp);
+      status = true;
+      msg = 'File deletion completed.';
+    })
+    .catch((err) => {
+      console.log(err);
+      msg = err.toString();
+    });
+  return { success: status, message: msg };
 }
 
 export async function deleteAllSnapshots(name: string) {
