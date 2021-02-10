@@ -12,38 +12,6 @@
       @collapse="onCollapse"/>
   </div>
 </template>
-<style scoped>
-/*You put CSS that applies to all things rendered in the <router-view>*/
-body{
-  background-color: #222222 !important;
-}
-#view {
-  padding-left: 50px;
-}
-#view.collapsed {
-  padding-left: 50px;
-}
-
-.sidebar.v-sidebar-menu .vsm-arrow:after {
-  content: "\f105";
-  font-family: "Font Awesome 5 Free", serif;
-  color: #fff;
-}
-.sidebar.v-sidebar-menu .collapse-btn:after {
-  content: "\f337";
-  font-family: "Font Awesome 5 Free", serif;
-}
-.v-sidebar-menu .vsm-header{
-  font-size: 1.2em;
-  text-align: center;
-}
-a {
-  text-decoration: none !important;
-}
-.v-sidebar-menu .vsm-title{
-  color: #fff;
-}
-</style>
 
 <script>
 import { mapGetters } from 'vuex';
@@ -174,8 +142,34 @@ export default {
 </script>
 
 <style lang="scss">
-$color: red;
-p {
-  color: $color;
+/*You put CSS that applies to all things rendered in the <router-view>*/
+body{
+  background-color: #222222 !important;
+}
+#view {
+  padding-left: 50px;
+}
+#view.collapsed {
+  padding-left: 50px;
+}
+
+.sidebar.v-sidebar-menu .vsm-arrow:after {
+  content: "\f105";
+  font-family: "Font Awesome 5 Free", serif;
+  color: #fff;
+}
+.sidebar.v-sidebar-menu .collapse-btn:after {
+  content: "\f337";
+  font-family: "Font Awesome 5 Free", serif;
+}
+.v-sidebar-menu .vsm-header{
+  font-size: 1.2em;
+  text-align: center;
+}
+a {
+  text-decoration: none !important;
+}
+.v-sidebar-menu .vsm-title{
+  color: #fff;
 }
 </style>
