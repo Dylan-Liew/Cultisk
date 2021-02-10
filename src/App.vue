@@ -12,7 +12,7 @@
       @collapse="onCollapse"/>
   </div>
 </template>
-<style scoped>
+<style scoped lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
 body{
   background-color: #222222 !important;
@@ -72,7 +72,7 @@ export default {
           icon: 'fa fa-key',
           child: [
             {
-              href: '/password-manager',
+              href: '/password-manager/',
               title: 'View Password',
               icon: 'fa fa-unlock-alt',
             },
@@ -146,12 +146,12 @@ export default {
           icon: 'fa fa-filter',
           child: [
             {
-              href: '/email-filtering',
+              href: '/email-filter/',
               title: 'View Filtered Email',
               icon: 'fa fa-list',
             },
             {
-              href: '/email-filtering/whitelist-management',
+              href: '/email-filter/whitelist',
               title: 'Whitelist Management',
               icon: 'fa fa-list-alt',
             },
@@ -172,10 +172,3 @@ export default {
   computed: mapGetters(['navStatus']),
 };
 </script>
-
-<style lang="scss">
-$color: red;
-p {
-  color: $color;
-}
-</style>
