@@ -9,18 +9,12 @@
       :menu="menu"
       :collapsed="collapsed"
       :show-one-child="showOneChild"
-      theme="test"
       @item-click="onItemClick"
       @collapse="onCollapse"/>
   </div>
 </template>
 <style lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
-/* TODO: Remove the p: color white before presentation */
-p, h1 {
-  color: white;
-}
-
 body{
   background-color: #222222 !important;
 }
@@ -88,19 +82,9 @@ export default {
               icon: 'fa fa-unlock-alt',
             },
             {
-              href: '/password-manager/add-password',
-              title: 'Add Password',
-              icon: 'fa fa-file-alt',
-            },
-            {
               href: '/password-manager/credit-cards',
               title: 'Credit Cards',
               icon: 'fa fa-plus',
-            },
-            {
-              href: '/password-manager/change-master-pass',
-              title: 'Change Master Password',
-              icon: 'fa fa-edit',
             },
             {
               href: '/password-manager/password-generator',
@@ -125,9 +109,9 @@ export default {
               icon: 'fa fa-virus',
             },
             {
-              href: '/anti-virus/scheduled-scan',
-              title: 'Scheduled Scan',
-              icon: 'fa fa-clock',
+              href: '/anti-virus/deleted-files',
+              title: 'Deleted Files',
+              icon: 'fa fa-trash',
             },
           ],
         },
@@ -139,16 +123,6 @@ export default {
               href: '/backup',
               title: 'View Backup',
               icon: 'fa fa-server',
-            },
-            {
-              href: '/backup/upload-files',
-              title: 'Upload Files',
-              icon: 'fa fa-upload',
-            },
-            {
-              href: '/backup/scheduled-backup-settings',
-              title: 'Scheduled Backup Settings',
-              icon: 'fa fa-calendar-week',
             },
           ],
         },
@@ -168,6 +142,22 @@ export default {
             },
           ],
         },
+        {
+          title: 'Settings',
+          icon: 'fa fa-filter',
+          child: [
+            {
+              href: '/settings/',
+              title: 'Cultisk Settings',
+              icon: 'fa fa-cog',
+            },
+            {
+              href: '/settings/password-manager-master-change',
+              title: 'Change Master Password',
+              icon: 'fa fa-unlock-alt',
+            },
+          ],
+        },
       ],
       collapsed: true,
       showOneChild: true,
@@ -179,6 +169,11 @@ export default {
     },
     onCollapse(c) {
       this.collapsed = c;
+      if (this.collapsed) {
+        document.getElementById('view').style.opacity = '1';
+      } else {
+        document.getElementById('view').style.opacity = '0.6';
+      }
     },
   },
   computed: mapGetters(['navStatus']),
