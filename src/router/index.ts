@@ -28,6 +28,7 @@ import SettingsIndex from '@/components/Settings/SettingsIndex.vue';
 import ChangeMasterPassword from '@/components/Settings/ChangeMasterPassword.vue';
 import ScheduledBackupSettings from '@/components/Settings/ScheduledBackupSettings.vue';
 import VaultAltAuth from '@/components/Settings/VaultAltAuth.vue';
+import Unlocking from "@/views/PasswordManager/Unlocking.vue";
 
 Vue.use(VueRouter);
 
@@ -150,6 +151,11 @@ const routes: Array<RouteConfig> = [
     path: '/dark-web-dash/',
     name: 'Dashboard Dark web',
     component: WebScannerDashboard,
+  },
+  {
+    path: '/password-manager/unlock/',
+    name: 'Unlock Password Manager',
+    component: Unlocking,
   },
   {
     name: 'Backup',
