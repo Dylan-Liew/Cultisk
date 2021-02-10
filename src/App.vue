@@ -9,6 +9,7 @@
       :menu="menu"
       :collapsed="collapsed"
       :show-one-child="showOneChild"
+      theme="test"
       @item-click="onItemClick"
       @collapse="onCollapse"/>
   </div>
@@ -16,9 +17,17 @@
 <style lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
 /* TODO: Remove the p: color white before presentation */
-p {
+p, h1 {
   color: white;
 }
+@import "~vue-material/dist/theme/engine"; // Import the theme engine
+
+@include md-register-theme("test", (
+  primary: md-get-palette-color(green, A200), // The primary color of your application
+  accent: md-get-palette-color(pink, 500) // The accent or secondary color
+));
+
+@import "~vue-material/dist/theme/all"; // Apply the theme
 body{
   background-color: #222222 !important;
 }
@@ -30,11 +39,11 @@ body{
   padding-left: 50px;
 }
 
-.sidebar.v-sidebar-menu .vsm-arrow:after {
-  content: "\f105";
-  font-family: "Font Awesome 5 Free", serif;
-  color: #fff;
-}
+//.sidebar.v-sidebar-menu .vsm-arrow:after {
+//  content: "\f105";
+//  font-family: "Font Awesome 5 Free", serif;
+//  color: #fff;
+//}
 .sidebar.v-sidebar-menu .collapse-btn:after {
   content: "\f337";
   font-family: "Font Awesome 5 Free", serif;
@@ -46,9 +55,9 @@ body{
 a {
   text-decoration: none !important;
 }
-.v-sidebar-menu .vsm-title{
-  color: #fff;
-}
+//.v-sidebar-menu .vsm-title{
+//  color: #ffffff;
+//}
 </style>
 
 <script>

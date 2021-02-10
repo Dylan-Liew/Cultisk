@@ -96,12 +96,11 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/anti-virus/',
-    name: 'Antivirus Home',
     component: AntiVirus,
     children: [
       // AntiVirusIndex will be rendered inside Antivirus <router-view>
       // when /anti-virus/ is matched
-      { path: '', component: AntiVirusIndex },
+      { path: '', component: AntiVirusIndex, name: 'Antivirus Home' },
       { path: 'deleted-files', component: DeletedFilesIndex },
     ],
   },
@@ -121,7 +120,7 @@ const routes: Array<RouteConfig> = [
         component: CardCreate,
       },
       {
-        name: 'Card creation',
+        name: 'Password creation',
         path: 'password-create',
         component: PasswordCreate,
       },
@@ -148,7 +147,7 @@ const routes: Array<RouteConfig> = [
     ],
   },
   {
-    path: 'dark-web-dash',
+    path: '/dark-web-dash/',
     name: 'Dashboard Dark web',
     component: WebScannerDashboard,
   },
@@ -159,21 +158,19 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/email-filter/',
-    name: 'Email Filter Home',
     component: EmailFilter,
     children: [
       // EmailIndex will be rendered inside EmailFilter <router-view>
       // when /email-filter/ is matched
       { path: '', component: EmailIndex },
-      { path: 'whitelist', component: WhitelistManagement },
+      { path: 'whitelist', component: WhitelistManagement, name: 'Email Filter Home' },
     ],
   },
   {
     path: '/settings/',
-    name: 'App settings',
     component: Settings,
     children: [
-      { path: '', component: SettingsIndex },
+      { path: '', component: SettingsIndex, name: 'App settings' },
       { path: 'antivirus-schedule', component: ScheduledScanSettings },
       { path: 'password-manager-master-change', component: ChangeMasterPassword },
       { path: 'backup-schedule', component: ScheduledBackupSettings },

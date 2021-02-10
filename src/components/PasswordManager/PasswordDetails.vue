@@ -32,7 +32,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Password Details',
+  name: 'PasswordDetails',
   data() {
     return (
       {

@@ -11,6 +11,6 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Password Gen',
+  name: 'PasswordGen',
 });
 </script>

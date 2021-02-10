@@ -28,7 +28,7 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex'; // @ is an alias to /src
 
 export default Vue.extend({
-  name: 'Password Manager',
+  name: 'PasswordManager',
   computed: mapGetters(['isUnlocked']),
   data: () => ({
     selected: {},
