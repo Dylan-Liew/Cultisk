@@ -10,7 +10,7 @@ import { match } from 'assert';
 
 const connectStr = process.env.AZURE_STORAGE_CONNECTION_STRING!;
 const blobServiceClient = StorageBlob.BlobServiceClient.fromConnectionString(connectStr);
-const containerClient = blobServiceClient.getContainerClient('test');
+const containerClient = blobServiceClient.getContainerClient(process.env.CONTAINER_NAME!);
 
 function md5File(filePath: string) {
   return new Promise((resolve, reject) => {
