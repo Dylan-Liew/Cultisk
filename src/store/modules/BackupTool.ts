@@ -19,7 +19,7 @@ interface BackupDataInt {
 }
 
 const actions = {
-  RetrieveBackupInfo({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>) {
+  RetrieveBackupInfo({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const userID = rootState.GUserID!;
     process.env.CONTAINER_NAME = userID;
     process.env.AZURE_STORAGE_CONNECTION_STRING = '***REMOVED***';

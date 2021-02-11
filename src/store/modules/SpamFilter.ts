@@ -23,7 +23,7 @@ const getters = {
 };
 
 const actions = {
-  async RetrieveSpamFilterInfo({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>) {
+  async RetrieveSpamFilterInfo({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const instance = GenerateClient(rootState.token);
     const response = await instance.get('/spam-filter/');
     if (response.status === 401) {

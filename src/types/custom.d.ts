@@ -29,11 +29,15 @@ export interface CommitFunction {
 }
 
 export interface CommitStateFunction<T> extends CommitFunction {
-    state: T;
+  state: T;
 }
 
-export interface CommitRootStateFunction<T> extends CommitFunction {
-  rootState: T;
+export interface CommitRootStateFunction<X> extends CommitFunction {
+  rootState: X;
+}
+
+export interface CommitRootSateStateFunction<T, X> extends CommitStateFunction<T> {
+  rootState: X;
 }
 
 export interface ServerResponse {

@@ -1,6 +1,6 @@
 import {
   CardEntry,
-  CommitFunction,
+  CommitFunction, CommitRootSateStateFunction,
   CommitRootStateFunction,
   CommitStateFunction,
   PasswordEntry,
@@ -175,7 +175,7 @@ const getters = {
 };
 
 const actions = {
-  async RetrievePWManagerData({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>) {
+  async RetrievePWManagerData({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const instance = GenerateClient(rootState.token);
     const response = await instance.get('/password-manager/data/');
     if (response.status === 401) {
@@ -185,7 +185,7 @@ const actions = {
       commit('SetPWData', ResponseData);
     }
   },
-  async UnlockVault({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>, { state }: CommitStateFunction<State>, password: string) {
+  async UnlockVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, password: string) {
     const instance = GenerateClient(rootState.token);
     const [stretchedKey, hash] = CalculateMasterKey(password, rootState.GUserID, state.encryptionSettings);
     const response: ProtectedSymmetricKeyResponse = await instance.post('/password-manager/check-password/', { hash });
@@ -195,7 +195,7 @@ const actions = {
       commit('UnlockVault', symmetricKey.toHex());
     }
   },
-  async SetupVault({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>, { state }: CommitStateFunction<State>, password: string) {
+  async SetupVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, password: string) {
     const instance = GenerateClient(rootState.token);
     const [stretchedKey, hash] = CalculateMasterKey(password, rootState.GUserID, state.encryptionSettings);
     const protectedSymmetricKey = GenerateProtectedSymmetricKey(stretchedKey);
@@ -206,14 +206,14 @@ const actions = {
       commit('UnlockVault', symmetricKey.toHex());
     }
   },
-  CheckExpiry({ commit }: CommitFunction, { state }: CommitStateFunction<State>) {
+  CheckExpiry({ commit, state }: CommitStateFunction<State>) {
     const currentTime = Math.floor(new Date().getTime() / 1000);
     const expiryTime = state.lastUnlocked + state.expireIn;
     if (currentTime > expiryTime) {
       commit('LockVault');
     }
   },
-  async AddNewCardEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: CardEntry) {
+  async AddNewCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: CardEntry) {
     const instance = GenerateClient(rootState.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response: ServerResponse = await instance.post('/password-manager/cards/', enc_data);
@@ -221,7 +221,7 @@ const actions = {
       commit('AddCardEntry', data);
     }
   },
-  async AddNewPasswordEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: PasswordEntry) {
+  async AddNewPasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: PasswordEntry) {
     const instance = GenerateClient(rootState.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response: ServerResponse = await instance.post('/password-manager/passwords/', enc_data);
@@ -229,7 +229,7 @@ const actions = {
       commit('AddPasswordEntry', data);
     }
   },
-  async UpdatePasswordEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: PasswordEntry) {
+  async UpdatePasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: PasswordEntry) {
     const instance = GenerateClient(rootState.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response: PasswordManagerUpdateResponse = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
@@ -237,7 +237,7 @@ const actions = {
       commit('AddPasswordEntry', data);
     }
   },
-  async UpdateCardEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: CardEntry) {
+  async UpdateCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: CardEntry) {
     const instance = GenerateClient(rootState.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response: PasswordManagerUpdateResponse = await instance.put(`/password-manager/card/${data.uuid}`, enc_data);

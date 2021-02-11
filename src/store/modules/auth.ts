@@ -106,7 +106,7 @@ const actions = {
       }
     }
   },
-  async RefreshAppToken({ commit }: CommitFunction, { state }: CommitStateFunction<State>) {
+  async RefreshAppToken({ commit, state }: CommitStateFunction<State>) {
     const AppID = state.appID;
     const data: RefreshTokenResponse = await RefreshAppToken(AppID);
     commit('SetToken', data.jwt);
