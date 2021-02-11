@@ -64,6 +64,7 @@ export interface PasswordEntry extends Entry {
   username: string;
   password: string;
   totp_secret?: string;
+  note?: string;
   url?: string;
 }
 
@@ -85,8 +86,8 @@ export interface PasswordManagerAllDataResponse extends ServerResponse {
   data: PasswordManagerData;
 }
 
-export interface PasswordManagerDataResponse extends ServerResponse {
-  data: CardEntry[] | PasswordEntry[];
+export interface PasswordManagerUpdateResponse extends ServerResponse {
+  data?: CardEntry | PasswordEntry;
 }
 
 export interface SpamFilterData {
@@ -97,4 +98,8 @@ export interface SpamFilterData {
 
 export interface SpamFilterDataResponse extends ServerResponse {
   data: SpamFilterData[];
+}
+
+export interface ProtectedSymmetricKeyResponse extends ServerResponse {
+  data: string;
 }

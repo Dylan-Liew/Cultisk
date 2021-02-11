@@ -1,49 +1,37 @@
-import pbkdf2 from 'crypto-js/pbkdf2';
-import Aes from 'crypto-js/aes';
-import utf8 from 'crypto-js/enc-utf8';
-import base64 from 'crypto-js/enc-base64';
-import WordArray from 'crypto-js/lib-typedarrays';
 import {
   CardEntry,
-  CommitFunction, CommitRootStateFunction,
-  CommitStateFunction, Entry,
-  PasswordEntry, PasswordManagerAllDataResponse,
+  CommitFunction,
+  CommitRootStateFunction,
+  CommitStateFunction,
+  PasswordEntry,
+  PasswordManagerAllDataResponse,
+  PasswordManagerUpdateResponse,
+  ProtectedSymmetricKeyResponse,
+  ServerResponse,
 } from '@/types/custom.d';
-import axios from 'axios';
-import generatePassword from 'password-generator';
 import GenerateClient from '@/helpers/request';
-import internal from 'stream';
+import forge from 'node-forge';
+
+const crypto = require('crypto');
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
 // TODO: Set Unlocked to false after development is done
 const state = {
   passwords: [],
   cards: [],
-  EncryptionSettings: {
+  encryptionSettings: {
     iterations: 100000,
-    encType: 'aes-256-cbc',
   },
-  key: null,
+  symmetricKey: '',
   lastUnlocked: null,
   unlocked: true,
-  alternativeAuth: {
-    pin: false,
-  },
+  expireIn: 1200,
+  // Value in seconds ^
 };
 
 interface EncryptionSettings {
   iterations: number;
-  encType: string;
 }
-
-interface AlternativeAuth {
-  pin: boolean;
-}
-
-interface EntryStore extends Entry {
-  encrypted: boolean;
-}
-
 interface PasswordEntryStore extends PasswordEntry {
   encrypted: boolean;
 }
@@ -55,11 +43,11 @@ interface CardEntryStore extends CardEntry {
 interface State {
   passwords: PasswordEntryStore[];
   cards: CardEntryStore[];
-  EncryptionSettings: EncryptionSettings;
-  key: WordArray;
+  encryptionSettings: EncryptionSettings;
+  symmetricKey: string;
   lastUnlocked: number;
   unlocked: boolean;
-  alternativeAuth: AlternativeAuth;
+  expireIn: number;
 }
 
 interface RootState extends State {
@@ -67,7 +55,7 @@ interface RootState extends State {
   GUserID: string;
 }
 
-class Cipher {
+class ProtectedInfo {
   encType: string;
 
   iv: string;
@@ -84,83 +72,103 @@ class Cipher {
   }
 }
 
-function GenerateKey(password: string, salt: string, settings: EncryptionSettings): WordArray {
-  return pbkdf2(password, salt, {
-    keySize: 256 / 32,
-    iterations: settings.iterations,
-  });
-}
-
-function Encrypt(key: WordArray, plainText: WordArray, settings: EncryptionSettings) {
-  const iv = WordArray.random(16);
-  const encrypted = Aes.encrypt(plainText, key, {
-    iv,
-  });
-  return new Cipher('aes-256-cbc', base64.stringify(iv), encrypted.toString());
-}
-
-function Decrypt(key: WordArray, cipher: Cipher) {
-  const iv = base64.parse(cipher.iv);
-  const decrypted = Aes.decrypt(cipher.ct, key, { iv });
-  return decrypted.toString(utf8);
-}
-
-function ResponseParser(data: string) {
+function EncParser(data: string) {
   const [encType, temp] = data.split('.');
-  const [iv, ct] = data.split('|');
-  return Cipher;
+  const [iv, ct] = temp.split('|');
+  return new ProtectedInfo(encType, iv, ct);
 }
 
-interface PasswordGeneratorOptions {
-  minLength: number;
-  upperCase: boolean;
-  lowerCase: boolean;
-  specialUse: boolean;
-  nonRepeating: boolean;
+function Decrypt(symmetricKey: string | ArrayBuffer, iv: string, encrypted: string) {
+  const decipher = forge.cipher.createDecipher('AES-CBC', forge.util.createBuffer(symmetricKey, 'raw'));
+  const ciphertext = forge.util.createBuffer(forge.util.hexToBytes(encrypted));
+  decipher.start({ iv });
+  decipher.update(ciphertext);
+  decipher.finish();
+  return decipher.output;
 }
 
-function isStrongEnough(password: string, generatorOptions: PasswordGeneratorOptions) {
-  const minLength = 18;
-  const UPPERCASE_RE = /([A-Z])/g;
-  const LOWERCASE_RE = /([a-z])/g;
-  const NUMBER_RE = /([\d])/g;
-  const SPECIAL_CHAR_RE = /([?-])/g;
-  const NON_REPEATING_CHAR_RE = /([\w\d?-])\1{2,}/g;
-  const uc = password.match(UPPERCASE_RE);
-  const lc = password.match(LOWERCASE_RE);
-  const n = password.match(NUMBER_RE);
-  const sc = password.match(SPECIAL_CHAR_RE);
-  const nr = password.match(NON_REPEATING_CHAR_RE);
-  return password.length >= minLength && !nr && uc && lc && n && sc;
+function Encrypt(symmetricKey: string | ArrayBuffer, iv: string, plaintext: string, encoding: 'raw' | 'utf8') {
+  const cipher = forge.cipher.createCipher('AES-CBC', forge.util.createBuffer(symmetricKey, 'raw'));
+  const text = forge.util.createBuffer(plaintext, encoding);
+  cipher.start({ iv });
+  cipher.update(text);
+  cipher.finish();
+  return new ProtectedInfo('AES-CBC', forge.util.createBuffer(iv, 'raw').toHex(), cipher.output.toHex());
 }
 
-// TODO: Update getters & mutator for Password Manager Store.
-// TODO: Add isUnlocked getter
+function CalculateMasterKey(password: string, salt: string, settings: EncryptionSettings) {
+  const masterKey: Buffer = crypto.pbkdf2Sync(password, salt, settings.iterations, 256 / 8, 'sha256');
+  const stretchedMasterKey: ArrayBuffer = crypto.hkdfSync('sha256', masterKey, '', '', 512 / 8);
+  const masterKeyHash: Buffer = crypto.pbkdf2Sync(masterKey, password, 1, 256 / 8, 'sha256');
+  return [stretchedMasterKey, masterKeyHash.toString('hex')];
+}
+
+function GenerateProtectedSymmetricKey(stretchedMasterKey: ArrayBuffer | string) {
+  // 256 bit key
+  const symmetricKey = forge.random.getBytesSync(32);
+  // 128 bit IV
+  const iv = forge.random.getBytesSync(16);
+  return Encrypt(stretchedMasterKey, iv, symmetricKey, 'raw');
+}
+
+function DecryptSymmetricKey(stretchedMasterKey: ArrayBuffer | string, protectedKey: ProtectedInfo) {
+  return Decrypt(stretchedMasterKey, forge.util.hexToBytes(protectedKey.iv), protectedKey.ct);
+}
+
+function DecryptValue(keyHex: string, encIVHex: string, valueHex: string) {
+  const encKey = forge.util.hexToBytes(keyHex);
+  const encIV = forge.util.hexToBytes(encIVHex);
+  return Decrypt(encKey, encIV, valueHex).toString();
+}
+
+function DecryptResult(keyHex: string, result: PasswordEntryStore | CardEntryStore) {
+  const decrypted: { [index: string]: string } = { ...result };
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [key, value] of Object.entries(result)) {
+    if (typeof value === 'string' && key !== 'uuid') {
+      const enc = EncParser(value);
+      decrypted[key] = DecryptValue(keyHex, enc.iv, enc.ct);
+    }
+  }
+  return decrypted;
+}
+
+function EncryptValue(keyHex: string, valueUft8: string) {
+  const key = forge.util.hexToBytes(keyHex);
+  const iv = forge.random.getBytesSync(16);
+  return Encrypt(key, iv, valueUft8, 'utf8').string;
+}
+
+function EncryptEntry(keyHex: string, entry: PasswordEntry | CardEntry) {
+  const encrypted: { [index: string]: string } = { ...entry };
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [key, value] of Object.entries(entry)) {
+    if (typeof value === 'string' && key !== 'uuid') {
+      encrypted[key] = EncryptValue(keyHex, value);
+    }
+  }
+  return encrypted;
+}
+
 const getters = {
   allPasswords: (state: State) => state.passwords,
   allCards: (state: State) => state.cards,
-  EncryptionSettings: (state: State) => state.EncryptionSettings,
+  encryptionSettings: (state: State) => state.encryptionSettings,
   isUnlocked: (state: State) => state.unlocked,
-  key: (state: State) => state.key,
+  key: (state: State) => state.symmetricKey,
   getCardByUUID: (state: State) => (uuid: string) => {
     const entries = state.cards;
     const result: CardEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [key, value] of Object.entries(result)) {
-      if (typeof value === 'string' && key !== 'uuid') {
-        result[key] = Decrypt(state.key, value);
-      }
+    if (result.encrypted) {
+      return DecryptResult(state.symmetricKey, result);
     }
     return result;
   },
   getPasswordByUUID: (state: State) => (uuid: string) => {
     const entries = state.passwords;
     const result: PasswordEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [key, value] of Object.entries(result)) {
-      if (typeof value === 'string' && key !== 'uuid') {
-        result[key] = Decrypt(state.key, value);
-      }
+    if (result.encrypted) {
+      return DecryptResult(state.symmetricKey, result);
     }
     return result;
   },
@@ -177,30 +185,117 @@ const actions = {
       commit('SetPWData', ResponseData);
     }
   },
-  // customPassword() {
-  //   let password = '';
-  //   const randomLength = Math.floor(Math.random() * (maxLength - minLength)) + minLength;
-  //   while (!isStrongEnough(password)) {
-  //     password = generatePassword(randomLength, false, /[\w\d\?\-]/);
-  //   }
-  //   return password;
-  // },
+  async UnlockVault({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>, { state }: CommitStateFunction<State>, password: string) {
+    const instance = GenerateClient(rootState.token);
+    const [stretchedKey, hash] = CalculateMasterKey(password, rootState.GUserID, state.encryptionSettings);
+    const response: ProtectedSymmetricKeyResponse = await instance.post('/password-manager/check-password/', { hash });
+    if (response.success) {
+      const protectedKey = EncParser(response.data);
+      const symmetricKey = DecryptSymmetricKey(stretchedKey, protectedKey);
+      commit('UnlockVault', symmetricKey.toHex());
+    }
+  },
+  async SetupVault({ commit }: CommitFunction, { rootState }: CommitRootStateFunction<RootState>, { state }: CommitStateFunction<State>, password: string) {
+    const instance = GenerateClient(rootState.token);
+    const [stretchedKey, hash] = CalculateMasterKey(password, rootState.GUserID, state.encryptionSettings);
+    const protectedSymmetricKey = GenerateProtectedSymmetricKey(stretchedKey);
+    const symmetric = protectedSymmetricKey.string;
+    const symmetricKey = DecryptSymmetricKey(stretchedKey, protectedSymmetricKey);
+    const response: ServerResponse = await instance.post('/password-manager/create-vault/', { hash, symmetric });
+    if (response.success) {
+      commit('UnlockVault', symmetricKey.toHex());
+    }
+  },
+  CheckExpiry({ commit }: CommitFunction, { state }: CommitStateFunction<State>) {
+    const currentTime = Math.floor(new Date().getTime() / 1000);
+    const expiryTime = state.lastUnlocked + state.expireIn;
+    if (currentTime > expiryTime) {
+      commit('LockVault');
+    }
+  },
+  async AddNewCardEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: CardEntry) {
+    const instance = GenerateClient(rootState.token);
+    const enc_data = EncryptEntry(state.symmetricKey, data);
+    const response: ServerResponse = await instance.post('/password-manager/cards/', enc_data);
+    if (response.success) {
+      commit('AddCardEntry', data);
+    }
+  },
+  async AddNewPasswordEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: PasswordEntry) {
+    const instance = GenerateClient(rootState.token);
+    const enc_data = EncryptEntry(state.symmetricKey, data);
+    const response: ServerResponse = await instance.post('/password-manager/passwords/', enc_data);
+    if (response.success) {
+      commit('AddPasswordEntry', data);
+    }
+  },
+  async UpdatePasswordEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: PasswordEntry) {
+    const instance = GenerateClient(rootState.token);
+    const enc_data = EncryptEntry(state.symmetricKey, data);
+    const response: PasswordManagerUpdateResponse = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
+    if (response.success && Object.prototype.hasOwnProperty.call(response, 'data')) {
+      commit('AddPasswordEntry', data);
+    }
+  },
+  async UpdateCardEntry({ commit }: CommitFunction, { state }: CommitStateFunction<State>, { rootState }: CommitRootStateFunction<RootState>, data: CardEntry) {
+    const instance = GenerateClient(rootState.token);
+    const enc_data = EncryptEntry(state.symmetricKey, data);
+    const response: PasswordManagerUpdateResponse = await instance.put(`/password-manager/card/${data.uuid}`, enc_data);
+    if (response.success && Object.prototype.hasOwnProperty.call(response, 'data')) {
+      commit('AddCardEntry', data);
+    }
+  },
+  RemoveCardEntry({ commit }: CommitFunction, uuid: string) {
+    commit('RemoveCard', uuid);
+  },
+  RemovePasswordEntry({ commit }: CommitFunction, uuid: string) {
+    commit('RemovePassword', uuid);
+  },
 };
 
 const mutations = {
   SetPWData: (state: State, PWData: PasswordManagerAllDataResponse): void => {
     const PasswordStore: PasswordEntryStore[] = PWData.data.passwords.map((x) => {
-      // eslint-disable-next-line no-param-reassign
-      x.name = Decrypt(state.key, x.name);
-      return { encrypted: true, ...x };
+      const enc = EncParser(x.name);
+      const decrypted = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
+      return { encrypted: true, ...x, name: decrypted };
     });
     const CardStore: CardEntryStore[] = PWData.data.cards.map((x) => {
-      // eslint-disable-next-line no-param-reassign
-      x.name = Decrypt(state.key, x.name);
-      return { encrypted: true, ...x };
+      const enc = EncParser(x.name);
+      const decrypted = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
+      return { encrypted: true, ...x, name: decrypted };
     });
     state.passwords = PasswordStore;
     state.cards = CardStore;
+  },
+  UnlockVault: (state: State, keyHex: string): void => {
+    state.symmetricKey = keyHex;
+    state.unlocked = true;
+    state.lastUnlocked = Math.floor(new Date().getTime() / 1000);
+  },
+  LockVault: (state: State): void => {
+    state.unlocked = false;
+    state.symmetricKey = '';
+  },
+  AddCardEntry: (state: State, entry: CardEntry): void => {
+    const { cards } = state;
+    const entryStore: CardEntryStore = { ...entry, encrypted: false };
+    cards.concat(entryStore);
+    state.cards = cards;
+  },
+  AddPasswordEntry: (state: State, entry: PasswordEntry): void => {
+    const { passwords } = state;
+    const entryStore: PasswordEntryStore = { ...entry, encrypted: false };
+    passwords.concat(entryStore);
+    state.passwords = passwords;
+  },
+  RemoveCard: (state: State, uuid: string): void => {
+    const entries = state.cards;
+    state.cards = entries.filter((obj) => obj.uuid !== uuid);
+  },
+  RemovePassword: (state: State, uuid: string): void => {
+    const entries = state.passwords;
+    state.passwords = entries.filter((obj) => obj.uuid !== uuid);
   },
 };
 

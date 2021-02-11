@@ -28,7 +28,7 @@ import SettingsIndex from '@/components/Settings/SettingsIndex.vue';
 import ChangeMasterPassword from '@/components/Settings/ChangeMasterPassword.vue';
 import ScheduledBackupSettings from '@/components/Settings/ScheduledBackupSettings.vue';
 import VaultAltAuth from '@/components/Settings/VaultAltAuth.vue';
-import Unlocking from "@/views/PasswordManager/Unlocking.vue";
+import Unlocking from '@/views/PasswordManager/Unlocking.vue';
 
 Vue.use(VueRouter);
 
