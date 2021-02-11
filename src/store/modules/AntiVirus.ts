@@ -45,6 +45,14 @@ const actions = {
       client.close();
     });
   },
+  ResetState({ commit }: CommitFunction) {
+    const defaultState = {
+      MalDetected: 0,
+      FileScanned: 0,
+      ScannedList: 0,
+    };
+    commit('SetAVInfo', defaultState);
+  },
 };
 
 const mutations = {

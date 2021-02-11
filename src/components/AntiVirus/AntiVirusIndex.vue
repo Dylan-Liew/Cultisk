@@ -89,7 +89,7 @@ export default Vue.extend({
     searched: [],
   }),
   methods: {
-    ...mapActions(['RetrieveAVInfo']),
+    ...mapActions(['RetrieveAVInfo', 'ResetState']),
     searchOnTable() {
       this.searched = searchByName(this.ScannedList, this.search);
       console.log('searched after', this.searched);
@@ -100,6 +100,13 @@ export default Vue.extend({
     ScannedList(newValue) {
       this.searched = newValue;
     },
+  },
+  beforeRouteLeave(to, from, next) {
+    // called when the route that renders this component is about to
+    // be navigated away from.
+    // has access to `this` component instance.
+    this.ResetState();
+    next();
   },
 });
 </script>
