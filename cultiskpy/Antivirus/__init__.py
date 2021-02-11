@@ -199,7 +199,7 @@ class DownloadScanner(Thread):
 
     def run(self):
         print("< <Download Folder Scan> Running")
-        download_path = self.get_download_path()
+        download_path = self.get_download_path() + "\\controlled_test"
         download_scanner = Scanner()
         event_handler = AVHandler(download_scanner, download_path)
         observer = Observer()
@@ -328,26 +328,35 @@ class Scanner:
                     else:
                         return False
 
-    def av_scan(self, directory=None, mal_detected=0, files_scanned=0, scanned_list=[]):
+    # def av_scan(self, directory=None, mal_detected=0, files_scanned=0, scanned_list=[]):
+    def av_scan(self, directory=None):
+        mal_detected = 0
+        files_scanned = 0
+        scanned_list = []
         no_malware = True
+
         directory = self.directory
         print(directory)
         exes = self.get_exe_files(directory)
-        files_scanned += len(exes)
         for exe in exes:
-            print("Scanning ", exe)
-            if self.vt_file_exist(exe):
-                self.mal_file(exe)
-                scanned_list.append({"FilePath": exe, "malicious": True})
-            else:
-                if self.vt_upload_file(exe):
+            try:
+                print("Scanning ", exe)
+                if self.vt_file_exist(exe):
                     self.mal_file(exe)
                     scanned_list.append({"FilePath": exe, "malicious": True})
-            malicious_items = [] # store malicious file path
-            for item in scanned_list:
-                malicious_items.append(item["FilePath"])
-            if exe not in malicious_items: # append non malicious file path
-                scanned_list.append({"FilePath": exe, "malicious": False})
+                else:
+                    if self.vt_upload_file(exe):
+                        self.mal_file(exe)
+                        scanned_list.append({"FilePath": exe, "malicious": True})
+                malicious_items = [] # store malicious file path
+                for item in scanned_list:
+                    malicious_items.append(item["FilePath"])
+                if exe not in malicious_items: # append non malicious file path
+                    scanned_list.append({"FilePath": exe, "malicious": False})
+            except:
+                print("failed to scan: ", exe)
+                continue
+        files_scanned += len(scanned_list)
         for item in scanned_list:
             if item['malicious']:
                 no_malware = False
@@ -361,10 +370,12 @@ class Scanner:
                     mal_detected += 1
                     string = "Scanned " + self.directory + "\n" + item['FilePath'] + " malicious file in " + self.directory + " Drive deleted"
                     self.toaster.show_toast("Anti Virus scan", string, icon_path="../static/media/cultisk.ico", duration=3)
+        last_scan_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         result = {
             'mal_detected': mal_detected,
             'files_scanned': files_scanned,
-            'scanned_list': scanned_list
+            'scanned_list': scanned_list,
+            'last_scanned_time': last_scan_time
         }
         print(f"> {result}")
 

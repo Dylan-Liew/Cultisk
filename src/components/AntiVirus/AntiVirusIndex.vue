@@ -2,8 +2,7 @@
   <div class="index">
       <div class="div-top-left">
           <b-form-file
-          placeholder="Choose a file or drop it here..."
-          drop-placeholder="Drop file here..."
+          placeholder="Choose a folder (Default is the Downloads folder)"
           directory
           :file-name-formatter="formatNames"
         ></b-form-file>
@@ -51,6 +50,12 @@
         <p class="card-text text-danger" v-else>{{ MalDetected }}</p>
       </div>
     </div>
+    <div class="card single-v-3" style="width: 5rem;">
+      <div class="card-body">
+        <h5 class="card-title text-muted">last scanned time</h5>
+        <p class="card-text">{{ last_scan_time }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -96,6 +101,14 @@
   .single-v-2{
     position: fixed;
     top: 75%;
+    left: 88%;
+    height: 200px !important;
+    width: 200px !important;
+    transform: translate(-50%, -50%);
+  }
+  .single-v-3{
+    position: fixed;
+    top: 95%;
     left: 88%;
     height: 200px !important;
     width: 200px !important;
@@ -152,7 +165,7 @@ export default Vue.extend({
     },
     formatNames(files) {
       try {
-        const folder_name = files[0].webkitRelativePath.substring(0, files[0].webkitRelativePath.lastIndexOf('/'));
+        const folder_name = files[0].path.substring(0, files[0].path.lastIndexOf('\\'));
         return `${folder_name} folder selected`;
       } catch (err) {
         return 'Invalid folder selected';

@@ -22,6 +22,7 @@ export interface ScanResultObj {
     mal_detected: number;
     files_scanned: number;
     scanned_list: object;
+    last_scan_time: string;
 }
 
 export interface CommitFunction {
