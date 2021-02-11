@@ -15,6 +15,17 @@
 </template>
 <style lang="scss">
 /*You put CSS that applies to all things rendered in the <router-view>*/
+// Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:ital,wght@0,300;0,400;1,300&display=swap');
+
+// Font Variables
+$Montserrat: 'Montserrat Alternates', serif;
+
+// Styles
+body {
+  font-family: $Montserrat !important;
+}
+
 body{
   background-color: #222222 !important;
 }
