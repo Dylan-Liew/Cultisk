@@ -118,13 +118,7 @@ export default {
         {
           title: 'Backup',
           icon: 'fa fa-database',
-          child: [
-            {
-              href: '/backup',
-              title: 'View Backup',
-              icon: 'fa fa-server',
-            },
-          ],
+          href: '/backup',
         },
         {
           title: 'Email Filtering',

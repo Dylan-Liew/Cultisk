@@ -3,7 +3,7 @@
       <md-table class="w-80 div-center" v-model="searched" md-sort="name" md-sort-order="asc" md-card md-fixed-header>
         <md-table-toolbar>
           <div class="md-toolbar-section-start">
-            <h1 class="md-title">Software Update Scan</h1>
+            <h1 class="md-title font-weight-bold">Software Update Scan</h1>
           </div>
           <md-field md-clearable class="md-toolbar-secton-end">
             <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
@@ -17,10 +17,10 @@
           </md-table-empty-state>
           <md-table-row slot="md-table-row" slot-scope="{ item }">
             <md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-            <md-table-cell md-label="Version" md-sort-by="version">{{ item.version }}</md-table-cell>
+            <md-table-cell md-label="Version">{{ item.version }}</md-table-cell>
             <md-table-cell md-label="Publisher" md-sort-by="publisher">{{ item.publisher }}</md-table-cell>
-            <md-table-cell md-label="Latest Version" md-sort-by="lat_version">{{ item.lat_version }}</md-table-cell>
-            <md-table-cell md-label="Download Link" md-sort-by="download_link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
+            <md-table-cell md-label="Latest Version">{{ item.lat_version }}</md-table-cell>
+            <md-table-cell md-label="Download Link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
 <!--              {{ item.download_link }}-->
           </md-table-row>
         </md-table>
