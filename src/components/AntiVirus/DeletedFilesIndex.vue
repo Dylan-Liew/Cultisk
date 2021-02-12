@@ -17,7 +17,7 @@
       </md-table-empty-state>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="File Name" md-sort-by="filename" md-numeric>{{ item.filename }}</md-table-cell>
+        <md-table-cell md-label="File Name" md-sort-by="filename">{{ item.filename }}</md-table-cell>
         <md-table-cell md-label="Deleted Time" md-sort-by="deleted_time">{{ item.deleted_time }}</md-table-cell>
       </md-table-row>
     </md-table>
