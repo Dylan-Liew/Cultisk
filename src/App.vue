@@ -101,11 +101,6 @@ export default {
               title: 'Credit Cards',
               icon: 'fa fa-plus',
             },
-            {
-              href: '/password-manager/password-generator',
-              title: 'Password Generator',
-              icon: 'fa fa-random',
-            },
           ],
         },
 
@@ -153,7 +148,7 @@ export default {
         },
         {
           title: 'Settings',
-          icon: 'fa fa-filter',
+          icon: 'fa fa-user-cog',
           child: [
             {
               href: '/settings/',
