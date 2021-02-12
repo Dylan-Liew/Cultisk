@@ -11,6 +11,7 @@ import {
 } from '@/types/custom.d';
 import GenerateClient from '@/helpers/request';
 import forge from 'node-forge';
+import hkdf from 'futoin-hkdf';
 
 const crypto = require('crypto');
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
@@ -19,12 +20,15 @@ const crypto = require('crypto');
 const state = {
   passwords: [],
   cards: [],
+  selectedPassword: {},
+  selectedCard: {},
+  vaultSetup: false,
   encryptionSettings: {
     iterations: 100000,
   },
   symmetricKey: '',
   lastUnlocked: null,
-  unlocked: true,
+  unlocked: false,
   expireIn: 1200,
   // Value in seconds ^
 };
@@ -43,16 +47,26 @@ interface CardEntryStore extends CardEntry {
 interface State {
   passwords: PasswordEntryStore[];
   cards: CardEntryStore[];
+  selectedPassword: PasswordEntryStore;
+  selectedCard: CardEntryStore;
   encryptionSettings: EncryptionSettings;
   symmetricKey: string;
   lastUnlocked: number;
+  vaultSetup: boolean;
   unlocked: boolean;
   expireIn: number;
 }
 
 interface RootState extends State {
-  token: string;
-  GUserID: string;
+  Auth: {
+    token: string;
+    GUserID: string;
+  };
+}
+
+interface SetupVaultInput {
+  hint: string | null;
+  password: string;
 }
 
 class ProtectedInfo {
@@ -70,6 +84,16 @@ class ProtectedInfo {
     this.ct = ct;
     this.string = `${encType}.${iv}|${ct}`;
   }
+}
+
+function toArrayBuffer(buf: Buffer): ArrayBuffer {
+  const ab = new ArrayBuffer(buf.length);
+  const view = new Uint8Array(ab);
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < buf.length; ++i) {
+    view[i] = buf[i];
+  }
+  return ab;
 }
 
 function EncParser(data: string) {
@@ -98,7 +122,8 @@ function Encrypt(symmetricKey: string | ArrayBuffer, iv: string, plaintext: stri
 
 function CalculateMasterKey(password: string, salt: string, settings: EncryptionSettings) {
   const masterKey: Buffer = crypto.pbkdf2Sync(password, salt, settings.iterations, 256 / 8, 'sha256');
-  const stretchedMasterKey: ArrayBuffer = crypto.hkdfSync('sha256', masterKey, '', '', 512 / 8);
+  const stretchedMasterKeyB: Buffer = hkdf.expand('sha256', 512 / 8, masterKey, 256 / 8, '');
+  const stretchedMasterKey = toArrayBuffer(stretchedMasterKeyB);
   const masterKeyHash: Buffer = crypto.pbkdf2Sync(masterKey, password, 1, 256 / 8, 'sha256');
   return [stretchedMasterKey, masterKeyHash.toString('hex')];
 }
@@ -156,27 +181,15 @@ const getters = {
   encryptionSettings: (state: State) => state.encryptionSettings,
   isUnlocked: (state: State) => state.unlocked,
   key: (state: State) => state.symmetricKey,
-  getCardByUUID: (state: State) => (uuid: string) => {
-    const entries = state.cards;
-    const result: CardEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
-    if (result.encrypted) {
-      return DecryptResult(state.symmetricKey, result);
-    }
-    return result;
-  },
-  getPasswordByUUID: (state: State) => (uuid: string) => {
-    const entries = state.passwords;
-    const result: PasswordEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
-    if (result.encrypted) {
-      return DecryptResult(state.symmetricKey, result);
-    }
-    return result;
-  },
+  selectedCard: (state: State) => state.selectedCard,
+  selectedPassword: (state: State) => state.selectedPassword,
+  expireIn: (state: State) => state.expireIn,
+  setupStatus: (state: State) => state.vaultSetup,
 };
 
 const actions = {
   async RetrievePWManagerData({ commit, rootState }: CommitRootStateFunction<RootState>) {
-    const instance = GenerateClient(rootState.token);
+    const instance = GenerateClient(rootState.Auth.token);
     const response = await instance.get('/password-manager/data/');
     if (response.status === 401) {
       commit('AuthenticationExpired');
@@ -186,24 +199,54 @@ const actions = {
     }
   },
   async UnlockVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, password: string) {
-    const instance = GenerateClient(rootState.token);
-    const [stretchedKey, hash] = CalculateMasterKey(password, rootState.GUserID, state.encryptionSettings);
-    const response: ProtectedSymmetricKeyResponse = await instance.post('/password-manager/check-password/', { hash });
-    if (response.success) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const [stretchedKey, hash] = CalculateMasterKey(password, rootState.Auth.GUserID, state.encryptionSettings);
+    const response = await instance.post('/password-manager/check-password/', { hash });
+    const ResponseData: ProtectedSymmetricKeyResponse = response.data;
+    if (ResponseData.success) {
       const protectedKey = EncParser(response.data);
       const symmetricKey = DecryptSymmetricKey(stretchedKey, protectedKey);
       commit('UnlockVault', symmetricKey.toHex());
     }
   },
-  async SetupVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, password: string) {
-    const instance = GenerateClient(rootState.token);
-    const [stretchedKey, hash] = CalculateMasterKey(password, rootState.GUserID, state.encryptionSettings);
+  async SetupVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, { hint, password }: SetupVaultInput) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const [stretchedKey, hash] = CalculateMasterKey(password, rootState.Auth.GUserID, state.encryptionSettings);
     const protectedSymmetricKey = GenerateProtectedSymmetricKey(stretchedKey);
     const symmetric = protectedSymmetricKey.string;
     const symmetricKey = DecryptSymmetricKey(stretchedKey, protectedSymmetricKey);
-    const response: ServerResponse = await instance.post('/password-manager/create-vault/', { hash, symmetric });
-    if (response.success) {
+    const response = await instance.post('/password-manager/setup-vault/', { hash, symmetric, hint });
+    const ResponseData: ServerResponse = response.data;
+    if (ResponseData.success) {
       commit('UnlockVault', symmetricKey.toHex());
+    }
+  },
+  async CheckVaultStatus({ commit, rootState }: CommitRootStateFunction<RootState>) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const response = await instance.get('/password-manager/setup-vault/');
+    const ResponseData: ServerResponse = response.data;
+    if (ResponseData.success) {
+      commit('SetupComplete');
+    }
+  },
+  getCardByUUID({ commit, state }: CommitStateFunction<State>, uuid: string) {
+    const entries = state.cards;
+    const result: CardEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
+    if (result.encrypted) {
+      result.encrypted = false;
+      commit('SetSelectedCard', DecryptResult(state.symmetricKey, result));
+    } else {
+      commit('SetSelectedCard', result);
+    }
+  },
+  getPasswordByUUID({ commit, state }: CommitStateFunction<State>, uuid: string) {
+    const entries = state.passwords;
+    const result: PasswordEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
+    if (result.encrypted) {
+      result.encrypted = false;
+      commit('SetSelectedPassword', DecryptResult(state.symmetricKey, result));
+    } else {
+      commit('SetSelectedPassword', result);
     }
   },
   CheckExpiry({ commit, state }: CommitStateFunction<State>) {
@@ -214,34 +257,38 @@ const actions = {
     }
   },
   async AddNewCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: CardEntry) {
-    const instance = GenerateClient(rootState.token);
+    const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
-    const response: ServerResponse = await instance.post('/password-manager/cards/', enc_data);
-    if (response.success) {
+    const response = await instance.post('/password-manager/cards/', enc_data);
+    const ResponseData: ServerResponse = response.data;
+    if (ResponseData.success) {
       commit('AddCardEntry', data);
     }
   },
   async AddNewPasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: PasswordEntry) {
-    const instance = GenerateClient(rootState.token);
+    const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
-    const response: ServerResponse = await instance.post('/password-manager/passwords/', enc_data);
-    if (response.success) {
+    const response = await instance.post('/password-manager/passwords/', enc_data);
+    const ResponseData: ServerResponse = response.data;
+    if (ResponseData.success) {
       commit('AddPasswordEntry', data);
     }
   },
   async UpdatePasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: PasswordEntry) {
-    const instance = GenerateClient(rootState.token);
+    const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
-    const response: PasswordManagerUpdateResponse = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
-    if (response.success && Object.prototype.hasOwnProperty.call(response, 'data')) {
+    const response = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
+    const ResponseData: PasswordManagerUpdateResponse = response.data;
+    if (ResponseData.success && Object.prototype.hasOwnProperty.call(ResponseData, 'data')) {
       commit('AddPasswordEntry', data);
     }
   },
   async UpdateCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: CardEntry) {
-    const instance = GenerateClient(rootState.token);
+    const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
-    const response: PasswordManagerUpdateResponse = await instance.put(`/password-manager/card/${data.uuid}`, enc_data);
-    if (response.success && Object.prototype.hasOwnProperty.call(response, 'data')) {
+    const response = await instance.put(`/password-manager/card/${data.uuid}`, enc_data);
+    const ResponseData: PasswordManagerUpdateResponse = response.data;
+    if (ResponseData.success && Object.prototype.hasOwnProperty.call(ResponseData, 'data')) {
       commit('AddCardEntry', data);
     }
   },
@@ -268,7 +315,11 @@ const mutations = {
     state.passwords = PasswordStore;
     state.cards = CardStore;
   },
+  SetupComplete: (state: State): void => {
+    state.vaultSetup = true;
+  },
   UnlockVault: (state: State, keyHex: string): void => {
+    state.vaultSetup = true;
     state.symmetricKey = keyHex;
     state.unlocked = true;
     state.lastUnlocked = Math.floor(new Date().getTime() / 1000);
@@ -296,6 +347,12 @@ const mutations = {
   RemovePassword: (state: State, uuid: string): void => {
     const entries = state.passwords;
     state.passwords = entries.filter((obj) => obj.uuid !== uuid);
+  },
+  SetSelectedCard: (state: State, value: CardEntryStore): void => {
+    state.selectedCard = value;
+  },
+  SetSelectedPassword: (state: State, value: PasswordEntryStore): void => {
+    state.selectedPassword = value;
   },
 };
 

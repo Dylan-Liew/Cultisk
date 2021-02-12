@@ -1,5 +1,4 @@
 import { Commit } from 'vuex';
-import { Server } from 'vue-cli-plugin-electron-builder';
 
 export declare module 'vue-material/dist/components';
 

@@ -23,95 +23,56 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import Vue from 'vue';
-import { mapGetters } from 'vuex'; // @ is an alias to /src
+import { mapGetters, mapActions } from 'vuex';
 
 export default Vue.extend({
   name: 'PasswordManager',
-  computed: mapGetters(['isUnlocked']),
+  computed: mapGetters(['isUnlocked', 'allPasswords', 'allCards']),
   data: () => ({
-    selected: {},
-    passwords: [
-      {
-        uuid: '593bfd33-56d9-45f1-b2cf-2fd297316225',
-        name: 'My Google account',
-        username: 'test@gmail.com',
-        password: 'text',
-        url: 'www.google.com',
-      },
-      {
-        uuid: '8eaa423b-2a63-42cb-a977-b38515e85da6',
-        name: 'My facebook account',
-        username: 'test@gmail.com',
-        password: 'text',
-        otpSecret: '5567890f',
-        url: 'www.facebook.com',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-      {
-        uuid: '386c5d12-2075-454a-abc2-4bd80170fe43',
-        name: 'My Online Account',
-        username: 'test@gmail.com',
-        password: 'mysupersecretpassword',
-      },
-
-    ],
+    passwords: [],
+    cards: [],
   }),
   methods: {
-    getClass: ({ wname }) => ({
-      'md-primary': wname,
+    ...mapActions(['RetrievePWManagerData', 'getPasswordByUUID', 'getCardByUUID']),
+    getClass: ({ name }) => ({
+      'md-primary': name,
     }),
     onSelect(item) {
-      this.$router.push(`/password-manager/password/${item.uuid}`);
-    },
-    masking() {
-      const x = document.getElementById('password');
-      if (x.type === 'password') {
-        x.type = 'text';
-        document.getElementById('mask-button').classList.add('fa-eye-slash');
-        document.getElementById('mask-button').classList.remove('fa-eye');
+      if (item.type === 'password') {
+        this.$router.push(`/password-manager/password/${item.uuid}?type=password`);
       } else {
-        x.type = 'password';
-        document.getElementById('mask-button').classList.add('fa-eye');
-        document.getElementById('mask-button').classList.remove('fa-eye-slash');
+        this.$router.push(`/password-manager/card/${item.uuid}?type=card`);
       }
     },
+  },
+  created() {
+    this.RetrievePWManagerData();
+  },
+  watch: {
+    allPasswords(newValue) {
+      this.passwords = newValue;
+    },
+    allCards(newValue) {
+      this.cards = newValue;
+    },
+  },
+  beforeRouteUpdate(to, from, next) {
+    // called when the route that renders this component has changed.
+    // This component being reused (by using an explicit `key`) in the new route or not doesn't change anything.
+    // For example, for a route with dynamic params `/foo/:id`, when we
+    // navigate between `/foo/1` and `/foo/2`, the same `Foo` component instance
+    // will be reused (unless you provided a `key` to `<router-view>`), and this hook will be called when that happens.
+    // has access to `this` component instance.
+    const { params } = to;
+    if (Object.prototype.hasOwnProperty.call(params, 'uuid') && to.query.type === 'password') {
+      this.getPasswordByUUID(params.uuid);
+    }
+    if (Object.prototype.hasOwnProperty.call(params, 'uuid') && to.query.type === 'card') {
+      this.getCardByUUID(params.uuid);
+    }
+    next();
   },
 });
 </script>
@@ -122,10 +83,7 @@ export default Vue.extend({
     width: 70%;
     margin: auto;
   }
-  .password-field{
-    border: none;
-    background: white;
-  }
+
   button:focus{
     outline: none;
     box-shadow: none;

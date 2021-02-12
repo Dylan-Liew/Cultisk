@@ -1,12 +1,16 @@
-import { CommitFunction } from '@/types/custom.d';
+import { CommitFunction, CommitRootSateStateFunction, CommitStateFunction } from '@/types/custom.d';
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
 // TODO: change default value for showNav to false after development is done.
 const state = {
-  showNav: true,
+  showNav: false,
 };
 interface State {
   showNav: boolean;
+}
+
+interface RootState extends State {
+  authenticated: boolean;
 }
 
 const getters = {
@@ -14,11 +18,12 @@ const getters = {
 };
 
 const actions = {
-  HideNav({ commit }: CommitFunction) {
-    commit('SetNavStatus', false);
-  },
-  ShowNav({ commit }: CommitFunction) {
-    commit('SetNavStatus', true);
+  ToggleNav({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>) {
+    if (rootState.authenticated) {
+      commit('SetNavStatus', true);
+    } else {
+      commit('SetNavStatus', !state.showNav);
+    }
   },
 };
 

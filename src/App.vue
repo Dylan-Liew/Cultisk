@@ -22,6 +22,10 @@
 $Montserrat: 'Montserrat Alternates', serif;
 
 // Styles
+// TODO: this is her to make default template visible. Remove after development.
+p {
+  color: white;
+}
 body {
   font-family: $Montserrat !important;
 }

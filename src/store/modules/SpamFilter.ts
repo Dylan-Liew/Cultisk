@@ -1,30 +1,27 @@
 import {
-  CommitFunction, CommitRootStateFunction,
-  CommitStateFunction, PasswordManagerAllDataResponse, SpamFilterData, SpamFilterDataResponse,
+  CommitRootStateFunction, SpamFilterData, SpamFilterDataResponse,
 } from '@/types/custom.d';
-import generatePassword from 'password-generator';
 import GenerateClient from '@/helpers/request';
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
 const state = {
-  emails: [],
+  emailInfo: [],
 };
 
-interface State {
-  emails: {};
-}
-
-interface RootState extends State {
-  token: string;
+interface RootState {
+  Auth: {
+    token: string;
+    GUserID: string;
+  };
 }
 
 const getters = {
-  allEmails: (state: State) => state.emails,
+  allEmails: (state: { emailInfo: any }) => state.emailInfo,
 };
 
 const actions = {
   async RetrieveSpamFilterInfo({ commit, rootState }: CommitRootStateFunction<RootState>) {
-    const instance = GenerateClient(rootState.token);
+    const instance = GenerateClient(rootState.Auth.token);
     const response = await instance.get('/spam-filter/');
     if (response.status === 401) {
       commit('AuthenticationExpired');
@@ -36,7 +33,7 @@ const actions = {
 };
 
 const mutations = {
-  SetSpamFilter(state: State, SpamData: SpamFilterData[]): void {
+  SetSpamFilter(state, SpamData: SpamFilterData[]): void {
     state.emails = SpamData;
   },
 };
