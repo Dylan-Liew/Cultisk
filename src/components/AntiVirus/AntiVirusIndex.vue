@@ -7,6 +7,11 @@
           :file-name-formatter="formatNames"
         ></b-form-file>
       </div>
+    <div class="card div-top-center" style="width: 5rem;">
+      <div class="card-body">
+        <span class="font-weight-bold">last scanned time:</span> {{ last_scan_time }}12/03/2012
+      </div>
+    </div>
       <div class="div-top-right">
         <div class="row">
           <div class="col text-center">
@@ -50,12 +55,6 @@
         <p class="card-text text-danger" v-else>{{ MalDetected }}</p>
       </div>
     </div>
-    <div class="card single-v-3" style="width: 5rem;">
-      <div class="card-body">
-        <h5 class="card-title text-muted">last scanned time</h5>
-        <p class="card-text">{{ last_scan_time }}</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -90,9 +89,16 @@
     width: 500px;
     transform: translate(-50%, -50%);
   }
+  .div-top-center{
+    position: fixed;
+    top: 6%;
+    left: 63%;
+    width: 330px !important;
+    transform: translate(-50%, -50%);
+  }
   .single-v-1{
     position: fixed;
-    top: 35%;
+    top: 30%;
     left: 88%;
     height: 200px !important;
     width: 200px !important;
@@ -100,15 +106,7 @@
   }
   .single-v-2{
     position: fixed;
-    top: 75%;
-    left: 88%;
-    height: 200px !important;
-    width: 200px !important;
-    transform: translate(-50%, -50%);
-  }
-  .single-v-3{
-    position: fixed;
-    top: 95%;
+    top: 70%;
     left: 88%;
     height: 200px !important;
     width: 200px !important;
