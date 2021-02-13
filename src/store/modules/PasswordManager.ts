@@ -12,6 +12,7 @@ import {
 import GenerateClient from '@/helpers/request';
 import forge from 'node-forge';
 import hkdf from 'futoin-hkdf';
+import { AuthState } from '@/store/modules/auth';
 
 const crypto = require('crypto');
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
@@ -44,7 +45,7 @@ interface CardEntryStore extends CardEntry {
   encrypted: boolean;
 }
 
-interface State {
+export interface PwManagerState {
   passwords: PasswordEntryStore[];
   cards: CardEntryStore[];
   selectedPassword: PasswordEntryStore;
@@ -57,11 +58,8 @@ interface State {
   expireIn: number;
 }
 
-interface RootState extends State {
-  Auth: {
-    token: string;
-    GUserID: string;
-  };
+interface RootState {
+  Auth: AuthState;
 }
 
 interface SetupVaultInput {
@@ -176,15 +174,15 @@ function EncryptEntry(keyHex: string, entry: PasswordEntry | CardEntry) {
 }
 
 const getters = {
-  allPasswords: (state: State) => state.passwords,
-  allCards: (state: State) => state.cards,
-  encryptionSettings: (state: State) => state.encryptionSettings,
-  isUnlocked: (state: State) => state.unlocked,
-  key: (state: State) => state.symmetricKey,
-  selectedCard: (state: State) => state.selectedCard,
-  selectedPassword: (state: State) => state.selectedPassword,
-  expireIn: (state: State) => state.expireIn,
-  setupStatus: (state: State) => state.vaultSetup,
+  allPasswords: (state: PwManagerState) => state.passwords,
+  allCards: (state: PwManagerState) => state.cards,
+  encryptionSettings: (state: PwManagerState) => state.encryptionSettings,
+  isUnlocked: (state: PwManagerState) => state.unlocked,
+  key: (state: PwManagerState) => state.symmetricKey,
+  selectedCard: (state: PwManagerState) => state.selectedCard,
+  selectedPassword: (state: PwManagerState) => state.selectedPassword,
+  expireIn: (state: PwManagerState) => state.expireIn,
+  setupStatus: (state: PwManagerState) => state.vaultSetup,
 };
 
 const actions = {
@@ -198,18 +196,18 @@ const actions = {
       commit('SetPWData', ResponseData);
     }
   },
-  async UnlockVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, password: string) {
+  async UnlockVault({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, password: string) {
     const instance = GenerateClient(rootState.Auth.token);
     const [stretchedKey, hash] = CalculateMasterKey(password, rootState.Auth.GUserID, state.encryptionSettings);
     const response = await instance.post('/password-manager/check-password/', { hash });
     const ResponseData: ProtectedSymmetricKeyResponse = response.data;
     if (ResponseData.success) {
-      const protectedKey = EncParser(response.data);
+      const protectedKey = EncParser(ResponseData.data);
       const symmetricKey = DecryptSymmetricKey(stretchedKey, protectedKey);
       commit('UnlockVault', symmetricKey.toHex());
     }
   },
-  async SetupVault({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, { hint, password }: SetupVaultInput) {
+  async SetupVault({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, { hint, password }: SetupVaultInput) {
     const instance = GenerateClient(rootState.Auth.token);
     const [stretchedKey, hash] = CalculateMasterKey(password, rootState.Auth.GUserID, state.encryptionSettings);
     const protectedSymmetricKey = GenerateProtectedSymmetricKey(stretchedKey);
@@ -229,7 +227,7 @@ const actions = {
       commit('SetupComplete');
     }
   },
-  getCardByUUID({ commit, state }: CommitStateFunction<State>, uuid: string) {
+  getCardByUUID({ commit, state }: CommitStateFunction<PwManagerState>, uuid: string) {
     const entries = state.cards;
     const result: CardEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
     if (result.encrypted) {
@@ -239,7 +237,7 @@ const actions = {
       commit('SetSelectedCard', result);
     }
   },
-  getPasswordByUUID({ commit, state }: CommitStateFunction<State>, uuid: string) {
+  getPasswordByUUID({ commit, state }: CommitStateFunction<PwManagerState>, uuid: string) {
     const entries = state.passwords;
     const result: PasswordEntryStore = entries.filter((obj) => obj.uuid === uuid)[0];
     if (result.encrypted) {
@@ -249,14 +247,14 @@ const actions = {
       commit('SetSelectedPassword', result);
     }
   },
-  CheckExpiry({ commit, state }: CommitStateFunction<State>) {
+  CheckExpiry({ commit, state }: CommitStateFunction<PwManagerState>) {
     const currentTime = Math.floor(new Date().getTime() / 1000);
     const expiryTime = state.lastUnlocked + state.expireIn;
     if (currentTime > expiryTime) {
       commit('LockVault');
     }
   },
-  async AddNewCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: CardEntry) {
+  async AddNewCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: CardEntry) {
     const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response = await instance.post('/password-manager/cards/', enc_data);
@@ -265,7 +263,7 @@ const actions = {
       commit('AddCardEntry', data);
     }
   },
-  async AddNewPasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: PasswordEntry) {
+  async AddNewPasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: PasswordEntry) {
     const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response = await instance.post('/password-manager/passwords/', enc_data);
@@ -274,7 +272,7 @@ const actions = {
       commit('AddPasswordEntry', data);
     }
   },
-  async UpdatePasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: PasswordEntry) {
+  async UpdatePasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: PasswordEntry) {
     const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
@@ -283,7 +281,7 @@ const actions = {
       commit('AddPasswordEntry', data);
     }
   },
-  async UpdateCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>, data: CardEntry) {
+  async UpdateCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: CardEntry) {
     const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response = await instance.put(`/password-manager/card/${data.uuid}`, enc_data);
@@ -301,7 +299,7 @@ const actions = {
 };
 
 const mutations = {
-  SetPWData: (state: State, PWData: PasswordManagerAllDataResponse): void => {
+  SetPWData: (state: PwManagerState, PWData: PasswordManagerAllDataResponse): void => {
     const PasswordStore: PasswordEntryStore[] = PWData.data.passwords.map((x) => {
       const enc = EncParser(x.name);
       const decrypted = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
@@ -315,43 +313,43 @@ const mutations = {
     state.passwords = PasswordStore;
     state.cards = CardStore;
   },
-  SetupComplete: (state: State): void => {
+  SetupComplete: (state: PwManagerState): void => {
     state.vaultSetup = true;
   },
-  UnlockVault: (state: State, keyHex: string): void => {
+  UnlockVault: (state: PwManagerState, keyHex: string): void => {
     state.vaultSetup = true;
     state.symmetricKey = keyHex;
     state.unlocked = true;
     state.lastUnlocked = Math.floor(new Date().getTime() / 1000);
   },
-  LockVault: (state: State): void => {
+  LockVault: (state: PwManagerState): void => {
     state.unlocked = false;
     state.symmetricKey = '';
   },
-  AddCardEntry: (state: State, entry: CardEntry): void => {
+  AddCardEntry: (state: PwManagerState, entry: CardEntry): void => {
     const { cards } = state;
     const entryStore: CardEntryStore = { ...entry, encrypted: false };
     cards.concat(entryStore);
     state.cards = cards;
   },
-  AddPasswordEntry: (state: State, entry: PasswordEntry): void => {
+  AddPasswordEntry: (state: PwManagerState, entry: PasswordEntry): void => {
     const { passwords } = state;
     const entryStore: PasswordEntryStore = { ...entry, encrypted: false };
     passwords.concat(entryStore);
     state.passwords = passwords;
   },
-  RemoveCard: (state: State, uuid: string): void => {
+  RemoveCard: (state: PwManagerState, uuid: string): void => {
     const entries = state.cards;
     state.cards = entries.filter((obj) => obj.uuid !== uuid);
   },
-  RemovePassword: (state: State, uuid: string): void => {
+  RemovePassword: (state: PwManagerState, uuid: string): void => {
     const entries = state.passwords;
     state.passwords = entries.filter((obj) => obj.uuid !== uuid);
   },
-  SetSelectedCard: (state: State, value: CardEntryStore): void => {
+  SetSelectedCard: (state: PwManagerState, value: CardEntryStore): void => {
     state.selectedCard = value;
   },
-  SetSelectedPassword: (state: State, value: PasswordEntryStore): void => {
+  SetSelectedPassword: (state: PwManagerState, value: PasswordEntryStore): void => {
     state.selectedPassword = value;
   },
 };

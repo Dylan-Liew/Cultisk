@@ -8,7 +8,7 @@ const state = {
   software: [],
 };
 
-interface SoftwareInfo {
+export interface SoftwareInfo {
   name: string;
   version: string;
   publisher: string;
@@ -18,12 +18,12 @@ interface SoftwareInfo {
   download_link: string;
 }
 
-interface State {
+export interface SoftwareState {
   software: SoftwareInfo[];
 }
 
 const getters = {
-  allSoftware: (state: State) => state.software,
+  allSoftware: (state: SoftwareState) => state.software,
 };
 
 const actions = {
@@ -43,7 +43,7 @@ const actions = {
 };
 
 const mutations = {
-  SetSoftwareList: (state: State, software: SoftwareInfo[]): void => {
+  SetSoftwareList: (state: SoftwareState, software: SoftwareInfo[]): void => {
     state.software = software;
   },
 };

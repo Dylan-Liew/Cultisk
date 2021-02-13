@@ -2,21 +2,19 @@ import {
   CommitRootStateFunction, SpamFilterData, SpamFilterDataResponse,
 } from '@/types/custom.d';
 import GenerateClient from '@/helpers/request';
+import { AuthState } from '@/store/modules/auth';
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
 const state = {
-  emailInfo: [],
+  emails: [],
 };
 
 interface RootState {
-  Auth: {
-    token: string;
-    GUserID: string;
-  };
+  Auth: AuthState;
 }
 
 const getters = {
-  allEmails: (state: { emailInfo: any }) => state.emailInfo,
+  allEmails: (state: { emails: any }) => state.emails,
 };
 
 const actions = {
@@ -33,7 +31,7 @@ const actions = {
 };
 
 const mutations = {
-  SetSpamFilter(state, SpamData: SpamFilterData[]): void {
+  SetSpamFilter(state: { emails: any }, SpamData: SpamFilterData[]): void {
     state.emails = SpamData;
   },
 };

@@ -22,7 +22,7 @@ const state = {
   appID: '',
 };
 
-interface State {
+export interface AuthState {
   authenticated: boolean;
   timeout: boolean;
   expired: boolean;
@@ -32,12 +32,12 @@ interface State {
 }
 
 const getters = {
-  appID: (state: State) => state.appID,
-  token: (state: State) => state.token,
-  GUserID: (state: State) => state.GUserID,
-  isAuthenticated: (state: State) => state.authenticated,
-  timeout: (state: State) => state.timeout,
-  expired: (state: State) => state.expired,
+  appID: (state: AuthState) => state.appID,
+  token: (state: AuthState) => state.token,
+  GUserID: (state: AuthState) => state.GUserID,
+  isAuthenticated: (state: AuthState) => state.authenticated,
+  timeout: (state: AuthState) => state.timeout,
+  expired: (state: AuthState) => state.expired,
 };
 
 async function AuthenticateApp(AppID: string) {
@@ -107,7 +107,7 @@ const actions = {
       }
     }
   },
-  async RefreshAppToken({ commit, state }: CommitStateFunction<State>) {
+  async RefreshAppToken({ commit, state }: CommitStateFunction<AuthState>) {
     const AppID = state.appID;
     const data: RefreshTokenResponse = await RefreshAppToken(AppID);
     commit('SetToken', data.jwt);
@@ -115,25 +115,25 @@ const actions = {
 };
 
 const mutations = {
-  SetAppID: (state: State, uuid: string): void => {
+  SetAppID: (state: AuthState, uuid: string): void => {
     state.appID = uuid;
   },
-  SetToken: (state: State, token: string): void => {
+  SetToken: (state: AuthState, token: string): void => {
     state.token = token;
   },
-  AppAuthenticated: (state: State, AuthData: OAuthRequestCallbackResponse): void => {
+  AppAuthenticated: (state: AuthState, AuthData: OAuthRequestCallbackResponse): void => {
     state.authenticated = true;
     state.timeout = false;
     state.expired = false;
     state.GUserID = AuthData.guser_id;
     state.token = AuthData.jwt;
   },
-  AuthenticationExpired: (state: State): void => {
+  AuthenticationExpired: (state: AuthState): void => {
     state.authenticated = false;
     state.timeout = false;
     state.expired = true;
   },
-  AuthenticationTimeout: (state: State): void => {
+  AuthenticationTimeout: (state: AuthState): void => {
     state.timeout = true;
   },
 };

@@ -1,18 +1,13 @@
 import Backup from '@/views/Backup.vue';
 import { CommitFunction, CommitRootStateFunction } from '@/types/custom.d';
 import * as StorageBlob from '@azure/storage-blob';
+import { AuthState } from '@/store/modules/auth';
 
 const state = {
 };
 
 interface RootState {
-  Auth: {
-    GUserID: string;
-  };
-}
-
-interface BackupDataInt {
-  GUserID: string;
+  Auth: AuthState;
 }
 
 const actions = {

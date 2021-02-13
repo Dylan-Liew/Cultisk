@@ -14,6 +14,11 @@ import { mapGetters, mapActions } from 'vuex';
 export default Vue.extend({
   name: 'PasswordManager',
   computed: mapGetters(['isUnlocked']),
+  created() {
+    if (!this.isUnlocked) {
+      this.$router.push('/password-manager/unlock/');
+    }
+  },
 });
 </script>
 

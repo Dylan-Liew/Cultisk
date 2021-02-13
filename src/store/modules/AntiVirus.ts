@@ -13,7 +13,7 @@ interface ScanResults {
   FilePath: string;
   malicious: boolean;
 }
-interface State{
+export interface AVState {
   MalDetected: number;
   FileScanned: number;
   ScannedList: ScanResults[];
@@ -26,9 +26,9 @@ interface AVResponse {
 }
 
 const getters = {
-  MalDetected: (state: State) => state.MalDetected,
-  FileScanned: (state: State) => state.FileScanned,
-  ScannedList: (state: State) => state.ScannedList,
+  MalDetected: (state: AVState) => state.MalDetected,
+  FileScanned: (state: AVState) => state.FileScanned,
+  ScannedList: (state: AVState) => state.ScannedList,
 };
 
 const actions = {
@@ -56,7 +56,7 @@ const actions = {
 };
 
 const mutations = {
-  SetAVInfo: (state: State, AvResponse: AVResponse): void => {
+  SetAVInfo: (state: AVState, AvResponse: AVResponse): void => {
     state.ScannedList = AvResponse.scanned_list;
     state.FileScanned = AvResponse.files_scanned;
     state.MalDetected = AvResponse.mal_detected;

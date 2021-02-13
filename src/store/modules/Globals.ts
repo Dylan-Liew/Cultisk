@@ -1,25 +1,26 @@
 import { CommitFunction, CommitRootSateStateFunction, CommitStateFunction } from '@/types/custom.d';
+import { AuthState } from '@/store/modules/auth';
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
 
 // TODO: change default value for showNav to false after development is done.
 const state = {
   showNav: false,
 };
-interface State {
+export interface GlobalState {
   showNav: boolean;
 }
 
-interface RootState extends State {
-  authenticated: boolean;
+interface RootState {
+  Auth: AuthState;
 }
 
 const getters = {
-  navStatus: (state: State) => state.showNav,
+  navStatus: (state: GlobalState) => state.showNav,
 };
 
 const actions = {
-  ToggleNav({ commit, rootState, state }: CommitRootSateStateFunction<State, RootState>) {
-    if (rootState.authenticated) {
+  ToggleNav({ commit, rootState, state }: CommitRootSateStateFunction<GlobalState, RootState>) {
+    if (rootState.Auth.authenticated) {
       commit('SetNavStatus', true);
     } else {
       commit('SetNavStatus', !state.showNav);
@@ -28,7 +29,7 @@ const actions = {
 };
 
 const mutations = {
-  SetNavStatus: (state: State, value: boolean): void => {
+  SetNavStatus: (state: GlobalState, value: boolean): void => {
     state.showNav = value;
   },
 };

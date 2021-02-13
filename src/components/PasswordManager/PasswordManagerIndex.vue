@@ -1,5 +1,6 @@
 <template>
   <div class="index">
+    <p>hi</p>
     <b-container class="position-fixed">
         <b-row>
           <b-col cols="6" >
