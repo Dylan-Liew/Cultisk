@@ -41,7 +41,7 @@
 <style scoped>
   .md-table{
     height: 570px;
-    width: 900px;
+    width: 950px;
     position: fixed;
     top: 53%;
     left: 50%;

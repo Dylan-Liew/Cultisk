@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <div id="view" :class="[{'collapsed' : collapsed}]">
-      <router-view/>
-    </div>
-    <sidebar-menu
-      v-if="navStatus"
-      class="sidebar"
-      :menu="menu"
-      :collapsed="collapsed"
-      :show-one-child="showOneChild"
-      @item-click="onItemClick"
-      @collapse="onCollapse"/>
+      <div id="view" :class="[{'collapsed' : collapsed}]">
+        <router-view/>
+      </div>
+      <sidebar-menu
+        v-if="navStatus"
+        class="sidebar"
+        :menu="menu"
+        :collapsed="collapsed"
+        :show-one-child="showOneChild"
+        @item-click="onItemClick"
+        @collapse="onCollapse"/>
   </div>
 </template>
 <style lang="scss">
