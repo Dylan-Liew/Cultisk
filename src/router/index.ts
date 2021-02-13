@@ -12,12 +12,6 @@ import AntiVirusIndex from '@/components/AntiVirus/AntiVirusIndex.vue';
 import ScheduledScanSettings from '@/components/Settings/ScheduledScanSettings.vue';
 import DeletedFilesIndex from '@/components/AntiVirus/DeletedFilesIndex.vue';
 import PasswordManager from '@/views/PasswordManager/PasswordManager.vue';
-import CardCreate from '@/components/PasswordManager/CardCreate.vue';
-import PasswordCreate from '@/components/PasswordManager/PasswordCreate.vue';
-import CardEdit from '@/components/PasswordManager/CardEdit.vue';
-import PasswordEdit from '@/components/PasswordManager/PasswordEdit.vue';
-import CardDetails from '@/components/PasswordManager/CardDetails.vue';
-import PasswordDetails from '@/components/PasswordManager/PasswordDetails.vue';
 import WebScannerDashboard from '@/views/PasswordManager/WebScannerDashboard.vue';
 import Backup from '@/views/Backup.vue';
 import EmailFilter from '@/views/EmailFilter.vue';
@@ -29,6 +23,7 @@ import ChangeMasterPassword from '@/components/Settings/ChangeMasterPassword.vue
 import ScheduledBackupSettings from '@/components/Settings/ScheduledBackupSettings.vue';
 import VaultAltAuth from '@/components/Settings/VaultAltAuth.vue';
 import Unlocking from '@/views/PasswordManager/Unlocking.vue';
+import PasswordManagerIndex from '@/components/PasswordManager/PasswordManagerIndex.vue';
 
 Vue.use(VueRouter);
 
@@ -116,35 +111,30 @@ const routes: Array<RouteConfig> = [
     name: 'Password Manager',
     children: [
       {
-        name: 'Card creation',
-        path: 'card-create',
-        component: CardCreate,
+        name: 'PasswordManagerIndex',
+        path: '',
+        component: PasswordManagerIndex,
       },
-      {
-        name: 'Password creation',
-        path: 'password-create',
-        component: PasswordCreate,
-      },
-      {
-        name: 'Card edit',
-        path: 'card-edit/:uuid',
-        component: CardEdit,
-      },
-      {
-        name: 'Password Edit',
-        path: 'password-edit/:uuid',
-        component: PasswordEdit,
-      },
-      {
-        name: 'Card details',
-        path: 'card/:uuid',
-        component: CardDetails,
-      },
-      {
-        name: 'Password Details',
-        path: 'password/:uuid',
-        component: PasswordDetails,
-      },
+      // {
+      //   name: 'Card creation',
+      //   path: 'card-create',
+      //   component: CardCreate,
+      // },
+      // {
+      //   name: 'Password creation',
+      //   path: 'password-create',
+      //   component: PasswordCreate,
+      // },
+      // {
+      //   name: 'Card details',
+      //   path: 'card/:uuid',
+      //   component: CardDetails,
+      // },
+      // {
+      //   name: 'Password Details',
+      //   path: 'password/:uuid',
+      //   component: PasswordDetails,
+      // },
     ],
   },
   {
