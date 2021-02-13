@@ -7,7 +7,7 @@
           <div class="form-group">
             <label for="MasterPassword">Password</label>
             <br>
-            <input :type="passwordMasked ? 'password' : 'text'" class="form-control float-left w-90" v-model="masterPassword" id="MasterPassword" placeholder="Password">
+            <input :type="passwordMasked ? 'password' : 'text'" class="form-control float-left mb-2 w-90" v-model="masterPassword" id="MasterPassword" placeholder="Password">
             <button class="btn float-right" v-on:click="masking">
               <i class="fa" :class="passwordMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
             </button>
@@ -93,6 +93,6 @@ form{
   padding: 15px;
 }
 .w-90{
-  width: 92%;
+  width: 92% !important;
 }
 </style>

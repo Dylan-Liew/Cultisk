@@ -4,7 +4,7 @@ import { AuthState } from '@/store/modules/auth';
 
 // TODO: change default value for showNav to false after development is done.
 const state = {
-  showNav: false,
+  showNav: true,
 };
 export interface GlobalState {
   showNav: boolean;

@@ -1,13 +1,28 @@
 <template>
   <div class="index">
-    <p>hi</p>
     <b-container class="position-fixed">
         <b-row>
-          <b-col cols="6" >
-              <md-table class="p-entries mt-2" md-height="590px" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
+          <b-col cols="6" style="left:0;">
+              <md-table class="p-entries mt-1" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
+              <md-table-toolbar>
+                <md-field md-clearable class="md-toolbar-section-end">
+                  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+                </md-field>
+                <div class="md-layout-item">
+                  <md-field>
+                    <md-select v-model="filtervalue">
+                      <md-option value="all">All</md-option>
+                      <md-option value="favourite">Favourite</md-option>
+                    </md-select>
+                  </md-field>
+                </div>
+              </md-table-toolbar>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
-                <md-table-cell md-label="Passwords Manager" md-sort-by="id">
-                    <span class="font-weight-bold">{{item.name}}</span><br>
+                <md-table-cell md-label="ID" md-sort-by="name">
+                    <span class="font-weight-bold float-left">{{item.name}}</span>
+                    <div v-if="item.favourite===true" v-on:click="favourite" class="fa fa-star float-right checked"></div>
+                    <div v-else v-on:click="favourite" class="fa fa-star float-right"></div>
+                    <br>
                     {{item.username}}
                 </md-table-cell>
               </md-table-row>
@@ -47,7 +62,6 @@
 <style lang="scss" scoped>
 .p-entries{
   width: 70%;
-  margin: auto;
 }
 .password-field{
   border: none;
@@ -56,6 +70,13 @@
 button:focus{
   outline: none;
   box-shadow: none;
+}
+
+.md-table-head {
+  display:none !important;
+}
+.checked {
+  color: orange;
 }
 </style>
 
@@ -67,6 +88,7 @@ export default Vue.extend({
   name: 'PasswordManagerIndex',
   data: () => ({
     selected: {},
+    filtervalue: 'all',
     passwords: [
       {
         uuid: '593bfd33-56d9-45f1-b2cf-2fd297316225',
@@ -75,6 +97,7 @@ export default Vue.extend({
         password: 'text',
         url: 'www.google.com',
         note: 'this is my main account',
+        favourite: true,
       },
       {
         uuid: '8eaa423b-2a63-42cb-a977-b38515e85da6',
@@ -83,6 +106,7 @@ export default Vue.extend({
         password: 'text',
         url: 'www.facebook.com',
         note: 'this is my catfish account',
+        favourite: true,
       },
       {
         uuid: '8eaa423b-2a63-42cb-a977-b38515e85da6',
@@ -92,30 +116,35 @@ export default Vue.extend({
         otpSecret: 'rtetgere',
         url: 'www.facebook.com',
         note: 'this is my main account',
+        favourite: true,
       },
       {
         uuid: 'a4fa2765-b54e-4302-8a78-4bc63ddedf34',
         name: 'My Online Account',
         username: 'test@gmail.com',
         password: 'mysupersecretpassword',
+        favourite: true,
       },
       {
         uuid: '5836c263-d611-4e69-92c4-de6172278d9e',
         name: 'My Online Account 2',
         username: 'test@gmail.com',
         password: 'apassword',
+        favourite: true,
       },
       {
         uuid: '3e3d4cf7-d175-4e04-9ab7-420086bf9e11',
         name: 'Scam Account',
         username: 'scam@gmail.com',
         password: 'hi',
+        favourite: true,
       },
       {
         uuid: '8ad01649-5be0-4af9-ada3-5badf48456a6',
         name: 'My Online Account',
         username: 'scam@gmail.com',
         password: 'mysupersecretpassword',
+        favourite: true,
       },
       {
         uuid: '76f3c1d4-5db0-451b-a69b-e04d97b608d1',
@@ -123,47 +152,39 @@ export default Vue.extend({
         username: 'test@gmail.com',
         password: 'mysupersecretpassword',
         totp: 'gdfdfgfwfw',
+        favourite: false,
       },
       {
         uuid: '7a370e20-4f21-4ee6-b4c6-939f10cd6387',
         name: 'My scam Bitcointalk Account',
         username: 'scam@gmail.com',
         password: 'mysupersecretpassword',
+        favourite: false,
       },
       {
         uuid: '0ecd2d95-f62a-48bf-9b49-0ab4fbfc29b1',
         name: 'Adding account',
         username: 'test@gmail.com',
         password: 'mysupersecretpassword',
-      },
-    ],
-    cards: [
-      {
-        uuid: 'ea803d35-ac08-4e85-b65f-68988f96c709',
-        brand: 'Visa',
-        number: '4916635451956666',
-        expiry_month: '02',
-        expiry_year: '2023',
-        ccv: '293',
+        favourite: false,
       },
       {
-        uuid: '1280aa8e-8af1-4a10-8916-b4bcfb2bbd00',
-        brand: 'Mastercard',
-        number: '5528807515210946',
-        expiry_month: '02',
-        expiry_year: '2023',
-        ccv: '313',
+        uuid: '0ecd2d95-f62a-48bf-9b49-0ab4fbfc29b1',
+        name: 'Adding account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
+        favourite: false,
       },
       {
-        uuid: 'dd1b3fd5-200e-499d-9409-f0d22fd99965',
-        brand: 'AMEX',
-        number: '378008955395048',
-        expiry_month: '02',
-        expiry_year: '2023',
-        ccv: '781',
+        uuid: '0ecd2d95-f62a-48bf-9b49-0ab4fbfc29b1',
+        name: 'Adding account',
+        username: 'test@gmail.com',
+        password: 'mysupersecretpassword',
+        favourite: false,
       },
     ],
     passwordMasked: true,
+    favourited: true,
   }),
   methods: {
     ...mapActions(['RetrievePWManagerData', 'getPasswordByUUID', 'getCardByUUID']),
@@ -175,6 +196,9 @@ export default Vue.extend({
     },
     masking() {
       this.passwordMasked = !this.passwordMasked;
+    },
+    favourite() {
+      this.favourited = !this.favourited;
     },
   },
   watch: {

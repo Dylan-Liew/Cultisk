@@ -14,7 +14,7 @@ const DOMAIN_NAME = 'http://127.0.0.1:5000';
 
 // TODO: change default value for authenticated to false after development is done.
 const state = {
-  authenticated: false,
+  authenticated: true,
   timeout: false,
   expired: false,
   token: '',
