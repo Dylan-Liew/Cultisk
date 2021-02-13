@@ -7,17 +7,17 @@
           <div class="form-group">
             <label for="MasterPassword">Password</label>
             <br>
-            <input :type="passwordMasked ? 'password' : 'text'" class="form-control float-left mb-2 w-90" v-model="masterPassword" id="MasterPassword" placeholder="Password">
-            <button class="btn float-right" v-on:click="masking">
-              <i class="fa" :class="passwordMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+            <input :type="masterMasked ? 'password' : 'text'" class="form-control float-left mb-2 w-90" v-model="masterPassword" id="MasterPassword" placeholder="Password">
+            <button class="btn float-right" @click.prevent="maskMasterPass">
+              <i class="fa" :class="masterMasked ? 'fa-eye' : 'fa-eye-slash'" id="mask-button"></i>
             </button>
           </div>
           <div class="form-group">
             <label>Confirm Password</label>
             <br>
-            <input :type="passwordMasked2 ? 'password' : 'text'" class="form-control float-left w-90" v-model="confirmPassword" placeholder="Confirm Password">
-            <button class="btn float-right" v-on:click="masking2">
-              <i class="fa" :class="passwordMasked2 ? 'fa-eye form-control-feedback' : 'fa-eye-slash'"></i>
+            <input :type="confirmMasked ? 'password' : 'text'" class="form-control float-left w-90" v-model="confirmPassword" placeholder="Confirm Password">
+            <button class="btn float-right" @click.prevent="maskConfirmPass">
+              <i class="fa" :class="confirmMasked ? 'fa-eye' : 'fa-eye-slash'"></i>
             </button>
           </div>
           <br>
@@ -25,7 +25,7 @@
             <label for="Hint">Password Hint</label>
             <input type="text" v-model="passwordHint" class="form-control" id="Hint" placeholder="Password Hint">
           </div>
-          <button type="submit" class="btn btn-primary" @click="CreateVault">Create Master Password</button>
+          <button type="submit" class="btn btn-primary" @click.prevent="CreateVault">Create Master Password</button>
         </form>
       </div>
     </div>
@@ -43,8 +43,8 @@ export default Vue.extend({
     masterPassword: '',
     confirmPassword: '',
     passwordHint: '',
-    passwordMasked: true,
-    passwordMasked2: true,
+    masterMasked: true,
+    confirmMasked: true,
   }),
   methods: {
     ...mapActions(['SetupVault', 'ToggleNav']),
@@ -66,11 +66,11 @@ export default Vue.extend({
         this.masterPassword = '';
       }
     },
-    masking() {
-      this.passwordMasked = !this.passwordMasked;
+    maskMasterPass() {
+      this.masterMasked = !this.masterMasked;
     },
-    masking2() {
-      this.passwordMasked2 = !this.passwordMasked2;
+    maskConfirmPass() {
+      this.confirmMasked = !this.confirmMasked;
     },
   },
 });

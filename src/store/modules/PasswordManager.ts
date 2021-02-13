@@ -29,7 +29,7 @@ const state = {
   },
   symmetricKey: '',
   lastUnlocked: null,
-  unlocked: true,
+  unlocked: false,
   expireIn: 1200,
   // Value in seconds ^
 };

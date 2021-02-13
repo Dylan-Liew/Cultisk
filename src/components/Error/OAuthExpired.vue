@@ -18,9 +18,9 @@ import { mapActions, mapGetters } from 'vuex';
 // TODO: When done move back to Home page, authentication complete + unhidden nav
 export default Vue.extend({
   name: 'OAuthExpired',
-  computed: mapGetters(['appID', 'isAuthenticated', 'timeout']),
+  computed: mapGetters(['appID', 'isAuthenticated', 'timeout', 'setupStatus']),
   methods: {
-    ...mapActions(['SetupOAuth']),
+    ...mapActions(['ToggleNav']),
     oauth() {
       this.$store.dispatch('SetupOAuth', this.appID);
     },
@@ -28,7 +28,14 @@ export default Vue.extend({
   watch: {
     isAuthenticated(newValue) {
       if (newValue) {
-        this.$router.push('/');
+        this.$store.dispatch('CheckVaultStatus').then(() => {
+          if (this.setupStatus) {
+            this.$router.push('/');
+            this.ToggleNav();
+          } else {
+            this.$router.push('/welcome/password-manager');
+          }
+        });
       }
     },
   },

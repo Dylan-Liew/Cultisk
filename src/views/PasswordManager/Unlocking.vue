@@ -8,9 +8,9 @@
             <div class="form-group">
               <label for="MasterPassword">Password</label>
               <br>
-              <input :type="passwordMasked ? 'password' : 'text'" class="form-control float-left w-90 mb-2" v-model="masterPassword" id="MasterPassword" placeholder="Password">
-              <button class="btn float-right" v-on:click="masking">
-                <i class="fa" :class="passwordMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+              <input :type="masterMasked ? 'password' : 'text'" class="form-control float-left w-90 mb-2" v-model="masterPassword" id="MasterPassword" placeholder="Password">
+              <button class="btn float-right" @click.prevent="maskMasterPass">
+                <i class="fa" :class="masterMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
               </button>
             </div>
             <button type="submit" class="btn btn-primary" @click="unlock">Unlock</button>
@@ -31,15 +31,15 @@ export default Vue.extend({
   computed: mapGetters(['isUnlocked']),
   data: () => ({
     masterPassword: '',
-    passwordMasked: true,
+    masterMasked: true,
   }),
   methods: {
     ...mapActions(['UnlockVault']),
     unlock() {
       this.$store.dispatch('UnlockVault', this.masterPassword);
     },
-    masking() {
-      this.passwordMasked = !this.passwordMasked;
+    maskMasterPass() {
+      this.masterMasked = !this.masterMasked;
     },
   },
   watch: {

@@ -38,10 +38,10 @@
                   <li class="list-group-item"><span class="font-weight-bold">Username:</span><br>{{ selected.username }}</li>
                   <li class="list-group-item"><span class="font-weight-bold">
                     Password:</span><br>
-                    <input class="password-field float-left" :type="passwordMasked ? 'password' : 'text'"
+                    <input class="password-field float-left" :type="userPassMasked ? 'password' : 'text'"
                            :value="selected.password" id="password" disabled>
-                    <button class="btn float-right" v-on:click="masking">
-                      <i class="fa" :class="passwordMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+                    <button class="btn float-right" v-on:click="maskUserPass">
+                      <i class="fa" :class="userPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
                     </button>
                   </li>
                   <li class="list-group-item" v-if="selected.url">
@@ -183,7 +183,7 @@ export default Vue.extend({
         favourite: false,
       },
     ],
-    passwordMasked: true,
+    userPassMasked: true,
     favourited: true,
   }),
   methods: {
@@ -194,8 +194,8 @@ export default Vue.extend({
     onSelect(item) {
       this.selected = item;
     },
-    masking() {
-      this.passwordMasked = !this.passwordMasked;
+    maskUserPass() {
+      this.userPassMasked = !this.userPassMasked;
     },
     favourite() {
       this.favourited = !this.favourited;
