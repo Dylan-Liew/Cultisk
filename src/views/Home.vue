@@ -23,31 +23,33 @@ export default Vue.extend({
   computed: mapGetters(['isAuthenticated', 'GUserID', 'setupStatus']),
   // TODO: Re enable Authentication Flow after development is done
   created() {
-    const store = new Store();
-    let appID = store.get('appID');
-    if (!appID) {
-      console.log('no appID creating new');
-      const uuid = uuidv4();
-      store.set('appID', uuid);
-      appID = uuid;
-      this.$store.commit('SetAppID', appID);
-      this.$router.push('/welcome/oauth');
-    } else {
-      console.log('App ID exist');
-      this.$store.commit('SetAppID', appID);
-      this.$store.dispatch('CheckAppAuthenticated', appID).then(() => {
-        if (!this.isAuthenticated) {
-          this.$router.push('/error/oauth');
-        } else {
-          this.$store.dispatch('CheckVaultStatus').then(() => {
-            if (this.setupStatus) {
-              this.ToggleNav();
-            } else {
-              this.$router.push('/welcome/password-manager');
-            }
-          });
-        }
-      });
+    if (!this.isAuthenticated) {
+      const store = new Store();
+      let appID = store.get('appID');
+      if (!appID) {
+        console.log('no appID creating new');
+        const uuid = uuidv4();
+        store.set('appID', uuid);
+        appID = uuid;
+        this.$store.commit('SetAppID', appID);
+        this.$router.push('/welcome/oauth');
+      } else {
+        console.log('App ID exist');
+        this.$store.commit('SetAppID', appID);
+        this.$store.dispatch('CheckAppAuthenticated', appID).then(() => {
+          if (!this.isAuthenticated) {
+            this.$router.push('/error/oauth');
+          } else {
+            this.$store.dispatch('CheckVaultStatus').then(() => {
+              if (this.setupStatus) {
+                this.ToggleNav();
+              } else {
+                this.$router.push('/welcome/password-manager');
+              }
+            });
+          }
+        });
+      }
     }
   },
 });

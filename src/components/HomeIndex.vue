@@ -1,5 +1,5 @@
 <template>
-  <div class="index">
+  <div class="index" style="z-index: 0;">
     <b-carousel
       id="carousel-1"
       v-model="slide"
