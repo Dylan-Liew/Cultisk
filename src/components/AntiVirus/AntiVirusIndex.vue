@@ -15,7 +15,7 @@
       <div class="div-top-right">
         <div class="row">
           <div class="col text-center">
-            <b-button style="width:130px; height: 45px; font-size:1.3em;" variant="primary" @click="RetrieveAVInfo">Scan</b-button>
+            <b-button style="width:130px; height: 45px; font-size:1.3em;" variant="primary" @click="RetrieveAVInfo(foldername)">Scan</b-button>
           </div>
         </div>
       </div>
@@ -154,6 +154,7 @@ export default Vue.extend({
   data: () => ({
     search: null,
     searched: [],
+    foldername: null,
   }),
   methods: {
     ...mapActions(['RetrieveAVInfo', 'ResetState']),
@@ -164,6 +165,7 @@ export default Vue.extend({
     formatNames(files) {
       try {
         const folder_name = files[0].path.substring(0, files[0].path.lastIndexOf('\\'));
+        this.foldername = folder_name;
         return `${folder_name} folder selected`;
       } catch (err) {
         return 'Invalid folder selected';

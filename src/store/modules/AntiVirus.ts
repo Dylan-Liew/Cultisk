@@ -48,13 +48,13 @@ const getters = {
 };
 
 const actions = {
-  RetrieveAVInfo({ commit }: CommitFunction) {
+  RetrieveAVInfo({ commit }: CommitFunction, foldername: string) {
     const client = new zerorpc.Client({ heartbeatInterval: 10000 });
     client.connect('tcp://127.0.0.1:4242');
     client.on('error', (error: string) => {
       console.error('RPC client error:', error);
     });
-    client.invoke('av_scan', (error: string, res: string) => {
+    client.invoke('av_scan', foldername, (error: string, res: string) => {
       const ResObj = JSON.parse(res);
       commit('SetAVInfo', ResObj);
       client.close();
