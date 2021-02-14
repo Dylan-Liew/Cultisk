@@ -63,7 +63,7 @@ body{
 </style>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Cultisk',
@@ -166,7 +166,7 @@ export default {
   },
   methods: {
     onItemClick() {
-      /*  pass; */
+      this.onLoad();
     },
     onCollapse(c) {
       this.collapsed = c;
@@ -176,7 +176,13 @@ export default {
         document.getElementById('view').style.opacity = '0.6';
       }
     },
+    ...mapActions([
+      'StartSchedulerInterval',
+    ]),
+    onLoad() {
+      this.StartSchedulerInterval(60000);
+    },
   },
-  computed: mapGetters(['navStatus']),
+  computed: mapGetters(['navStatus', 'GUserID']),
 };
 </script>

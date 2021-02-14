@@ -9,13 +9,39 @@ import readline from 'readline';
 import { upload } from '@/store/modules/Backup/azureAPI';
 import * as scheduler from '@/store/modules/Backup/scheduler';
 import { CronTime } from 'cron';
-
+/* eslint no-shadow: ["error", { "allow": ["state"] }] */
 const state = {
+  jobID: 0,
+  interval: 0,
 };
+
+interface BackUpState {
+  jobID: number;
+  interval: number;
+}
 
 interface RootState {
   Auth: AuthState;
 }
+
+interface SnapshotData {
+  name: string;
+  snapshotID: string;
+}
+
+const getters = {
+  getJobID: (state: BackUpState) => state.jobID,
+  getInterval: (state: BackUpState) => state.interval,
+};
+
+const mutations = {
+  setNewJobID(state: BackUpState, newID: number) {
+    state.jobID = newID;
+  },
+  setNewInterval(state: BackUpState, newInterval: number) {
+    state.interval = newInterval;
+  },
+};
 
 const actions = {
   CreateUserContainer({ commit, rootState }: CommitRootStateFunction<RootState>) {
@@ -51,7 +77,7 @@ const actions = {
     for await (const line of rl) {
       // Each line in input.txt will be successively available here as `line`.
       try {
-        await upload(line);
+        await upload(line, rootState.Auth.GUserID);
       } catch (err) {
         console.log(err);
       }
@@ -59,11 +85,11 @@ const actions = {
     console.log('upload finished');
   },
   async GetFileStructure({ commit, rootState }: CommitRootStateFunction<RootState>, folder = '') {
-    return azureAPI.getFileJSON(folder);
+    return azureAPI.getFileJSON(folder, rootState.Auth.GUserID);
   },
   DeleteFile({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
     try {
-      azureAPI.deleteFile(name);
+      azureAPI.deleteFile(name, rootState.Auth.GUserID);
       return true;
     } catch (err) {
       console.log(err);
@@ -71,26 +97,34 @@ const actions = {
     return false;
   },
   DownloadFile({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
-    return azureAPI.downloadFile(name);
+    return azureAPI.downloadFile(name, rootState.Auth.GUserID);
   },
   async GetSnapshots({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
-    const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name));
+    const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name), rootState.Auth.GUserID);
     return snapshotList;
   },
-  async DownloadSnapshot({ commit, rootState }: CommitRootStateFunction<RootState>, { name, snapshotID }) {
-    return azureAPI.downloadSnapshot(name, snapshotID);
-  },
-  GetNextUploads({ commit, rootState }: CommitRootStateFunction<RootState>, i: number) {
-    return scheduler.BackupJob.nextDates(i);
-  },
-  SetSchedulerInterval({ commit, rootState }: CommitRootStateFunction<RootState>, interval: string) {
-    const cronInterval = new CronTime(interval);
-    scheduler.BackupJob.setTime(cronInterval);
+  async DownloadSnapshot({ commit, rootState }: CommitRootStateFunction<RootState>, { name, snapshotID }: SnapshotData) {
+    await azureAPI.downloadSnapshot(name, snapshotID, rootState.Auth.GUserID);
     return true;
+  },
+  StartSchedulerInterval({ commit, rootState }: CommitRootStateFunction<RootState>, interval: number) {
+    const backupJob = scheduler.createJob(rootState.Auth.GUserID, interval);
+    commit('setNewJobID', backupJob);
+    commit('setNewInterval', interval);
+    return backupJob;
+  },
+  SetSchedulerInterval({ commit, rootState }: CommitRootStateFunction<RootState>, interval: number) {
+    clearInterval(state.jobID);
+    const backupJob = scheduler.createJob(rootState.Auth.GUserID, interval);
+    commit('setNewJobID', backupJob);
+    commit('setNewInterval', interval);
+    return backupJob;
   },
 };
 
 export default {
   state,
+  getters,
+  mutations,
   actions,
 };
