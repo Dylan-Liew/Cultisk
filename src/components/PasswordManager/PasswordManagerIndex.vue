@@ -3,9 +3,9 @@
     <b-container class="position-fixed">
         <b-row>
           <b-col cols="6" style="left:0;">
-              <md-table class="p-entries mt-1" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
+              <md-table class="p-entries mt-1 mx-auto w-75" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-toolbar>
-                <b-container class="bv-example-row">
+                <b-container>
                   <b-row>
                     <b-col cols="8">
                       <md-field md-clearable class="md-toolbar-section-start">
@@ -24,7 +24,6 @@
                     </b-col>
                   </b-row>
                 </b-container>
-
               </md-table-toolbar>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
                 <md-table-cell md-sort-by="name" md-label="test">
@@ -36,7 +35,9 @@
                 </md-table-cell>
               </md-table-row>
             </md-table>
-            <button type="button" class="btn btn-primary">Primary</button>
+            <div class="text-center mt-1">
+              <b-button variant="primary" v-b-modal.modal-prevent-closing>Add Password</b-button>
+            </div>
           </b-col>
           <b-col cols="6">
               <div class="card" style="width: 50%; margin:100px auto;">
@@ -50,7 +51,7 @@
                     Password:</span><br>
                     <input class="password-field float-left" :type="userPassMasked ? 'password' : 'text'"
                            :value="selected.password" id="password" disabled>
-                    <button class="btn float-right" v-on:click="maskUserPass">
+                    <button class="btn float-right p-0" v-on:click="maskUserPass">
                       <i class="fa" :class="userPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
                     </button>
                   </li>
@@ -66,6 +67,75 @@
           </b-col>
         </b-row>
     </b-container>
+    <b-modal
+      id="modal-prevent-closing"
+      ref="modal"
+      title="Add Password"
+      @show="resetModal"
+      @hidden="resetModal"
+      @ok="handleOk"
+    >
+      <form ref="form" @submit.stop.prevent="handleSubmit">
+        <b-form-group
+          label="Name"
+          label-for="name-input"
+          invalid-feedback="Name is required"
+          :state="nameState"
+        >
+          <b-form-input
+            id="name-input"
+            v-model="pname"
+            :state="nameState"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group
+          label="Username"
+          label-for="username-input"
+          invalid-feedback="Username is required"
+          :state="UsernameState"
+        >
+          <b-form-input
+            id="username-input"
+            v-model="username"
+            :state="UsernameState"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <label for="text-password">Password</label>
+        <b-form-input class="float-left" style="width:93.5%;" :value="addpassword"  v-model="password" :type="addPassMasked ? 'password' : 'text'" id="text-password" aria-describedby="password-help-block"></b-form-input>
+        <button class="btn float-right p-0 mt-2" v-on:click="maskUserPass">
+          <i class="fa" :class="addPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+        </button>
+        <b-form-text id="password-help-block">
+          <br>
+          Your password must be 8-20 characters long, contain letters and numbers, and must not
+          contain spaces, special characters, or emoji.
+        </b-form-text>
+        <b-form-group
+          label="Authenticator Key (TOTP)"
+          label-for="totp-input"
+          :state="totpState"
+        >
+          <b-form-input
+            id="totp-input"
+            v-model="totp"
+            :state="totpState"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group
+          label="URL"
+          label-for="url-input"
+          :state="urlState"
+        >
+          <b-form-input
+            id="url-input"
+            v-model="url"
+            :state="urlState"
+          ></b-form-input>
+        </b-form-group>
+      </form>
+    </b-modal>
   </div>
 </template>
 
@@ -206,7 +276,8 @@ export default Vue.extend({
   display: none !important;
 }
 .p-entries{
-  width: 70%;
+  width: 100%;
+  height: 620px;
 }
 .password-field{
   border: none;
@@ -216,11 +287,14 @@ button:focus{
   outline: none;
   box-shadow: none;
 }
-
+.content{
+  height: 100%;
+}
 .checked {
   color: orange;
 }
-。md-table-head{
+.md-table-head{
   display: none !important;
 }
+
 </style>
