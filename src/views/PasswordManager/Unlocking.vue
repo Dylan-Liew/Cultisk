@@ -12,6 +12,8 @@
               <button class="btn float-right" @click.prevent="maskMasterPass">
                 <i class="fa" :class="masterMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
               </button>
+              <br>
+              <a class="forget">Forget Password</a>
             </div>
             <button class="btn btn-primary" @click.prevent="unlock">Unlock</button>
           </form>
@@ -76,5 +78,8 @@ form{
 }
 .w-90{
   width: 92% !important;
+}
+.forget:hover{
+  text-decoration: underline;
 }
 </style>
