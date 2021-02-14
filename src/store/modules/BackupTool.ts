@@ -1,5 +1,4 @@
-import Backup from '@/views/Backup.vue';
-import { CommitFunction, CommitRootStateFunction } from '@/types/custom.d';
+import { CommitRootStateFunction } from '@/types/custom.d';
 import * as StorageBlob from '@azure/storage-blob';
 import { AuthState } from '@/store/modules/auth';
 import * as UserInterface from '@/Backup/userInterface';
@@ -19,9 +18,8 @@ interface RootState {
 }
 
 const actions = {
-  RetrieveBackupInfo({ commit, rootState }: CommitRootStateFunction<RootState>) {
-    const userID = rootState.Auth.GUserID!;
-    process.env.CONTAINER_NAME = userID;
+  CreateUserContainer({ commit, rootState }: CommitRootStateFunction<RootState>) {
+    process.env.CONTAINER_NAME = rootState.Auth.GUserID!;
     process.env.AZURE_STORAGE_CONNECTION_STRING = '***REMOVED***';
     const blobService = StorageBlob.BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
     blobService.getContainerClient(process.env.CONTAINER_NAME).exists()
@@ -51,6 +49,7 @@ const actions = {
       // Note: we use the crlfDelay option to recognize all instances of CR LF
       // ('\r\n') in input.txt as a single line break.
 
+    // eslint-disable-next-line no-restricted-syntax
     for await (const line of rl) {
       // Each line in input.txt will be successively available here as `line`.
       try {
@@ -80,7 +79,7 @@ const actions = {
     const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name));
     return snapshotList;
   },
-  async DownloadSnapshot({ commit, rootState }: CommitRootStateFunction<RootState>, name: string, snapshotID: string) {
+  async DownloadSnapshot({ commit, rootState }: CommitRootStateFunction<RootState>, { name, snapshotID }) {
     return azureAPI.downloadSnapshot(name, snapshotID);
   },
   GetNextUploads({ commit, rootState }: CommitRootStateFunction<RootState>, i: number) {
