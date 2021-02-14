@@ -8,10 +8,12 @@ import * as crypto from 'crypto';
 import _ from 'lodash';
 import { match } from 'assert';
 
-const connectStr = process.env.AZURE_STORAGE_CONNECTION_STRING!;
+const connectStr = '***REMOVED***';
 const blobServiceClient = StorageBlob.BlobServiceClient.fromConnectionString(connectStr);
 const containerClient = blobServiceClient.getContainerClient(process.env.CONTAINER_NAME!);
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
 function md5File(filePath: string) {
   return new Promise((resolve, reject) => {
     const output = crypto.createHash('md5');
@@ -112,7 +114,7 @@ export async function getFileJSON(folder = '') {
   }
   // eslint-disable-next-line no-restricted-syntax
   for await (const item of blobServiceClient.getContainerClient('test').listBlobsFlat()) {
-    const reg = /[^\/]+/g;
+    const reg = /[^/]+/g;
     const matches = item.name.match(reg)!;
     fileJSON = _.merge(fileJSON, parse(matches));
   }
@@ -121,8 +123,9 @@ export async function getFileJSON(folder = '') {
 
 export async function getFileList(folder = '') {
   const fileList = [];
+  // eslint-disable-next-line no-restricted-syntax
   for await (const item of blobServiceClient.getContainerClient('test').listBlobsFlat()) {
-    const reg = /[^\/]+/g;
+    const reg = /[^/]+/g;
     const matches = item.name.match(reg)!;
     fileList.push({ name: matches.pop(), path: item.name });
   }

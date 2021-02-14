@@ -1,13 +1,13 @@
 import { CommitRootStateFunction } from '@/types/custom.d';
 import * as StorageBlob from '@azure/storage-blob';
 import { AuthState } from '@/store/modules/auth';
-import * as UserInterface from '@/Backup/userInterface';
+import * as UserInterface from '@/store/modules/Backup/userInterface';
 import * as path from 'path';
-import * as azureAPI from '@/Backup/azureAPI';
+import * as azureAPI from '@/store/modules/Backup/azureAPI';
 import fs from 'fs';
 import readline from 'readline';
-import { upload } from '@/Backup/azureAPI';
-import * as scheduler from '@/Backup/scheduler';
+import { upload } from '@/store/modules/Backup/azureAPI';
+import * as scheduler from '@/store/modules/Backup/scheduler';
 import { CronTime } from 'cron';
 
 const state = {
@@ -19,13 +19,11 @@ interface RootState {
 
 const actions = {
   CreateUserContainer({ commit, rootState }: CommitRootStateFunction<RootState>) {
-    process.env.CONTAINER_NAME = rootState.Auth.GUserID!;
-    process.env.AZURE_STORAGE_CONNECTION_STRING = '***REMOVED***';
-    const blobService = StorageBlob.BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
-    blobService.getContainerClient(process.env.CONTAINER_NAME).exists()
+    const blobService = StorageBlob.BlobServiceClient.fromConnectionString('***REMOVED***');
+    blobService.getContainerClient(rootState.Auth.GUserID).exists()
       .then((value) => {
         if (!value) {
-          blobService.createContainer(process.env.CONTAINER_NAME!)
+          blobService.createContainer(rootState.Auth.GUserID)
             .catch((err) => console.log(err));
         }
       })
