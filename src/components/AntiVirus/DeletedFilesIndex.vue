@@ -11,10 +11,12 @@
         </md-field>
       </md-table-toolbar>
 
-      <md-table-empty-state class="div-empty"
+      <md-table-empty-state class="div-empty" v-if="search"
         md-label="No files found"
         :md-description="`No files found for this '${search}' query. Try a different search term.`">
       </md-table-empty-state>
+
+      <md-table-empty-state class="div-empty" v-else/>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }">
         <md-table-cell md-label="File Name" md-sort-by="filename">{{ item.FilePath }}</md-table-cell>

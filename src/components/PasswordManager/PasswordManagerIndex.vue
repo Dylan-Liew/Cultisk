@@ -1,9 +1,9 @@
 <template>
   <div class="index">
-    <b-container class="position-fixed">
+    <b-container class="password-manager position-fixed">
         <b-row>
           <b-col cols="6" style="left:0;">
-              <md-table class="p-entries mt-1 mx-auto w-75" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
+              <md-table class="p-entries mt-1 mx-auto w-75 test" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-toolbar>
                 <b-container>
                   <b-row>
@@ -26,8 +26,8 @@
                 </b-container>
               </md-table-toolbar>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
-                <md-table-cell md-sort-by="name" md-label="test">
-                    <span class="font-weight-bold float-left">{{item.name}}</span>
+                <md-table-cell md-sort-by="name">
+                    <span class="font-weight-bold float-left">{{item.name}}</span><i class="ml-2 fas fa-exclamation-circle"></i>
                     <div v-if="item.favourite===true" v-on:click="favourite" class="fa fa-star float-right checked"></div>
                     <div v-else v-on:click="favourite" class="fa fa-star float-right"></div>
                     <br>
@@ -39,31 +39,72 @@
               <b-button variant="primary" v-b-modal.modal-prevent-closing>Add Password</b-button>
             </div>
           </b-col>
-          <b-col cols="6">
-              <div class="card" style="width: 50%; margin:100px auto;">
-                  <div class="card-header">
-                    Item Information
+          <b-col v-if="selected.name" cols="6">
+            <div class="card" style="width: 80%; margin:50px auto;">
+              <div class="card-header font-weight-bold">
+                Item Information
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <span class="text-muted">Account Name:</span><br>
+                  <input class="input-field" :value="selected.name" disabled>
+                </li>
+                <li class="list-group-item">
+                  <span class="text-muted">Username:</span><br>
+                  <input class="input-field" :value="selected.username" disabled>
+                <li class="list-group-item"><span class="text-muted">
+                  Password:</span><br>
+                  <input class="input-field float-left" :type="userPassMasked ? 'password' : 'text'"
+                         :value="selected.password" id="password" disabled>
+                  <button class="btn float-right p-0" v-on:click="maskUserPass">
+                    <i class="fa" :class="userPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+                  </button>
+                  <button class="btn float-right p-0 mr-2" @click.prevent="x">
+                    <i class="fa fa-copy"></i>
+                  </button>
+                </li>
+                <li class="list-group-item" v-if="selected.url">
+                  <span class="text-muted">URL:</span>
+                  <br>
+                  <input class="input-field" :value="selected.url" disabled>
+                </li>
+                <li class="list-group-item" v-if="selected.otpSecret"><span class="text-muted">TOTP secret:</span>
+                  <br>
+                  <input class="input-field" :value="selected.otpSecret" disabled>
+                </li>
+              </ul>
+            </div>
+              <div v-if="selected.note" class="card" style="width: 80%; margin:50px auto;">
+                  <div class="card-header text-muted">
+                    Note:
                   </div>
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item"><span class="font-weight-bold">Account Name:</span><br>{{ selected.name }}</li>
-                  <li class="list-group-item"><span class="font-weight-bold">Username:</span><br>{{ selected.username }}</li>
-                  <li class="list-group-item"><span class="font-weight-bold">
-                    Password:</span><br>
-                    <input class="password-field float-left" :type="userPassMasked ? 'password' : 'text'"
-                           :value="selected.password" id="password" disabled>
-                    <button class="btn float-right p-0" v-on:click="maskUserPass">
-                      <i class="fa" :class="userPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
-                    </button>
-                  </li>
-                  <li class="list-group-item" v-if="selected.url">
-                    <span class="font-weight-bold">URL:</span>
-                    <br>{{ selected.url }}
-                  </li>
-                  <li class="list-group-item" v-if="selected.otpSecret"><span class="font-weight-bold">TOTP secret:</span>
-                    <br>{{ selected.otpSecret }}
-                  </li>
-                </ul>
+                  <li class="list-group-item">
+                    <input class="input-field" :value="selected.note" disabled>
+                  </li></ul>
               </div>
+            <b-container style="width: 80%; margin:30px auto;">
+              <b-row>
+                <b-col md="4">
+                  <button type="button" class="btn btn-primary">Edit</button>
+                </b-col>
+                <b-col md="4" offset-md="4">
+                  <button type="button" class="btn btn-danger">Delete</button>
+                </b-col>
+              </b-row>
+            </b-container>
+            <b-container style="width: 80%; margin:30px auto;">
+              <b-row>
+                <b-col md="4">
+                  <button type="button" class="btn btn-danger">Cancel</button>
+                </b-col>
+                <b-col md="4" offset-md="4">
+                  <button type="button" class="btn btn-primary">Save</button>
+                </b-col>
+              </b-row>
+            </b-container>
+          </b-col>
+          <b-col cols="6" v-else>
           </b-col>
         </b-row>
     </b-container>
@@ -103,15 +144,13 @@
           ></b-form-input>
         </b-form-group>
         <label for="text-password">Password</label>
-        <b-form-input class="float-left" style="width:93.5%;" :value="addpassword"  v-model="password" :type="addPassMasked ? 'password' : 'text'" id="text-password" aria-describedby="password-help-block"></b-form-input>
-        <button class="btn float-right p-0 mt-2" v-on:click="maskUserPass">
-          <i class="fa" :class="addPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+        <b-form-input class="float-left" style="width:85%;" :value="addpassword" :type="addPassMasked ? 'password' : 'text'" id="text-password" aria-describedby="password-help-block"></b-form-input>
+        <button class="btn float-right p-0 mt-2 mx-1" @click.prevent="copy" >
+          <i class="fa fa-sync-alt" ></i>
         </button>
-        <b-form-text id="password-help-block">
-          <br>
-          Your password must be 8-20 characters long, contain letters and numbers, and must not
-          contain spaces, special characters, or emoji.
-        </b-form-text>
+        <button class="btn float-right p-0 mt-2 mx-2" @click.prevent="maskAddPass" >
+          <i class="fa" :class="addPassMasked ? 'fa-eye' : 'fa-eye-slash'"></i>
+        </button>
         <b-form-group
           label="Authenticator Key (TOTP)"
           label-for="totp-input"
@@ -148,6 +187,18 @@ export default Vue.extend({
   data: () => ({
     selected: {},
     filtervalue: 'all',
+    userPassMasked: true,
+    favourited: true,
+    addPassMasked: true,
+    pname: '',
+    nameState: null,
+    username: '',
+    UsernameState: null,
+    addpassword: '',
+    totp: '',
+    totpState: null,
+    url: '',
+    urlState: null,
     passwords: [
       {
         uuid: '593bfd33-56d9-45f1-b2cf-2fd297316225',
@@ -242,8 +293,6 @@ export default Vue.extend({
         favourite: false,
       },
     ],
-    userPassMasked: true,
-    favourited: true,
   }),
   methods: {
     ...mapActions(['RetrievePWManagerData', 'getPasswordByUUID', 'getCardByUUID']),
@@ -256,8 +305,19 @@ export default Vue.extend({
     maskUserPass() {
       this.userPassMasked = !this.userPassMasked;
     },
+    maskAddPass() {
+      this.addPassMasked = !this.addPassMasked;
+    },
     favourite() {
       this.favourited = !this.favourited;
+    },
+    copy() {
+      /* Get the text field */
+      const copyText = document.getElementById('password');
+      /* Select the text field */
+      copyText.select();
+      /* Copy the text inside the text field */
+      document.execCommand('copy');
     },
   },
   watch: {
@@ -272,29 +332,31 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.md-table .md-table-fixed-header{
+.password-manager .md-table-fixed-header{
   display: none !important;
 }
-.p-entries{
+.password-manager .p-entries{
   width: 100%;
   height: 620px;
 }
-.password-field{
+.password-manager .input-field{
   border: none;
   background: white;
 }
-button:focus{
+.password-manager button:focus{
   outline: none;
   box-shadow: none;
 }
-.content{
+.password-manager .content{
   height: 100%;
 }
-.checked {
+.password-manager .checked {
   color: orange;
 }
-.md-table-head{
-  display: none !important;
+.password-manager .fa:hover{
+  opacity: 0.7;
 }
-
+.fa-exclamation-circle{
+  color: red;
+}
 </style>
