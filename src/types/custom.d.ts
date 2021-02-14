@@ -94,6 +94,25 @@ export interface PasswordManagerUpdateResponse extends ServerResponse {
   data?: CardEntry | PasswordEntry;
 }
 
+export interface DataBreach {
+  Name: string;
+  BreachDate: string;
+  PwnCount: number;
+  DataClasses: [];
+}
+
+export interface PasteData {
+  Source: string;
+  EmailCount: number;
+}
+export interface DarkScannerData {
+  paste: PasteData[];
+  breach: DataBreach[];
+}
+export interface DarkScannerResponse extends ServerResponse {
+  data: DarkScannerData;
+}
+
 export interface SpamFilterData {
   sender: string;
   message: string;

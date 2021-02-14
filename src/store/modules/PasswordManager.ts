@@ -1,6 +1,7 @@
 import {
   CardEntry,
-  CommitFunction, CommitRootSateStateFunction,
+  CommitFunction,
+  CommitRootSateStateFunction,
   CommitRootStateFunction,
   CommitStateFunction,
   PasswordEntry,
@@ -183,6 +184,16 @@ const getters = {
   selectedPassword: (state: PwManagerState) => state.selectedPassword,
   expireIn: (state: PwManagerState) => state.expireIn,
   setupStatus: (state: PwManagerState) => state.vaultSetup,
+  GetPasswordHashes: (state: PwManagerState) => {
+    const entries = state.passwords;
+    return entries.map((x) => {
+      const enc = EncParser(x.password);
+      const decryptedPw = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
+      const sha1Sum = crypto.createHash('sha1');
+      sha1Sum.update(decryptedPw);
+      return { uuid: x.uuid, hash: sha1Sum.digest().toString() };
+    });
+  },
 };
 
 const actions = {
@@ -278,7 +289,7 @@ const actions = {
     const response = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
     const ResponseData: PasswordManagerUpdateResponse = response.data;
     if (ResponseData.success && Object.prototype.hasOwnProperty.call(ResponseData, 'data')) {
-      commit('AddPasswordEntry', data);
+      commit('UpdatePasswordEntry', { data, encrypted: false });
     }
   },
   async UpdateCardEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: CardEntry) {
@@ -287,7 +298,31 @@ const actions = {
     const response = await instance.put(`/password-manager/card/${data.uuid}`, enc_data);
     const ResponseData: PasswordManagerUpdateResponse = response.data;
     if (ResponseData.success && Object.prototype.hasOwnProperty.call(ResponseData, 'data')) {
-      commit('AddCardEntry', data);
+      commit('UpdateCardEntry', { data, encrypted: false });
+    }
+  },
+  async FavouriteTogglePWEntry({ commit, rootState }: CommitRootStateFunction<RootState>, data: PasswordEntryStore) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const postData = {
+      uuid: data.uuid,
+      favorite: !data.favorite,
+    };
+    const response = await instance.put(`/password-manager/password/${data.uuid}`, postData);
+    const ResponseData: PasswordManagerUpdateResponse = response.data;
+    if (ResponseData.success && Object.prototype.hasOwnProperty.call(ResponseData, 'data')) {
+      commit('UpdatePasswordEntry', { data, encrypted: true });
+    }
+  },
+  async FavouriteToggleCardEntry({ commit, rootState }: CommitRootStateFunction<RootState>, data: CardEntryStore) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const postData = {
+      uuid: data.uuid,
+      favorite: !data.favorite,
+    };
+    const response = await instance.put(`/password-manager/card/${data.uuid}`, postData);
+    const ResponseData: PasswordManagerUpdateResponse = response.data;
+    if (ResponseData.success && Object.prototype.hasOwnProperty.call(ResponseData, 'data')) {
+      commit('UpdateCardEntry', { data, encrypted: true });
     }
   },
   RemoveCardEntry({ commit }: CommitFunction, uuid: string) {
@@ -337,6 +372,18 @@ const mutations = {
     const entryStore: PasswordEntryStore = { ...entry, encrypted: false };
     passwords.concat(entryStore);
     state.passwords = passwords;
+  },
+  UpdatePasswordEntry: (state: PwManagerState, payload: {data: PasswordEntry; encrypted: boolean}): void => {
+    const entries = state.passwords;
+    const pos = entries.map((e) => e.uuid).indexOf(payload.data.uuid);
+    entries[pos] = { ...payload.data, encrypted: payload.encrypted };
+    state.passwords = entries;
+  },
+  UpdateCardEntry: (state: PwManagerState, payload: {data: CardEntry; encrypted: boolean}): void => {
+    const entries = state.cards;
+    const pos = entries.map((e) => e.uuid).indexOf(payload.data.uuid);
+    entries[pos] = { ...payload.data, encrypted: payload.encrypted };
+    state.cards = entries;
   },
   RemoveCard: (state: PwManagerState, uuid: string): void => {
     const entries = state.cards;

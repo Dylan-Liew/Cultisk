@@ -7,6 +7,7 @@ import PwManager from '@/store/modules/PasswordManager';
 import AntiVirus from '@/store/modules/AntiVirus';
 import SpamFilter from '@/store/modules/SpamFilter';
 import BackupTool from '@/store/modules/BackupTool';
+import DarkWebScan from '@/store/modules/DarkWebScan';
 
 Vue.use(Vuex);
 
@@ -19,5 +20,6 @@ export default new Vuex.Store({
     AntiVirus,
     SpamFilter,
     BackupTool,
+    DarkWebScan,
   },
 });
