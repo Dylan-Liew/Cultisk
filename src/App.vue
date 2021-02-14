@@ -144,20 +144,9 @@ export default {
           ],
         },
         {
-          title: 'Settings',
-          icon: 'fa fa-user-cog',
-          child: [
-            {
-              href: '/settings/',
-              title: 'Cultisk Settings',
-              icon: 'fa fa-cog',
-            },
-            {
-              href: '/settings/password-manager-master-change',
-              title: 'Change Master Password',
-              icon: 'fa fa-unlock-alt',
-            },
-          ],
+          title: 'Change Password',
+          icon: 'fa fa-cog',
+          href: '/settings/',
         },
       ],
       collapsed: true,

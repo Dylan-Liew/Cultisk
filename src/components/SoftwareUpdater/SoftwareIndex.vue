@@ -17,9 +17,9 @@
           </md-table-empty-state>
           <md-table-row slot="md-table-row" slot-scope="{ item }">
             <md-table-cell md-label="Name" md-sort-by="name">{{ item.name }}</md-table-cell>
-            <md-table-cell md-label="Version">{{ item.version }}</md-table-cell>
+            <md-table-cell md-label="Version">{{ item.lat_version }}</md-table-cell>
             <md-table-cell md-label="Publisher" md-sort-by="publisher">{{ item.publisher }}</md-table-cell>
-            <md-table-cell md-label="Latest Version">{{ item.lat_version }}</md-table-cell>
+            <md-table-cell md-label="Latest Version">{{ item.version }}</md-table-cell>
             <md-table-cell md-label="Download Link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
 <!--              {{ item.download_link }}-->
           </md-table-row>

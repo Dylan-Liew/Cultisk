@@ -27,7 +27,7 @@
               </md-table-toolbar>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
                 <md-table-cell md-sort-by="name">
-                    <span class="font-weight-bold float-left">{{item.name}}</span>
+                    <span class="font-weight-bold float-left">{{item.name}}</span><i class="ml-2 fas fa-exclamation-circle"></i>
                     <div v-if="item.favourite===true" v-on:click="favourite" class="fa fa-star float-right checked"></div>
                     <div v-else v-on:click="favourite" class="fa fa-star float-right"></div>
                     <br>
@@ -40,42 +40,69 @@
             </div>
           </b-col>
           <b-col v-if="selected.name" cols="6">
-              <div class="card" style="width: 80%; margin:50px auto;">
-                <div class="card-header font-weight-bold">
-                  Item Information
-                </div>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item"><span class="text-muted">Account Name:</span><br>{{ selected.name }}</li>
-                  <li class="list-group-item"><span class="text-muted">Username:</span><br>{{ selected.username }}</li>
-                  <li class="list-group-item"><span class="text-muted">
-                    Password:</span><br>
-                    <input class="password-field float-left" :type="userPassMasked ? 'password' : 'text'"
-                           :value="selected.password" id="password" disabled>
-                    <button class="btn float-right p-0" v-on:click="maskUserPass">
-                      <i class="fa" :class="userPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
-                    </button>
-                    <button class="btn float-right p-0 mr-2" @click.prevent="x">
-                      <i class="fa fa-copy"></i>
-                    </button>
-                  </li>
-                  <li class="list-group-item" v-if="selected.url">
-                    <span class="text-muted">URL:</span>
-                    <br>{{ selected.url }}
-                  </li>
-                  <li class="list-group-item" v-if="selected.otpSecret"><span class="text-muted">TOTP secret:</span>
-                    <br>{{ selected.otpSecret }}
-                  </li>
-                </ul>
+            <div class="card" style="width: 80%; margin:50px auto;">
+              <div class="card-header font-weight-bold">
+                Item Information
               </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <span class="text-muted">Account Name:</span><br>
+                  <input class="input-field" :value="selected.name" disabled>
+                </li>
+                <li class="list-group-item">
+                  <span class="text-muted">Username:</span><br>
+                  <input class="input-field" :value="selected.username" disabled>
+                <li class="list-group-item"><span class="text-muted">
+                  Password:</span><br>
+                  <input class="input-field float-left" :type="userPassMasked ? 'password' : 'text'"
+                         :value="selected.password" id="password" disabled>
+                  <button class="btn float-right p-0" v-on:click="maskUserPass">
+                    <i class="fa" :class="userPassMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
+                  </button>
+                  <button class="btn float-right p-0 mr-2" @click.prevent="x">
+                    <i class="fa fa-copy"></i>
+                  </button>
+                </li>
+                <li class="list-group-item" v-if="selected.url">
+                  <span class="text-muted">URL:</span>
+                  <br>
+                  <input class="input-field" :value="selected.url" disabled>
+                </li>
+                <li class="list-group-item" v-if="selected.otpSecret"><span class="text-muted">TOTP secret:</span>
+                  <br>
+                  <input class="input-field" :value="selected.otpSecret" disabled>
+                </li>
+              </ul>
+            </div>
               <div v-if="selected.note" class="card" style="width: 80%; margin:50px auto;">
                   <div class="card-header text-muted">
                     Note:
                   </div>
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item">
-                    {{ selected.note }}
+                    <input class="input-field" :value="selected.note" disabled>
                   </li></ul>
               </div>
+            <b-container style="width: 80%; margin:30px auto;">
+              <b-row>
+                <b-col md="4">
+                  <button type="button" class="btn btn-primary">Edit</button>
+                </b-col>
+                <b-col md="4" offset-md="4">
+                  <button type="button" class="btn btn-danger">Delete</button>
+                </b-col>
+              </b-row>
+            </b-container>
+            <b-container style="width: 80%; margin:30px auto;">
+              <b-row>
+                <b-col md="4">
+                  <button type="button" class="btn btn-danger">Cancel</button>
+                </b-col>
+                <b-col md="4" offset-md="4">
+                  <button type="button" class="btn btn-primary">Save</button>
+                </b-col>
+              </b-row>
+            </b-container>
           </b-col>
           <b-col cols="6" v-else>
           </b-col>
@@ -312,7 +339,7 @@ export default Vue.extend({
   width: 100%;
   height: 620px;
 }
-.password-manager .password-field{
+.password-manager .input-field{
   border: none;
   background: white;
 }
@@ -327,6 +354,9 @@ export default Vue.extend({
   color: orange;
 }
 .password-manager .fa:hover{
-  color: #007BFF;
+  opacity: 0.7;
+}
+.fa-exclamation-circle{
+  color: red;
 }
 </style>
