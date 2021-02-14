@@ -8,7 +8,7 @@
         ></b-form-file>
       </div>
     <div class="card div-top-center" style="width: 5rem;">
-      <div class="card-body">
+      <div class="card-body m-2">
         <span class="font-weight-bold">last scanned time:</span> {{ last_scan_time }}12/03/2012
       </div>
     </div>
@@ -44,13 +44,13 @@
       </md-table>
     <div class="card single-v-1" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title text-muted">Number of Files Scanned</h5>
+        <h5 class="card-title text-muted m-2">Number of Files Scanned</h5>
         <p class="card-text">{{ FileScanned }}</p>
       </div>
     </div>
     <div class="card single-v-2" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title text-muted">Number of Malicious Files</h5>
+        <h5 class="card-title text-muted m-2">Number of Malicious Files</h5>
         <p class="card-text text-success" v-if="MalDetected===0">{{ MalDetected }}</p>
         <p class="card-text text-danger" v-else>{{ MalDetected }}</p>
       </div>

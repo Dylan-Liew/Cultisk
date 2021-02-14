@@ -5,20 +5,29 @@
           <b-col cols="6" style="left:0;">
               <md-table class="p-entries mt-1" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-toolbar>
-                <md-field md-clearable class="md-toolbar-section-end">
-                  <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
-                </md-field>
-                <div class="md-layout-item">
-                  <md-field>
-                    <md-select v-model="filtervalue">
-                      <md-option value="all">All</md-option>
-                      <md-option value="favourite">Favourite</md-option>
-                    </md-select>
-                  </md-field>
-                </div>
+                <b-container class="bv-example-row">
+                  <b-row>
+                    <b-col cols="8">
+                      <md-field md-clearable class="md-toolbar-section-start">
+                        <md-input placeholder="Search by name..." v-model="search" @input="searchOnTable" />
+                      </md-field>
+                    </b-col>
+                    <b-col cols="4">
+                      <div class="md-layout-item">
+                        <md-field>
+                          <md-select v-model="filtervalue">
+                            <md-option value="all">All</md-option>
+                            <md-option value="favourite">Favourite</md-option>
+                          </md-select>
+                        </md-field>
+                      </div>
+                    </b-col>
+                  </b-row>
+                </b-container>
+
               </md-table-toolbar>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
-                <md-table-cell md-label="ID" md-sort-by="name">
+                <md-table-cell md-sort-by="name" md-label="test">
                     <span class="font-weight-bold float-left">{{item.name}}</span>
                     <div v-if="item.favourite===true" v-on:click="favourite" class="fa fa-star float-right checked"></div>
                     <div v-else v-on:click="favourite" class="fa fa-star float-right"></div>
@@ -27,6 +36,7 @@
                 </md-table-cell>
               </md-table-row>
             </md-table>
+            <button type="button" class="btn btn-primary">Primary</button>
           </b-col>
           <b-col cols="6">
               <div class="card" style="width: 50%; margin:100px auto;">
@@ -58,27 +68,6 @@
     </b-container>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.p-entries{
-  width: 70%;
-}
-.password-field{
-  border: none;
-  background: white;
-}
-button:focus{
-  outline: none;
-  box-shadow: none;
-}
-
-.md-table-head {
-  display:none !important;
-}
-.checked {
-  color: orange;
-}
-</style>
 
 <script lang="js">
 import Vue from 'vue';
@@ -211,3 +200,27 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.md-table .md-table-fixed-header{
+  display: none !important;
+}
+.p-entries{
+  width: 70%;
+}
+.password-field{
+  border: none;
+  background: white;
+}
+button:focus{
+  outline: none;
+  box-shadow: none;
+}
+
+.checked {
+  color: orange;
+}
+。md-table-head{
+  display: none !important;
+}
+</style>
