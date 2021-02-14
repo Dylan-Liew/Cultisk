@@ -61,7 +61,7 @@ export default Vue.extend({
       this.confirmMasked = !this.confirmMasked;
     },
     oldMasterPass() {
-      this.masterMasked = !this.masterMasked;
+      this.oldMasked = !this.oldMasked;
     },
   },
 });
