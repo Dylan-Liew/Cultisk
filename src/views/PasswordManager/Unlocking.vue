@@ -13,7 +13,7 @@
                 <i class="fa" :class="masterMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
               </button>
             </div>
-            <button type="submit" class="btn btn-primary" @click="unlock">Unlock</button>
+            <button class="btn btn-primary" @click.prevent="unlock">Unlock</button>
           </form>
         </div>
       </div>
@@ -26,6 +26,8 @@
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 
+const { dialog } = require('electron').remote;
+
 export default Vue.extend({
   name: 'PasswordManagerUnlock',
   computed: mapGetters(['isUnlocked']),
@@ -36,17 +38,21 @@ export default Vue.extend({
   methods: {
     ...mapActions(['UnlockVault']),
     unlock() {
-      this.$store.dispatch('UnlockVault', this.masterPassword);
+      this.$store.dispatch('UnlockVault', this.masterPassword).then(() => {
+        if (this.isUnlocked) {
+          this.$router.push('/password-manager/');
+        } else {
+          dialog.showMessageBox({
+            type: 'warning',
+            title: 'invalid password',
+            message: 'Please check your password and try again.',
+          });
+          this.masterPassword = '';
+        }
+      });
     },
     maskMasterPass() {
       this.masterMasked = !this.masterMasked;
-    },
-  },
-  watch: {
-    isUnlocked(newValue) {
-      if (newValue) {
-        this.$router.push('/password-manager/');
-      }
     },
   },
 });

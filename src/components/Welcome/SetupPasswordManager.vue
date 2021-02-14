@@ -34,7 +34,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
+
+const { dialog } = require('electron').remote;
 
 // TODO: When done move back to Home page, init complete + unhidden nav
 export default Vue.extend({
@@ -60,7 +62,11 @@ export default Vue.extend({
           this.$router.push('/');
         });
       } else {
-        // TODO: Show user alert that password does not match
+        dialog.showMessageBox({
+          type: 'warning',
+          title: 'invalid password',
+          message: 'Please check your password and try again.',
+        });
         this.passwordHint = '';
         this.confirmPassword = '';
         this.masterPassword = '';
