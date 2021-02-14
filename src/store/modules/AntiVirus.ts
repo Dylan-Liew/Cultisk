@@ -28,6 +28,19 @@ interface AVResponse {
   last_scanned_time: string;
 }
 
+interface DeletedfileResults {
+  FilePath: string;
+  timing: string;
+}
+
+interface DeletedfileState {
+  DeletedFilelist: DeletedfileResults[];
+}
+
+interface DeletedfileResponse {
+  DeletedFilelist: DeletedfileResults[];
+}
+
 const getters = {
   MalDetected: (state: AVState) => state.MalDetected,
   FileScanned: (state: AVState) => state.FileScanned,
@@ -58,6 +71,19 @@ const actions = {
     };
     commit('SetAVInfo', defaultState);
   },
+  GetDeletedfiles({ commit }: CommitFunction) {
+    const client = new zerorpc.Client({ heartbeatInterval: 10000 });
+    client.connect('tcp://127.0.0.1:4242');
+    client.on('error', (error: string) => {
+      console.error('RPC client error:', error);
+    });
+    client.invoke('Get_deleted_file', (error: string, res: string) => {
+      const ResObj = JSON.parse(res);
+      console.log(ResObj);
+      commit('SetDeletedFile', ResObj);
+      client.close();
+    });
+  },
 };
 
 const mutations = {
@@ -66,6 +92,9 @@ const mutations = {
     state.FileScanned = AvResponse.files_scanned;
     state.MalDetected = AvResponse.mal_detected;
     state.last_scanned_time = AvResponse.last_scanned_time;
+  },
+  SetDeletedFile: (state: DeletedfileState, AvResponse: DeletedfileResponse): void => {
+    state.DeletedFilelist = AvResponse.DeletedFilelist;
   },
 };
 

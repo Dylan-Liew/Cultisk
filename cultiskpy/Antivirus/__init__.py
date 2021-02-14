@@ -390,7 +390,20 @@ class Scanner:
         result = {
             'mal_detected': 1,
             'files_scanned': 130,
-            'scanned_list': [('C:\\Users', 'safe'), ('D:\\malware', 'malicious'), ('C:\\IE', 'safe')]
+            'scanned_list': [{"FilePath": 'D:\\malware', "malicious": True}, {"FilePath": 'C:\\not_malware', "malicious": False}],
+            'last_scanned_time': '10/02/2021 06:50:25'
         }
         print(f"> {result}")
         return json.dumps(result)
+
+def Get_deleted_file():
+    file = open('../result.txt', 'r')
+    result = []
+    filelines = file.read().splitlines()
+    for line in filelines:
+        filepath, timing = line.split(',')
+        result.append({'FilePath': filepath, "timing": timing})
+    print(json.dumps(result))
+    file.close()
+    return json.dumps(result)
+
