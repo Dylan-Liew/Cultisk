@@ -9,7 +9,7 @@
       </div>
     <div class="card div-top-center" style="width: 5rem;">
       <div class="card-body m-2">
-        <span class="font-weight-bold">last scanned time:</span> {{ last_scan_time }}12/03/2012
+        <span class="font-weight-bold">last scanned time:</span> {{ last_scanned_time }}
       </div>
     </div>
       <div class="div-top-right">
@@ -170,7 +170,7 @@ export default Vue.extend({
       }
     },
   },
-  computed: mapGetters(['ScannedList', 'MalDetected', 'FileScanned']),
+  computed: mapGetters(['ScannedList', 'MalDetected', 'FileScanned', 'last_scanned_time']),
   watch: {
     ScannedList(newValue) {
       this.searched = newValue;

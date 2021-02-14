@@ -8,7 +8,7 @@ const state = {
   MalDetected: 0,
   FileScanned: 0,
   ScannedList: [],
-  last_scan_time: 0,
+  last_scanned_time: '00:00:00',
 };
 interface ScanResults {
   FilePath: string;
@@ -18,21 +18,21 @@ export interface AVState {
   MalDetected: number;
   FileScanned: number;
   ScannedList: ScanResults[];
-  last_scan_time: string;
+  last_scanned_time: string;
 }
 
 interface AVResponse {
   files_scanned: number;
   mal_detected: number;
   scanned_list: ScanResults[];
-  last_scan_time: string;
+  last_scanned_time: string;
 }
 
 const getters = {
   MalDetected: (state: AVState) => state.MalDetected,
   FileScanned: (state: AVState) => state.FileScanned,
   ScannedList: (state: AVState) => state.ScannedList,
-  last_scan_time: (state: AVState) => state.last_scan_time,
+  last_scanned_time: (state: AVState) => state.last_scanned_time,
 };
 
 const actions = {
@@ -54,7 +54,7 @@ const actions = {
       MalDetected: 0,
       FileScanned: 0,
       ScannedList: 0,
-      last_scan_time: 0,
+      last_scanned_time: 0,
     };
     commit('SetAVInfo', defaultState);
   },
@@ -65,7 +65,7 @@ const mutations = {
     state.ScannedList = AvResponse.scanned_list;
     state.FileScanned = AvResponse.files_scanned;
     state.MalDetected = AvResponse.mal_detected;
-    state.last_scan_time = AvResponse.last_scan_time;
+    state.last_scanned_time = AvResponse.last_scanned_time;
   },
 };
 
