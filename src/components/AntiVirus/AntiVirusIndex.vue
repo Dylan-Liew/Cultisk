@@ -136,7 +136,7 @@
 <script lang="ts">
 /* eslint @typescript-eslint/no-var-requires: "off" */
 import Vue from 'vue';
-import { mapGetters, mapActions, mapState } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { AVInfo } from '@/types/custom.d';
 
 const toLower = (text: string) => text.toString().toLowerCase();

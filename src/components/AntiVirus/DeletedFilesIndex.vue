@@ -17,8 +17,8 @@
       </md-table-empty-state>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="File Name" md-sort-by="filename">{{ item.filename }}</md-table-cell>
-        <md-table-cell md-label="Deleted Time" md-sort-by="deleted_time">{{ item.deleted_time }}</md-table-cell>
+        <md-table-cell md-label="File Name" md-sort-by="filename">{{ item.FilePath }}</md-table-cell>
+        <md-table-cell md-label="Deleted Time" md-sort-by="deleted_time">{{ item.timing }}</md-table-cell>
       </md-table-row>
     </md-table>
   </div>
@@ -40,6 +40,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapGetters, mapActions } from 'vuex';
 
 const toLower = (text) => text.toString().toLowerCase();
 
@@ -56,36 +57,23 @@ export default Vue.extend({
   data: () => ({
     search: null,
     searched: [],
-    files: [
-      {
-        filename: 'test',
-        deleted_time: '1/1/2020 1:1:1',
-      },
-      {
-        filename: 'test',
-        deleted_time: '1/1/2020 1:1:1',
-      },
-      {
-        filename: 'test',
-        deleted_time: '1/1/2020 1:1:1',
-      },
-      {
-        filename: 'test',
-        deleted_time: '1/1/2020 1:1:1',
-      },
-      {
-        filename: 'test',
-        deleted_time: '1/1/2020 1:1:1',
-      },
-    ],
   }),
+  computed: mapGetters(['deletedFiles']),
   methods: {
+    ...mapActions(['GetDeletedFiles']),
     searchOnTable() {
-      this.searched = searchByName(this.files, this.search);
+      this.searched = searchByName(this.deletedFiles, this.search);
     },
   },
   created() {
-    this.searched = this.files;
+    this.GetDeletedFiles();
+  },
+  watch: {
+    deletedFiles(newValue) {
+      this.searched = newValue;
+      console.log(this.searched);
+      console.log(newValue);
+    },
   },
 });
 </script>

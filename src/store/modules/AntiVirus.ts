@@ -9,6 +9,7 @@ const state = {
   FileScanned: 0,
   ScannedList: [],
   last_scanned_time: '00:00:00',
+  DeletedFileList: [],
 };
 interface ScanResults {
   FilePath: string;
@@ -19,6 +20,7 @@ export interface AVState {
   FileScanned: number;
   ScannedList: ScanResults[];
   last_scanned_time: string;
+  DeletedFileList: DeletedFileResults[];
 }
 
 interface AVResponse {
@@ -28,17 +30,13 @@ interface AVResponse {
   last_scanned_time: string;
 }
 
-interface DeletedfileResults {
+interface DeletedFileResults {
   FilePath: string;
   timing: string;
 }
 
-interface DeletedfileState {
-  DeletedFilelist: DeletedfileResults[];
-}
-
-interface DeletedfileResponse {
-  DeletedFilelist: DeletedfileResults[];
+interface DeletedFileResponse {
+  DeletedFileList: DeletedFileResults[];
 }
 
 const getters = {
@@ -46,6 +44,7 @@ const getters = {
   FileScanned: (state: AVState) => state.FileScanned,
   ScannedList: (state: AVState) => state.ScannedList,
   last_scanned_time: (state: AVState) => state.last_scanned_time,
+  deletedFiles: (state: AVState) => state.DeletedFileList,
 };
 
 const actions = {
@@ -57,7 +56,6 @@ const actions = {
     });
     client.invoke('av_scan', (error: string, res: string) => {
       const ResObj = JSON.parse(res);
-      console.log(ResObj);
       commit('SetAVInfo', ResObj);
       client.close();
     });
@@ -71,7 +69,7 @@ const actions = {
     };
     commit('SetAVInfo', defaultState);
   },
-  GetDeletedfiles({ commit }: CommitFunction) {
+  GetDeletedFiles({ commit }: CommitFunction) {
     const client = new zerorpc.Client({ heartbeatInterval: 10000 });
     client.connect('tcp://127.0.0.1:4242');
     client.on('error', (error: string) => {
@@ -79,7 +77,6 @@ const actions = {
     });
     client.invoke('Get_deleted_file', (error: string, res: string) => {
       const ResObj = JSON.parse(res);
-      console.log(ResObj);
       commit('SetDeletedFile', ResObj);
       client.close();
     });
@@ -93,8 +90,8 @@ const mutations = {
     state.MalDetected = AvResponse.mal_detected;
     state.last_scanned_time = AvResponse.last_scanned_time;
   },
-  SetDeletedFile: (state: DeletedfileState, AvResponse: DeletedfileResponse): void => {
-    state.DeletedFilelist = AvResponse.DeletedFilelist;
+  SetDeletedFile: (state: AVState, response: DeletedFileResults[]): void => {
+    state.DeletedFileList = response;
   },
 };
 

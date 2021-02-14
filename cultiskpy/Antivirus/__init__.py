@@ -396,14 +396,14 @@ class Scanner:
         print(f"> {result}")
         return json.dumps(result)
 
-def Get_deleted_file():
-    file = open('../result.txt', 'r')
-    result = []
-    filelines = file.read().splitlines()
-    for line in filelines:
-        filepath, timing = line.split(',')
-        result.append({'FilePath': filepath, "timing": timing})
-    print(json.dumps(result))
-    file.close()
-    return json.dumps(result)
+    def Get_deleted_file(self):
+        file = open('result.txt', 'r')
+        result = []
+        filelines = file.read().splitlines()
+        for line in filelines:
+            filepath, timing = line.split(',')
+            result.append({'FilePath': filepath, "timing": timing})
+        print(json.dumps(result))
+        file.close()
+        return json.dumps(result)
 
