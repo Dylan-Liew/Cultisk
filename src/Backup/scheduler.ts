@@ -9,7 +9,7 @@ Every 30 mins trigger request OAuth
 Every hour
  */
 
-const BackupJob = new CronJob('0 */1 * * * *', async () => {
+export const BackupJob = new CronJob('0 */1 * * * *', async () => {
   console.log('starting upload');
   const fileStream = fs.createReadStream(path.join(__dirname, 'pathList.txt'));
 
