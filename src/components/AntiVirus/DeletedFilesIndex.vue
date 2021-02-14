@@ -11,7 +11,7 @@
         </md-field>
       </md-table-toolbar>
 
-      <md-table-empty-state
+      <md-table-empty-state class="div-empty"
         md-label="No files found"
         :md-description="`No files found for this '${search}' query. Try a different search term.`">
       </md-table-empty-state>
@@ -36,6 +36,12 @@
   .md-field {
     max-width: 300px;
   }
+  .div-empty{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 </style>
 
 <script lang="ts">
@@ -46,7 +52,7 @@ const toLower = (text) => text.toString().toLowerCase();
 
 const searchByName = (items, term) => {
   if (term) {
-    return items.filter((item) => toLower(item.name).includes(toLower(term)));
+    return items.filter((item) => toLower(item.filename).includes(toLower(term)));
   }
 
   return items;
