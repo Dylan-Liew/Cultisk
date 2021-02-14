@@ -166,7 +166,7 @@ def on_devices_changed(drives: List[Drive]):
         print("drive: ", drive, type(drive))
         print("drive letter: ", drive.letter, type(drive.letter))
         usb_scanner = Scanner()
-        usb_scanner.av_scan(directory=drive.letter)
+        usb_scanner.av_scan(selected_directory=drive.letter)
 
 
 class AVHandler(FileSystemEventHandler):
@@ -175,8 +175,9 @@ class AVHandler(FileSystemEventHandler):
         self.directory = directory
 
     def on_created(self, event):
-        self.scanner.av_scan(directory=self.directory)
         print("on_created", event.src_path)
+        if event.src_path[-4:] == '.exe':
+            self.scanner.av_filescan(file_path=event.src_path)
 
 
 class DownloadScanner(Thread):
@@ -199,7 +200,7 @@ class DownloadScanner(Thread):
 
     def run(self):
         print("< <Download Folder Scan> Running")
-        download_path = self.get_download_path() + "\\controlled_test"
+        download_path = self.get_download_path()
         download_scanner = Scanner()
         event_handler = AVHandler(download_scanner, download_path)
         observer = Observer()
@@ -388,6 +389,22 @@ class Scanner:
         # file.close()
 
         return json.dumps(result)
+
+    def av_filescan(self, file_path):
+        try:
+            print("Scanning ", file_path)
+            if self.vt_file_exist(file_path):
+                self.mal_file(file_path)
+                string = "Scanned " + file_path + "\n" + file_path + " has been deleted"
+                self.toaster.show_toast("Anti Virus scan", string, icon_path="../static/media/cultisk.ico", duration=3)
+            else:
+                if self.vt_upload_file(file_path):
+                    self.mal_file(file_path)
+                    string = "Scanned " + file_path + "\n" + file_path + " has been deleted"
+                    self.toaster.show_toast("Anti Virus scan", string, icon_path="../static/media/cultisk.ico", duration=3)
+        except:
+            print("failed to scan: ", file_path)
+        return
 
     # test_func
     def test_scan(self, directory=None):
