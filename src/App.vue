@@ -155,7 +155,7 @@ export default {
   },
   methods: {
     onItemClick() {
-      this.onLoad();
+      /* pass */
     },
     onCollapse(c) {
       this.collapsed = c;
@@ -165,13 +165,11 @@ export default {
         document.getElementById('view').style.opacity = '0.6';
       }
     },
-    ...mapActions([
-      'StartSchedulerInterval',
-    ]),
-    onLoad() {
-      this.StartSchedulerInterval(60000);
-    },
+    ...mapActions(['CreateUserContainer']),
   },
   computed: mapGetters(['navStatus', 'GUserID']),
+  created() {
+    // this.CreateUserContainer();
+  },
 };
 </script>
