@@ -40,6 +40,11 @@ export interface CommitRootSateStateFunction<T, X> extends CommitStateFunction<T
   rootState: X;
 }
 
+export interface CommitRootStateRootGetter<X> extends CommitFunction {
+  rootState: X;
+  rootGetters: never;
+}
+
 export interface ServerResponse {
   success: boolean;
 }
