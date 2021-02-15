@@ -81,19 +81,19 @@ export default Vue.extend({
     value: null,
     emails: [
       {
-        email: 'email@hello.com',
+        email: 'joel@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'kentw@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'william@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'cassandra@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'Dylan@gmail.com',
       },
     ],
   }),

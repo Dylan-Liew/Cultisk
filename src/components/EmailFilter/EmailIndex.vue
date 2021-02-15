@@ -70,6 +70,16 @@ export default Vue.extend({
     selected: {},
     emails: [
       {
+        sender: 'sender123@gmail.com',
+        subject: 'Open Me',
+        message: 'Hello, This is not a Spam email. I am not Spamming you.',
+      },
+      {
+        sender: '123sender@gmail.com',
+        subject: 'Spamming',
+        message: 'Spams',
+      },
+      {
         sender: 'testuser@gmail.com',
         subject: 'hows life',
         message: 'be careful of corona virus'
