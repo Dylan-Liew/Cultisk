@@ -94,7 +94,7 @@ export default {
               icon: 'fa fa-unlock-alt',
             },
             {
-              href: '/password-manager/credit-cards',
+              href: '/password-manager/cards',
               title: 'Credit Cards',
               icon: 'fa fa-plus',
             },

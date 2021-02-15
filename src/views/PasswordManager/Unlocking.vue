@@ -12,8 +12,9 @@
               <button class="btn float-right" @click.prevent="maskMasterPass">
                 <i class="fa" :class="masterMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
               </button>
-              <br>
-              <a class="forget">Forget Password</a>
+              <div class="float-none">
+                <a class="forget-password">Forget Password</a>
+              </div>
             </div>
             <button class="btn btn-primary" @click.prevent="unlock">Unlock</button>
           </form>
@@ -42,7 +43,11 @@ export default Vue.extend({
     unlock() {
       this.$store.dispatch('UnlockVault', this.masterPassword).then(() => {
         if (this.isUnlocked) {
-          this.$router.push('/password-manager/');
+          if (this.$route.query.dest === 'password') {
+            this.$router.push('/password-manager/');
+          } else {
+            this.$router.push('/password-manager/cards');
+          }
         } else {
           dialog.showMessageBox({
             type: 'warning',
@@ -60,7 +65,7 @@ export default Vue.extend({
 });
 </script>
 
-<style>
+<style scoped>
 /*You put CSS that applies to all things rendered in the <router-view>/component*/
 
 .form-container{
@@ -79,7 +84,22 @@ form{
 .w-90{
   width: 92% !important;
 }
-.forget:hover{
+.forget-password:hover{
   text-decoration: underline;
 }
+.container{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding:0;
+  width:50%;
+}
+.card-body{
+  padding: 0;
+}
+form{
+  padding: 15px;
+}
+
 </style>
