@@ -20,8 +20,7 @@
             <md-table-cell md-label="Version">{{ item.lat_version }}</md-table-cell>
             <md-table-cell md-label="Publisher" md-sort-by="publisher">{{ item.publisher }}</md-table-cell>
             <md-table-cell md-label="Latest Version">{{ item.version }}</md-table-cell>
-            <md-table-cell md-label="Download Link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
-<!--              {{ item.download_link }}-->
+            <md-table-cell md-label="Download Link"><md-button class="md-primary md-raised" @click.prevent="download(item.download_link)">Download</md-button></md-table-cell>
           </md-table-row>
         </md-table>
         <div class="div-bottom container">
@@ -73,6 +72,7 @@
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 import { SoftwareInfo } from '@/types/custom.d';
+import open from 'open';
 
 const toLower = (text: string) => text.toString().toLowerCase();
 
@@ -95,6 +95,9 @@ export default Vue.extend({
     searchOnTable() {
       this.searched = searchByName(this.allSoftware, this.search);
       console.log('searched after', this.searched);
+    },
+    download(url) {
+      open(url);
     },
   },
   computed: mapGetters(['allSoftware']),
