@@ -270,7 +270,7 @@ class Scanner:
         return hash_md5.hexdigest()
 
     def mal_file(self, full_file_path):
-        # os.remove(full_file_path)
+        os.remove(full_file_path)
         print("Removed  ", full_file_path)
         time_now = datetime.now()
         dt_string = time_now.strftime("%d/%m/%Y %H:%M:%S") # 10/02/2021 22:17:10

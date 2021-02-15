@@ -3,10 +3,10 @@ import {
   CommitFunction,
   CommitRootSateStateFunction,
   CommitRootStateFunction,
-  CommitStateFunction,
+  CommitStateFunction, DataBreach,
   PasswordEntry,
-  PasswordManagerAllDataResponse,
-  PasswordManagerUpdateResponse,
+  PasswordManagerAllDataResponse, PasswordManagerData,
+  PasswordManagerUpdateResponse, PasteData,
   ProtectedSymmetricKeyResponse,
   ServerResponse,
 } from '@/types/custom.d';
@@ -14,6 +14,7 @@ import GenerateClient from '@/helpers/request';
 import forge from 'node-forge';
 import hkdf from 'futoin-hkdf';
 import { AuthState } from '@/store/modules/auth';
+import { DarkWebState } from '@/store/modules/DarkWebScan';
 
 const crypto = require('crypto');
 /* eslint no-shadow: ["error", { "allow": ["state"] }] */
@@ -30,7 +31,8 @@ const state = {
   },
   symmetricKey: '',
   lastUnlocked: null,
-  unlocked: true,
+  unlocked: false,
+  breachedPasswords: [],
   expireIn: 1200,
   // Value in seconds ^
 };
@@ -40,10 +42,13 @@ interface EncryptionSettings {
 }
 interface PasswordEntryStore extends PasswordEntry {
   encrypted: boolean;
+  exposedCount: number;
+  leaked: boolean;
 }
 
 interface CardEntryStore extends CardEntry {
   encrypted: boolean;
+  displayMasked: string;
 }
 
 export interface PwManagerState {
@@ -61,6 +66,11 @@ export interface PwManagerState {
 
 interface RootState {
   Auth: AuthState;
+}
+
+interface PwExposedResult {
+  hashValue: string;
+  exposedCount: number;
 }
 
 interface SetupVaultInput {
@@ -149,7 +159,8 @@ function DecryptResult(keyHex: string, result: PasswordEntryStore | CardEntrySto
   const decrypted: { [index: string]: string } = { ...result };
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of Object.entries(result)) {
-    if (typeof value === 'string' && key !== 'uuid') {
+    if (typeof value === 'string' && !['name', 'uuid', 'displayMasked', 'brand', 'type', 'username'].includes(key)) {
+      console.log(key, value);
       const enc = EncParser(value);
       decrypted[key] = DecryptValue(keyHex, enc.iv, enc.ct);
     }
@@ -167,11 +178,26 @@ function EncryptEntry(keyHex: string, entry: PasswordEntry | CardEntry) {
   const encrypted: { [index: string]: string } = { ...entry };
   // eslint-disable-next-line no-restricted-syntax
   for (const [key, value] of Object.entries(entry)) {
-    if (typeof value === 'string' && key !== 'uuid') {
+    if (typeof value === 'string' && !['uuid', 'type'].includes(key)) {
       encrypted[key] = EncryptValue(keyHex, value);
     }
   }
   return encrypted;
+}
+
+function hashExist(raw: string, hash: string) {
+  const hashResult = raw.split('|');
+  const hashResultParsed: PwExposedResult[] = hashResult.map((x) => {
+    const [hashSuffix, exposedCountS] = x.split(':');
+    const hashValue = `${hash.slice(0, 5)}${hashSuffix}`;
+    const exposedCount = Number(exposedCountS);
+    return { hashValue, exposedCount };
+  });
+  const result: PwExposedResult[] = hashResultParsed.filter((obj) => obj.hashValue === hash);
+  if (result.length === 0) {
+    return { hash, exposedCount: 0 };
+  }
+  return result[0];
 }
 
 const getters = {
@@ -184,16 +210,7 @@ const getters = {
   selectedPassword: (state: PwManagerState) => state.selectedPassword,
   expireIn: (state: PwManagerState) => state.expireIn,
   setupStatus: (state: PwManagerState) => state.vaultSetup,
-  GetPasswordHashes: (state: PwManagerState) => {
-    const entries = state.passwords;
-    return entries.map((x) => {
-      const enc = EncParser(x.password);
-      const decryptedPw = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
-      const sha1Sum = crypto.createHash('sha1');
-      sha1Sum.update(decryptedPw);
-      return { uuid: x.uuid, hash: sha1Sum.digest().toString() };
-    });
-  },
+  breachedPasswords: (state: DarkWebState) => state.breachedPasswords,
 };
 
 const actions = {
@@ -204,6 +221,28 @@ const actions = {
       commit('AuthenticationExpired');
     } else {
       const ResponseData: PasswordManagerAllDataResponse = response.data;
+      const pEntries: PasswordEntry[] = ResponseData.data.passwords;
+      ResponseData.data.passwords = await Promise.all(pEntries.map(async (x) => {
+        const enc = EncParser(x.password);
+        console.log(x.password);
+        const decryptedPw = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
+        const sha1Sum = crypto.createHash('sha1');
+        sha1Sum.update(decryptedPw);
+        const digest = sha1Sum.digest('hex');
+        console.log(digest);
+        const query = digest.slice(0, 5);
+        const scannerResponse = await instance.get(`/web-scanner/password/${query}`);
+        const ScannerData: string = scannerResponse.data.data;
+        const result = hashExist(ScannerData, digest);
+        if (result.exposedCount === 0) {
+          return {
+            ...x, exposedCount: result.exposedCount, leaked: false, encrypted: true,
+          };
+        }
+        return {
+          ...x, exposedCount: result.exposedCount, leaked: true, encrypted: true,
+        };
+      }));
       commit('SetPWData', ResponseData);
     }
   },
@@ -271,7 +310,7 @@ const actions = {
     const response = await instance.post('/password-manager/cards/', enc_data);
     const ResponseData: ServerResponse = response.data;
     if (ResponseData.success) {
-      commit('AddCardEntry', data);
+      commit('AddCardEntry', { ...data, uuid: ResponseData.data });
     }
   },
   async AddNewPasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: PasswordEntry) {
@@ -280,10 +319,25 @@ const actions = {
     const response = await instance.post('/password-manager/passwords/', enc_data);
     const ResponseData: ServerResponse = response.data;
     if (ResponseData.success) {
-      commit('AddPasswordEntry', data);
+      const sha1Sum = crypto.createHash('sha1');
+      sha1Sum.update(data.password);
+      const digest = sha1Sum.digest('hex');
+      const query = digest.slice(0, 5);
+      const scannerResponse = await instance.get(`/web-scanner/password/${query}`);
+      const ScannerData: string = scannerResponse.data.data;
+      const result = hashExist(ScannerData, digest);
+      if (result.exposedCount === 0) {
+        commit('AddPasswordEntry', {
+          ...data, exposedCount: result.exposedCount, leaked: false, encrypted: false, uuid: ResponseData.data,
+        });
+      } else {
+        commit('AddPasswordEntry', {
+          ...data, exposedCount: result.exposedCount, leaked: true, encrypted: false, uuid: ResponseData.data,
+        });
+      }
     }
   },
-  async UpdatePasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: PasswordEntry) {
+  async UpdatePasswordEntry({ commit, rootState, state }: CommitRootSateStateFunction<PwManagerState, RootState>, data: CardEntry) {
     const instance = GenerateClient(rootState.Auth.token);
     const enc_data = EncryptEntry(state.symmetricKey, data);
     const response = await instance.put(`/password-manager/password/${data.uuid}`, enc_data);
@@ -331,19 +385,39 @@ const actions = {
   RemovePasswordEntry({ commit }: CommitFunction, uuid: string) {
     commit('RemovePassword', uuid);
   },
+
 };
 
+interface PasswordManagerDataModified extends PasswordManagerData {
+  passwords: PasswordEntryStore[];
+}
+
+interface PasswordManagerAllDataModified extends PasswordManagerAllDataResponse {
+  data: PasswordManagerDataModified;
+}
+
 const mutations = {
-  SetPWData: (state: PwManagerState, PWData: PasswordManagerAllDataResponse): void => {
+  SetPWData: (state: PwManagerState, PWData: PasswordManagerAllDataModified): void => {
     const PasswordStore: PasswordEntryStore[] = PWData.data.passwords.map((x) => {
-      const enc = EncParser(x.name);
-      const decrypted = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
-      return { encrypted: true, ...x, name: decrypted };
+      const encName = EncParser(x.name);
+      const decryptedName = DecryptValue(state.symmetricKey, encName.iv, encName.ct);
+      const encUsername = EncParser(x.username);
+      const decryptedUsername = DecryptValue(state.symmetricKey, encUsername.iv, encUsername.ct);
+      return {
+        ...x, name: decryptedName, username: decryptedUsername,
+      };
     });
     const CardStore: CardEntryStore[] = PWData.data.cards.map((x) => {
-      const enc = EncParser(x.name);
-      const decrypted = DecryptValue(state.symmetricKey, enc.iv, enc.ct);
-      return { encrypted: true, ...x, name: decrypted };
+      const encName = EncParser(x.name);
+      const decryptedName = DecryptValue(state.symmetricKey, encName.iv, encName.ct);
+      const encBrand = EncParser(x.brand);
+      const decryptedBrand = DecryptValue(state.symmetricKey, encBrand.iv, encBrand.ct);
+      const encCardNum = EncParser(x.number);
+      const decryptedNumber = DecryptValue(state.symmetricKey, encCardNum.iv, encCardNum.ct);
+      const displayMasked = `${decryptedBrand}, *${decryptedNumber.slice(-4)}`;
+      return {
+        encrypted: true, ...x, name: decryptedName, brand: decryptedBrand, displayMasked,
+      };
     });
     state.passwords = PasswordStore;
     state.cards = CardStore;
@@ -363,23 +437,23 @@ const mutations = {
   },
   AddCardEntry: (state: PwManagerState, entry: CardEntry): void => {
     const { cards } = state;
-    const entryStore: CardEntryStore = { ...entry, encrypted: false };
-    cards.concat(entryStore);
+    const displayMasked = `${entry.brand}, *${entry.number.slice(-4)}`;
+    const entryStore: CardEntryStore = { ...entry, encrypted: false, displayMasked };
+    cards.push(entryStore);
     state.cards = cards;
   },
-  AddPasswordEntry: (state: PwManagerState, entry: PasswordEntry): void => {
+  AddPasswordEntry: (state: PwManagerState, entryStore: PasswordEntryStore): void => {
     const { passwords } = state;
-    const entryStore: PasswordEntryStore = { ...entry, encrypted: false };
-    passwords.concat(entryStore);
+    passwords.push(entryStore);
     state.passwords = passwords;
   },
-  UpdatePasswordEntry: (state: PwManagerState, payload: {data: PasswordEntry; encrypted: boolean}): void => {
+  UpdatePasswordEntry: (state: PwManagerState, payload: {data: PasswordEntryStore; encrypted: boolean}): void => {
     const entries = state.passwords;
     const pos = entries.map((e) => e.uuid).indexOf(payload.data.uuid);
     entries[pos] = { ...payload.data, encrypted: payload.encrypted };
     state.passwords = entries;
   },
-  UpdateCardEntry: (state: PwManagerState, payload: {data: CardEntry; encrypted: boolean}): void => {
+  UpdateCardEntry: (state: PwManagerState, payload: {data: CardEntryStore; encrypted: boolean}): void => {
     const entries = state.cards;
     const pos = entries.map((e) => e.uuid).indexOf(payload.data.uuid);
     entries[pos] = { ...payload.data, encrypted: payload.encrypted };
@@ -395,9 +469,17 @@ const mutations = {
   },
   SetSelectedCard: (state: PwManagerState, value: CardEntryStore): void => {
     state.selectedCard = value;
+    const entries = state.cards;
+    const pos = entries.map((e) => e.uuid).indexOf(value.uuid);
+    entries[pos] = { ...value, encrypted: false };
+    state.cards = entries;
   },
   SetSelectedPassword: (state: PwManagerState, value: PasswordEntryStore): void => {
     state.selectedPassword = value;
+    const entries = state.passwords;
+    const pos = entries.map((e) => e.uuid).indexOf(value.uuid);
+    entries[pos] = { ...value, encrypted: false };
+    state.passwords = entries;
   },
 };
 
