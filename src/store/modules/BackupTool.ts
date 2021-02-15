@@ -46,14 +46,9 @@ const mutations = {
 const actions = {
   CreateUserContainer({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const blobService = StorageBlob.BlobServiceClient.fromConnectionString('***REMOVED***');
-    blobService.getContainerClient(rootState.Auth.GUserID).exists()
-      .then((value) => {
-        if (!value) {
-          blobService.createContainer(rootState.Auth.GUserID)
-            .catch((err) => console.log(err));
-        }
-      })
-      .catch((err) => console.log(err));
+    console.log(rootState.Auth.GUserID);
+    const containerClient = blobService.getContainerClient(rootState.Auth.GUserID.toString());
+    containerClient.create();
   },
   AddPath({ commit, rootState }: CommitRootStateFunction<RootState>, newPath: string) {
     UserInterface.addFilePath(path.normalize(newPath));
@@ -96,26 +91,31 @@ const actions = {
     }
     return false;
   },
+  GetFileList({ commit, rootState }: CommitRootStateFunction<RootState>, folder = '') {
+    let fileList: { filename: string; LastModifiedTime: string }[] = [];
+    azureAPI.getFileList(folder, 'test').then((value) => { fileList = value; });
+    return fileList;
+  },
   DownloadFile({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
-    return azureAPI.downloadFile(name, rootState.Auth.GUserID);
+    return azureAPI.downloadFile(name, 'test');
   },
   async GetSnapshots({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
-    const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name), rootState.Auth.GUserID);
+    const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name), 'test');
     return snapshotList;
   },
   async DownloadSnapshot({ commit, rootState }: CommitRootStateFunction<RootState>, { name, snapshotID }: SnapshotData) {
-    await azureAPI.downloadSnapshot(name, snapshotID, rootState.Auth.GUserID);
+    await azureAPI.downloadSnapshot(name, snapshotID, 'test');
     return true;
   },
   StartSchedulerInterval({ commit, rootState }: CommitRootStateFunction<RootState>, interval: number) {
-    const backupJob = scheduler.createJob(rootState.Auth.GUserID, interval);
+    const backupJob = scheduler.createJob('test', interval);
     commit('setNewJobID', backupJob);
     commit('setNewInterval', interval);
     return backupJob;
   },
   SetSchedulerInterval({ commit, rootState }: CommitRootStateFunction<RootState>, interval: number) {
     clearInterval(state.jobID);
-    const backupJob = scheduler.createJob(rootState.Auth.GUserID, interval);
+    const backupJob = scheduler.createJob('test', interval);
     commit('setNewJobID', backupJob);
     commit('setNewInterval', interval);
     return backupJob;

@@ -28,6 +28,10 @@ export default Vue.extend({
     };
   },
   methods: {
+    ...mapActions(['CreateUserContainer']),
+  },
+  created() {
+    this.CreateUserContainer();
   },
 });
 </script>

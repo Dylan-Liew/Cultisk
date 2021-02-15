@@ -97,6 +97,17 @@ export async function upload(filePath: string, container: string) {
   return [{ success: status, message: msg, file: filePath }];
 }
 
+export async function getBlobSnapshots(name: string, container: string) {
+  const snapList = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const value of blobServiceClient.getContainerClient(container).listBlobsFlat({ prefix: name, includeSnapshots: true })) {
+    if (value.snapshot) {
+      snapList.push({ filename: value.name, LastModifiedTime: value.snapshot });
+    }
+  }
+  return snapList;
+}
+
 export async function getFileJSON(folder = '', container: string) {
   let fileJSON = {};
   function parse(matches: Array<string>) {
@@ -126,21 +137,12 @@ export async function getFileList(folder = '', container: string) {
   for await (const item of blobServiceClient.getContainerClient(container).listBlobsFlat()) {
     const reg = /[^/]+/g;
     const matches = item.name.match(reg)!;
-    fileList.push({ name: matches.pop(), path: item.name });
+    if (item.deleted !== true) {
+      fileList.push({ filename: item.name, LastModifiedTime: item.metadata!.lastModified });
+    }
   }
   console.log(fileList);
   return fileList;
-}
-
-export async function getBlobSnapshots(name: string, container: string) {
-  const snapList = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const value of blobServiceClient.getContainerClient(container).listBlobsFlat({ prefix: name, includeSnapshots: true })) {
-    if (value.snapshot) {
-      snapList.push({ lastModified: value.properties.lastModified, snapshotTime: value.snapshot });
-    }
-  }
-  return snapList;
 }
 
 export function downloadFile(name: string, container: string) {
