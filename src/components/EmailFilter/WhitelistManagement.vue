@@ -6,7 +6,7 @@
       md-title="Add Whitelist"
       md-input-placeholder="Enter email to whitelist..."
       md-confirm-text="Confirm"
-      @md-confirm="hello"
+      @md-confirm="hello(value)"
     />
     <div class="div-top container">
       <div class="row">
@@ -81,19 +81,19 @@ export default Vue.extend({
     value: null,
     emails: [
       {
-        email: 'email@hello.com',
+        email: 'joel@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'kentw@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'william@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'cassandra@gmail.com',
       },
       {
-        email: 'email@hello.com',
+        email: 'Dylan@gmail.com',
       },
     ],
   }),
@@ -101,8 +101,8 @@ export default Vue.extend({
     searchOnTable() {
       this.searched = searchByName(this.emails, this.search);
     },
-    hello() {
-      console.log('test');
+    hello(text) {
+      this.emails.push({ email: text });
     },
   },
   created() {

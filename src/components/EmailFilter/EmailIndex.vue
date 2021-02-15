@@ -5,9 +5,9 @@
           <b-col cols="4" >
               <md-table class="e-entries ml-4 mt-2" md-height="590px" style="height:650px" v-model="emails" md-card @md-selected="onSelect" md-fixed-header>
               <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
-                <md-table-cell md-label="Filtered Email" md-sort-by="id">
+                <md-table-cell md-label="Filtered Email">
                     <span class="font-weight-bold" style="font-size:1.1em;">{{item.sender}}</span>
-                    <button type="button" class="btn btn-danger btn-sm float-right mt-2">Untrash</button>
+                    <button type="button" class="btn btn-danger btn-sm float-right mt-2" @click.prevent="untrash(item.id)">Untrash</button>
                     <br>
                   <span class="font-weight-bold">{{item.subject}}</span>
                     <br>
@@ -70,22 +70,35 @@ export default Vue.extend({
     selected: {},
     emails: [
       {
+        sender: 'sender123@gmail.com',
+        subject: 'Open Me',
+        message: 'Hello, This is not a Spam email. I am not Spamming you.',
+      },
+      {
+        sender: '123sender@gmail.com',
+        subject: 'Spamming',
+        message: 'Spams',
+      },
+      {
         sender: 'testuser@gmail.com',
         subject: 'hows life',
         message: 'be careful of corona virus'
           + 'dsadddddddddddddsasdsadsadsadsdasd'
           + 'asdsadsadsadsasadsaddasdsadasdsad'
           + 'asdsadsadsadsdsadsa',
+        id: '1',
       },
       {
         sender: 'testuser1@gmail.com',
         subject: 'bruh',
         message: 'corona 2',
+        id: '2',
       },
       {
         sender: 'testuser3@gmail.com',
         subject: 'life good',
         message: 'be careful of corona virus2',
+        id: '3',
       },
     ],
   }),
@@ -96,6 +109,9 @@ export default Vue.extend({
     }),
     onSelect(item) {
       this.selected = item;
+    },
+    untrash(id) {
+      this.emails = this.emails.filter((obj) => obj.id !== id);
     },
   },
   computed: mapGetters(['allEmails']),
