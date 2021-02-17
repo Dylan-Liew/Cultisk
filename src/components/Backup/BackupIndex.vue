@@ -118,43 +118,7 @@ export default Vue.extend({
   data: () => ({
     selected: {},
     foldername: null,
-    files: [
-      {
-        filename: 'C:/Users/kentl/Videos/hello.txt',
-        LastModifiedTime: '2/2/2021, 6:29:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/hello.txt', LastModifiedTime: '2/2/2021, 5:35:02 PM' }, { Filename: 'C:/Users/kentl/Videos/hello.txt', LastModifiedTime: '2/2/2021, 5:35:02 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Videos/hello2.txt',
-        LastModifiedTime: '2/2/2021, 6:05:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/hello2.txt', LastModifiedTime: '2/2/2021, 3:40:05 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Downloads/shanghai-ccp-member.csv',
-        LastModifiedTime: '3/2/2021, 2:40:05 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Downloads/shanghai-ccp-member.csv', LastModifiedTime: '3/2/2021, 2:40:05 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Pictures/me.jpg',
-        LastModifiedTime: '4/2/2021, 1:25:06 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Pictures/me.jpg', LastModifiedTime: '4/2/2021, 1:25:06 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Videos/rickroll.ogv',
-        LastModifiedTime: '2/2/2021, 5:35:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/rickroll.ogv', LastModifiedTime: '2/2/2021, 5:35:02 PM' }, { Filename: 'C:/Users/kentl/Videos/rickroll.ogv', LastModifiedTime: '2/2/2021, 5:35:02 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Videos/hello2.txt',
-        LastModifiedTime: '2/2/2021, 6:05:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/hello2.txt', LastModifiedTime: '2/2/2021, 3:40:05 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Pictures/2021resclown.jpg',
-        LastModifiedTime: '2/2/2021, 1:40:05 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Pictures/2021resclown.jpg', LastModifiedTime: '2/2/2021, 1:40:05 PM' }],
-      },
-    ],
+    files: [],
   }),
   methods: {
     getClass: ({ filename }) => ({
@@ -172,6 +136,10 @@ export default Vue.extend({
         return 'Invalid folder selected';
       }
     },
+    ...mapActions(['AddPath', 'GetFileList']),
+  },
+  created() {
+    this.data().files = this.GetFileList();
   },
 });
 </script>
