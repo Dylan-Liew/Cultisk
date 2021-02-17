@@ -64,7 +64,7 @@ export default Vue.extend({
       } else {
         dialog.showMessageBox({
           type: 'warning',
-          title: 'invalid password',
+          title: 'Master password do not match',
           message: 'Please check your password and try again.',
         });
         this.passwordHint = '';

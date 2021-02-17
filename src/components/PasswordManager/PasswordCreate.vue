@@ -88,9 +88,8 @@ export default Vue.extend({
     genPassword() {
       this.password = generator.generate({
         length: 12,
-        symbols: true,
-        strict: true,
         numbers: true,
+        excludeSimilarCharacters: true,
       });
     },
     CopyToClip() {

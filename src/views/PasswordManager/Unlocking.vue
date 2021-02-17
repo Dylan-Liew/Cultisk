@@ -82,7 +82,7 @@ form{
   padding: 15px;
 }
 .w-90{
-  width: 92% !important;
+  width: 92.5% !important;
 }
 .forget-password:hover{
   text-decoration: underline;

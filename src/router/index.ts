@@ -23,11 +23,8 @@ import ChangeMasterPassword from '@/components/Settings/ChangeMasterPassword.vue
 import ScheduledBackupSettings from '@/components/Settings/ScheduledBackupSettings.vue';
 import VaultAltAuth from '@/components/Settings/VaultAltAuth.vue';
 import Unlocking from '@/views/PasswordManager/Unlocking.vue';
-import PasswordManagerIndex from '@/components/PasswordManager/PasswordManagerIndex.vue';
 import CardCreate from '@/components/PasswordManager/CardCreate.vue';
 import PasswordCreate from '@/components/PasswordManager/PasswordCreate.vue';
-import CardDetails from '@/components/PasswordManager/CardDetails.vue';
-import PasswordDetails from '@/components/PasswordManager/PasswordDetails.vue';
 import CreditCardManager from '@/views/PasswordManager/CreditCardManager.vue';
 
 Vue.use(VueRouter);
@@ -120,11 +117,6 @@ const routes: Array<RouteConfig> = [
         path: 'password-create',
         component: PasswordCreate,
       },
-      {
-        name: 'Password Details',
-        path: 'password/:uuid',
-        component: PasswordDetails,
-      },
     ],
   },
   {
@@ -136,11 +128,6 @@ const routes: Array<RouteConfig> = [
         name: 'Card creation',
         path: 'card-create',
         component: CardCreate,
-      },
-      {
-        name: 'Card details',
-        path: 'card/:uuid',
-        component: CardDetails,
       },
     ],
   },
