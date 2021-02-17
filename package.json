@@ -30,6 +30,7 @@
     "lodash": "^4.17.20",
     "node-forge": "^0.10.0",
     "open": "^7.0.0",
+    "original-fs": "^1.1.0",
     "password-generator": "^2.3.2",
     "regex": "^0.1.1",
     "totp-generator": "0.0.8",

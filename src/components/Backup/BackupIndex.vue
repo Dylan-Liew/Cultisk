@@ -22,7 +22,7 @@
             <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
               <md-table-cell md-label="Backup Manager" md-sort-by="id">
                   <span class="font-weight-bold">{{item.filename}}</span>
-                  <button class="download btn float-right mb-2"><i class="fa fa-download"></i></button>
+                  <button class="download btn float-right mb-2" @click="downloadFile(item.filename)"><i class="fa fa-download"></i></button>
                   <br>
                   {{item.username}}
               </md-table-cell>
@@ -37,7 +37,7 @@
             <md-table-row slot="md-table-row" slot-scope="{ item }">
               <md-table-cell md-label="Filename" md-sort-by="Filename">{{ item.Filename }}</md-table-cell>
               <md-table-cell md-label="Last Modified">{{ item.LastModifiedTime }}</md-table-cell>
-              <md-table-cell md-label="Download" md-sort-by="download_link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
+              <md-table-cell md-label="Download" md-sort-by="download_link"><md-button class="md-primary md-raised" @click="downloadSnapshot(item.Filename, item.LastModifiedTime)">Download</md-button></md-table-cell>
             </md-table-row>
           </md-table>
         </b-col>
@@ -47,7 +47,7 @@
         id="modal-prevent-closing"
         ref="modal"
         title="Upload File"
-        @ok="x"
+        @ok="newFile"
       >
      <b-form-file
         v-model="file1"
@@ -60,11 +60,12 @@
   id="modal-prevent-closing2"
   ref="modal"
   title="Settings"
-  @ok="x"
+  @ok="newPath"
   >
     <b-form-file
       placeholder="Autobackup Folder"
       directory
+      no-traverse
       :file-name-formatter="formatNames"
     ></b-form-file>
       <b-form-select
@@ -118,45 +119,11 @@ export default Vue.extend({
   data: () => ({
     selected: {},
     foldername: null,
-    files: [
-      {
-        filename: 'C:/Users/kentl/Videos/hello.txt',
-        LastModifiedTime: '2/2/2021, 6:29:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/hello.txt', LastModifiedTime: '2/2/2021, 5:35:02 PM' }, { Filename: 'C:/Users/kentl/Videos/hello.txt', LastModifiedTime: '2/2/2021, 5:35:02 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Videos/hello2.txt',
-        LastModifiedTime: '2/2/2021, 6:05:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/hello2.txt', LastModifiedTime: '2/2/2021, 3:40:05 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Downloads/shanghai-ccp-member.csv',
-        LastModifiedTime: '3/2/2021, 2:40:05 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Downloads/shanghai-ccp-member.csv', LastModifiedTime: '3/2/2021, 2:40:05 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Pictures/me.jpg',
-        LastModifiedTime: '4/2/2021, 1:25:06 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Pictures/me.jpg', LastModifiedTime: '4/2/2021, 1:25:06 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Videos/rickroll.ogv',
-        LastModifiedTime: '2/2/2021, 5:35:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/rickroll.ogv', LastModifiedTime: '2/2/2021, 5:35:02 PM' }, { Filename: 'C:/Users/kentl/Videos/rickroll.ogv', LastModifiedTime: '2/2/2021, 5:35:02 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Videos/hello2.txt',
-        LastModifiedTime: '2/2/2021, 6:05:02 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Videos/hello2.txt', LastModifiedTime: '2/2/2021, 3:40:05 PM' }],
-      },
-      {
-        filename: 'C:/Users/kentl/Pictures/2021resclown.jpg',
-        LastModifiedTime: '2/2/2021, 1:40:05 PM',
-        Snapshots: [{ Filename: 'C:/Users/kentl/Pictures/2021resclown.jpg', LastModifiedTime: '2/2/2021, 1:40:05 PM' }],
-      },
-    ],
+    files: [],
+    file1: File,
   }),
   methods: {
+    ...mapActions(['AddPath', 'GetFileList', 'FileUpload', 'DownloadFile', 'DownloadSnapshot']),
     getClass: ({ filename }) => ({
       'md-primary': filename,
     }),
@@ -172,6 +139,27 @@ export default Vue.extend({
         return 'Invalid folder selected';
       }
     },
+    newFile() {
+      console.log(this.file1.path);
+      this.$store.dispatch('FileUpload', this.file1.path);
+    },
+    newPath() {
+      console.log(this.foldername);
+      this.$store.dispatch('AddPath', this.foldername);
+    },
+    getFileList() {
+      this.$store.dispatch('GetFileList')
+        .then((value) => { this.files = value; });
+    },
+    downloadFile(name) {
+      this.$store.dispatch('DownloadFile', name);
+    },
+    downloadSnapshot(name, snapshot) {
+      this.$store.dispatch('DownloadSnapshot', { name, snapshot });
+    },
+  },
+  created() {
+    this.getFileList();
   },
 });
 </script>

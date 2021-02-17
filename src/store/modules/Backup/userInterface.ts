@@ -1,20 +1,19 @@
 import readline from 'readline';
 import { upload } from '@/store/modules/Backup/azureAPI';
-import ErrnoException = NodeJS.ErrnoException;
+import * as path from 'path';
+import * as ofs from 'original-fs';
+import { remote } from 'electron';
 
-const fs = require('fs');
-const fsp = require('fs').promises;
-const path = require('path');
-
+const { app } = remote;
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 export function addFilePath(name: string) {
   const filePath = `${path.normalize(name)}\n`;
-  fs.writeFile(path.join(__dirname, 'pathList.txt'), Buffer.from(filePath), { flag: 'a' }, (err: ErrnoException) => console.log(err));
+  ofs.writeFile(path.join(app.getAppPath(), 'pathList.txt'), Buffer.from(filePath), { flag: 'a' }, (err: any) => console.log(err));
 }
 
 export async function getFilePaths() {
-  const fileStream = fs.createReadStream(path.join(__dirname, 'pathList.txt'));
+  const fileStream = ofs.createReadStream(path.join(__dirname, 'pathList.txt'));
 
   const rl = readline.createInterface({
     input: fileStream,
