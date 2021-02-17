@@ -87,11 +87,10 @@ import BottomButtons from '@/components/PasswordManager/BottomButtons.vue';
 import { mapActions, mapGetters } from 'vuex';
 import { CardEntry } from '@/types/custom.d';
 
-const generator = require('generate-password');
 const { clipboard } = require('electron').remote;
 
 export default Vue.extend({
-  name: 'PasswordCreate',
+  name: 'CardCreate',
   computed: mapGetters([]),
   components: {
     BottomButtons,

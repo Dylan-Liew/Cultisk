@@ -38,8 +38,6 @@ const getters = {
   breachedPasswords: (state: DarkWebState) => state.breachedPasswords,
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
 const actions = {
   async CheckDataBreach({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const instance = GenerateClient(rootState.Auth.token);

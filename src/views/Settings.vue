@@ -2,7 +2,7 @@
 <div class="settings-index">
   <div class="card container">
     <div class="card-body">
-      <h5 class="card-header m-0">Cultisk - Set Master Password</h5>
+      <h5 class="card-header m-0">Cultisk - Change Master Password</h5>
       <form>
         <div class="form-group">
           <label for="MasterPassword">Old Password</label>
@@ -28,9 +28,13 @@
             <i class="fa" :class="confirmMasked ? 'fa-eye' : 'fa-eye-slash'"></i>
           </button>
         </div>
+        <div class="form-group">
+          <label for="Hint">Password Hint</label>
+          <br>
+          <input type="text" v-model="passwordHint" class="form-control" id="Hint" placeholder="New Password Hint">
+        </div>
         <br>
-        <br>
-        <button type="submit" class="btn btn-primary" @click.prevent="x">Change Master Password</button>
+        <button type="submit" class="btn btn-primary" @click.prevent="ChangeMasterPassword">Change Master Password</button>
       </form>
     </div>
   </div>
@@ -40,6 +44,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { mapActions } from 'vuex';
+
+const { dialog } = require('electron').remote;
 
 export default Vue.extend({
   name: 'PasswordManagerSetup',
@@ -62,6 +68,39 @@ export default Vue.extend({
     },
     oldMasterPass() {
       this.oldMasked = !this.oldMasked;
+    },
+    ChangeMasterPassword() {
+      this.$store.dispatch('CheckPassword', this.oldPassword).then((r) => {
+        if (r) {
+          let hint: string | null = this.passwordHint;
+          if (hint.length === 0) {
+            hint = null;
+          }
+          if (this.masterPassword === this.confirmPassword) {
+            const password = this.masterPassword;
+            this.$store.dispatch('ChangeMasterPassword', { password, hint }).then(() => {
+              this.ToggleNav();
+              this.$router.push('/');
+            });
+          } else {
+            dialog.showMessageBox({
+              type: 'warning',
+              title: 'New master password do not match',
+              message: 'Please check your password and try again.',
+            });
+            this.passwordHint = '';
+            this.confirmPassword = '';
+            this.masterPassword = '';
+          }
+        } else {
+          dialog.showMessageBox({
+            type: 'warning',
+            title: 'Invalid master password',
+            message: 'Please check your password and try again.',
+          });
+          this.oldPassword = '';
+        }
+      });
     },
   },
 });
