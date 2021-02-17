@@ -41,6 +41,9 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
   * Run `pip install -r requirements.txt`
   
 * Run the application by running the following commands in the order as stated and different terminal
-  * Run Cultisk-Server 
   * `py cultiskpy\main.py` under cultiskpy directory
   * `npm run electron:serve`
+ 
+ ### VirusTotal API key Setup
+ * Sign up for a virustotal account (https://www.virustotal.com/gui/join-us)
+ * Set the API key as an environment variable
