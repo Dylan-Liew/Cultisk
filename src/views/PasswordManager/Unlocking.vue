@@ -12,11 +12,11 @@
               <button class="btn float-right" @click.prevent="maskMasterPass">
                 <i class="fa" :class="masterMasked ? 'fa-eye' : 'fa-eye-slash'"  id="mask-button"></i>
               </button>
-              <div class="float-none">
-                <a class="forget-password">Forget Password</a>
-              </div>
             </div>
             <button class="btn btn-primary" @click.prevent="unlock">Unlock</button>
+            <br>
+            <br>
+            <button class="btn btn-primary" @click.prevent="retrievePasswordHint">Get password Hint</button>
           </form>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default Vue.extend({
     masterMasked: true,
   }),
   methods: {
-    ...mapActions(['UnlockVault']),
+    ...mapActions(['UnlockVault', 'RetrievePWHint']),
     unlock() {
       this.$store.dispatch('UnlockVault', this.masterPassword).then(() => {
         if (this.isUnlocked) {
@@ -60,6 +60,21 @@ export default Vue.extend({
     },
     maskMasterPass() {
       this.masterMasked = !this.masterMasked;
+    },
+    retrievePasswordHint() {
+      this.$store.dispatch('RetrieveHint').then((x) => {
+        if (x.length !== 0) {
+          dialog.showMessageBox({
+            title: 'Your master password Hint',
+            message: `The hint for your master password is ${x}`,
+          });
+        } else {
+          dialog.showMessageBox({
+            title: 'Your master password Hint',
+            message: 'You did not set a hint for your master password.',
+          });
+        }
+      });
     },
   },
 });

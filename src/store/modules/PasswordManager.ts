@@ -274,6 +274,12 @@ const actions = {
       commit('UnlockVault', symmetricKey.toHex());
     }
   },
+  async RetrieveHint({ commit, rootState }: CommitRootStateFunction<RootState>) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const response = await instance.get('/password-manager/password-hint/');
+    const ResponseData: ProtectedSymmetricKeyResponse = response.data;
+    return ResponseData.data;
+  },
   async CheckVaultStatus({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const instance = GenerateClient(rootState.Auth.token);
     const response = await instance.get('/password-manager/setup-vault/');
