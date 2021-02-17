@@ -31,7 +31,7 @@ export default Vue.extend({
     ...mapActions(['CreateUserContainer']),
   },
   created() {
-    this.CreateUserContainer();
+    this.$store.dispatch('CreateUserContainer');
   },
 });
 </script>

@@ -22,7 +22,7 @@
             <md-table-row class="content" slot="md-table-row" slot-scope="{ item }" :class="getClass(item)" md-selectable="single">
               <md-table-cell md-label="Backup Manager" md-sort-by="id">
                   <span class="font-weight-bold">{{item.filename}}</span>
-                  <button class="download btn float-right mb-2"><i class="fa fa-download"></i></button>
+                  <button class="download btn float-right mb-2" @click="downloadFile(item.filename)"><i class="fa fa-download"></i></button>
                   <br>
                   {{item.username}}
               </md-table-cell>
@@ -37,7 +37,7 @@
             <md-table-row slot="md-table-row" slot-scope="{ item }">
               <md-table-cell md-label="Filename" md-sort-by="Filename">{{ item.Filename }}</md-table-cell>
               <md-table-cell md-label="Last Modified">{{ item.LastModifiedTime }}</md-table-cell>
-              <md-table-cell md-label="Download" md-sort-by="download_link"><md-button class="md-primary md-raised">Download</md-button></md-table-cell>
+              <md-table-cell md-label="Download" md-sort-by="download_link"><md-button class="md-primary md-raised" @click="downloadSnapshot(item.Filename, item.LastModifiedTime)">Download</md-button></md-table-cell>
             </md-table-row>
           </md-table>
         </b-col>
@@ -47,7 +47,7 @@
         id="modal-prevent-closing"
         ref="modal"
         title="Upload File"
-        @ok="x"
+        @ok="newFile"
       >
      <b-form-file
         v-model="file1"
@@ -60,11 +60,12 @@
   id="modal-prevent-closing2"
   ref="modal"
   title="Settings"
-  @ok="x"
+  @ok="newPath"
   >
     <b-form-file
       placeholder="Autobackup Folder"
       directory
+      no-traverse
       :file-name-formatter="formatNames"
     ></b-form-file>
       <b-form-select
@@ -119,8 +120,10 @@ export default Vue.extend({
     selected: {},
     foldername: null,
     files: [],
+    file1: File,
   }),
   methods: {
+    ...mapActions(['AddPath', 'GetFileList', 'FileUpload', 'DownloadFile', 'DownloadSnapshot']),
     getClass: ({ filename }) => ({
       'md-primary': filename,
     }),
@@ -136,10 +139,27 @@ export default Vue.extend({
         return 'Invalid folder selected';
       }
     },
-    ...mapActions(['AddPath', 'GetFileList']),
+    newFile() {
+      console.log(this.file1.path);
+      this.$store.dispatch('FileUpload', this.file1.path);
+    },
+    newPath() {
+      console.log(this.foldername);
+      this.$store.dispatch('AddPath', this.foldername);
+    },
+    getFileList() {
+      this.$store.dispatch('GetFileList')
+        .then((value) => { this.files = value; });
+    },
+    downloadFile(name) {
+      this.$store.dispatch('DownloadFile', name);
+    },
+    downloadSnapshot(name, snapshot) {
+      this.$store.dispatch('DownloadSnapshot', { name, snapshot });
+    },
   },
   created() {
-    this.data().files = this.GetFileList();
+    this.getFileList();
   },
 });
 </script>

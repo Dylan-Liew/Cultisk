@@ -1,12 +1,10 @@
 import * as StorageBlob from '@azure/storage-blob';
-import * as BlobChangefeed from '@azure/storage-blob-changefeed';
 import * as fs from 'fs';
 import { promises as fsp } from 'fs';
 import * as path from 'path';
 import * as stream from 'stream';
 import * as crypto from 'crypto';
 import _ from 'lodash';
-import { match } from 'assert';
 
 const connectStr = '***REMOVED***';
 const blobServiceClient = StorageBlob.BlobServiceClient.fromConnectionString(connectStr);
@@ -102,7 +100,7 @@ export async function getBlobSnapshots(name: string, container: string) {
   // eslint-disable-next-line no-restricted-syntax
   for await (const value of blobServiceClient.getContainerClient(container).listBlobsFlat({ prefix: name, includeSnapshots: true })) {
     if (value.snapshot) {
-      snapList.push({ filename: value.name, LastModifiedTime: value.snapshot });
+      snapList.push({ Filename: value.name, LastModifiedTime: value.snapshot });
     }
   }
   return snapList;
@@ -138,7 +136,9 @@ export async function getFileList(folder = '', container: string) {
     const reg = /[^/]+/g;
     const matches = item.name.match(reg)!;
     if (item.deleted !== true) {
-      fileList.push({ filename: item.name, LastModifiedTime: item.metadata!.lastModified });
+      const lastModified = item.metadata?.LastModifiedTime;
+      const snapshots = await getBlobSnapshots(item.name, container);
+      fileList.push({ filename: item.name, LastModifiedTime: lastModified, Snapshots: snapshots });
     }
   }
   console.log(fileList);

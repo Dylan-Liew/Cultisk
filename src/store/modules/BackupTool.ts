@@ -4,7 +4,7 @@ import { AuthState } from '@/store/modules/auth';
 import * as UserInterface from '@/store/modules/Backup/userInterface';
 import * as path from 'path';
 import * as azureAPI from '@/store/modules/Backup/azureAPI';
-import fs from 'fs';
+import fs from 'original-fs';
 import readline from 'readline';
 import { upload } from '@/store/modules/Backup/azureAPI';
 import * as scheduler from '@/store/modules/Backup/scheduler';
@@ -44,11 +44,10 @@ const mutations = {
 };
 
 const actions = {
-  CreateUserContainer({ commit, rootState }: CommitRootStateFunction<RootState>) {
+  async CreateUserContainer({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const blobService = StorageBlob.BlobServiceClient.fromConnectionString('***REMOVED***');
     console.log(rootState.Auth.GUserID);
-    const containerClient = blobService.getContainerClient(rootState.Auth.GUserID.toString());
-    containerClient.create();
+    await blobService.createContainer(rootState.Auth.GUserID);
   },
   AddPath({ commit, rootState }: CommitRootStateFunction<RootState>, newPath: string) {
     UserInterface.addFilePath(path.normalize(newPath));
@@ -56,6 +55,9 @@ const actions = {
   async RetrievePaths({ commit, rootState }: CommitRootStateFunction<RootState>) {
     const pathArray = await UserInterface.getFilePaths();
     return pathArray;
+  },
+  FileUpload({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
+    upload(name, rootState.Auth.GUserID).then((value) => console.log(value)).catch((err) => console.log(err));
   },
   async ManualUpload({ commit, rootState }: CommitRootStateFunction<RootState>) {
     console.log('starting upload');
@@ -91,20 +93,19 @@ const actions = {
     }
     return false;
   },
-  GetFileList({ commit, rootState }: CommitRootStateFunction<RootState>, folder = '') {
-    let fileList: { filename: string; LastModifiedTime: string }[] = [];
-    azureAPI.getFileList(folder, 'test').then((value) => { fileList = value; });
+  async GetFileList({ commit, rootState }: CommitRootStateFunction<RootState>, folder = '') {
+    const fileList = await azureAPI.getFileList(folder, rootState.Auth.GUserID);
     return fileList;
   },
   DownloadFile({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
-    return azureAPI.downloadFile(name, 'test');
+    return azureAPI.downloadFile(name, rootState.Auth.GUserID);
   },
   async GetSnapshots({ commit, rootState }: CommitRootStateFunction<RootState>, name: string) {
-    const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name), 'test');
+    const snapshotList = await azureAPI.getBlobSnapshots(path.normalize(name), rootState.Auth.GUserID);
     return snapshotList;
   },
   async DownloadSnapshot({ commit, rootState }: CommitRootStateFunction<RootState>, { name, snapshotID }: SnapshotData) {
-    await azureAPI.downloadSnapshot(name, snapshotID, 'test');
+    await azureAPI.downloadSnapshot(name, snapshotID, rootState.Auth.GUserID);
     return true;
   },
   StartSchedulerInterval({ commit, rootState }: CommitRootStateFunction<RootState>, interval: number) {
