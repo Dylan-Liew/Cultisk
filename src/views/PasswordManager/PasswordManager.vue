@@ -3,7 +3,7 @@
     <b-container class="password-manager position-fixed">
       <b-row>
         <b-col cols="6" style="left:0;">
-          <md-table class="p-entries mt-1 mx-auto w-75 test" md-height="100%" v-model="allPasswords" md-card @md-selected="onSelect" md-fixed-header>
+          <md-table class="p-entries mt-1 mx-auto w-75 test" md-height="100%" v-model="passwords" md-card @md-selected="onSelect" md-fixed-header>
             <md-table-toolbar>
               <b-container>
                 <b-row>
