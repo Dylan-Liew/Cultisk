@@ -82,20 +82,21 @@ export default Vue.extend({
     value: null,
   }),
   methods: {
-    ...mapActions(['RetrieveSpamFilterInfo']),
+    ...mapActions(['GetWhiteList', 'AddNewEntry']),
     searchOnTable() {
-      this.searched = searchByName(this.GetWhiteList, this.search);
+      this.searched = searchByName(this.whitelist, this.search);
     },
     hello(text) {
-      this.whitelist.push(text);
+      this.searched.push(text);
+      this.AddNewEntry(text);
     },
   },
-  computed: mapGetters(['GetWhiteList']),
+  computed: mapGetters(['whitelist']),
   created() {
     this.GetWhiteList();
   },
   watch: {
-    GetWhiteList(newValue) {
+    whitelist(newValue) {
       this.searched = newValue;
     },
   },

@@ -28,7 +28,7 @@ interface SpamFilterState {
 
 const getters = {
   allEmails: (state: SpamFilterState) => state.emails,
-  getWhiteList: (state: SpamFilterState) => state.whitelist,
+  whitelist: (state: SpamFilterState) => state.whitelist,
 };
 
 const actions = {
@@ -52,9 +52,9 @@ const actions = {
       commit('SetWhitelist', ResponseData);
     }
   },
-  async AddNewEntry({ commit, rootState }: CommitRootStateFunction<RootState>) {
+  async AddNewEntry({ commit, rootState }: CommitRootStateFunction<RootState>, email: string) {
     const instance = GenerateClient(rootState.Auth.token);
-    const response = await instance.post('/spam-filter/whitelist/');
+    const response = await instance.post('/spam-filter/whitelist/', { email });
     if (response.status === 401) {
       commit('AuthenticationExpired');
     } else {
