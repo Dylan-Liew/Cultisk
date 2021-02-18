@@ -32,7 +32,7 @@
       </md-table-empty-state>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }">
-        <md-table-cell md-label="Emails" md-sort-by="email">{{ item }}</md-table-cell>
+        <md-table-cell md-label="Emails" md-sort-by="email">{{ item.email }}</md-table-cell>
       </md-table-row>
     </md-table>
   </div>
@@ -61,7 +61,6 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapActions, mapGetters } from 'vuex';
 
 const toLower = (text) => text.toString().toLowerCase();
 
@@ -80,24 +79,34 @@ export default Vue.extend({
     searched: [],
     active: false,
     value: null,
+    emails: [
+      {
+        email: 'joel@gmail.com',
+      },
+      {
+        email: 'kentw@gmail.com',
+      },
+      {
+        email: 'william@gmail.com',
+      },
+      {
+        email: 'cassandra@gmail.com',
+      },
+      {
+        email: 'Dylan@gmail.com',
+      },
+    ],
   }),
   methods: {
-    ...mapActions(['RetrieveSpamFilterInfo']),
     searchOnTable() {
-      this.searched = searchByName(this.GetWhiteList, this.search);
+      this.searched = searchByName(this.emails, this.search);
     },
     hello(text) {
-      this.whitelist.push(text);
+      this.emails.push({ email: text });
     },
   },
-  computed: mapGetters(['GetWhiteList']),
   created() {
-    this.GetWhiteList();
-  },
-  watch: {
-    GetWhiteList(newValue) {
-      this.searched = newValue;
-    },
+    this.searched = this.emails;
   },
 });
 </script>
