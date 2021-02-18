@@ -120,8 +120,9 @@ export interface DarkScannerResponse extends ServerResponse {
 
 export interface SpamFilterData {
   sender: string;
-  message: string;
+  body: string;
   subject: string;
+  message_id: string;
 }
 
 export interface SpamFilterDataResponse extends ServerResponse {

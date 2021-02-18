@@ -7,14 +7,28 @@ import { AuthState } from '@/store/modules/auth';
 
 const state = {
   emails: [],
+  whitelist: [],
 };
 
 interface RootState {
   Auth: AuthState;
 }
 
+interface EmailInfo {
+  body: string;
+  message_id: string;
+  sender: string;
+  subject: string;
+}
+
+interface SpamFilterState {
+  emails: EmailInfo[];
+  whitelist: string[];
+}
+
 const getters = {
-  allEmails: (state: { emails: any }) => state.emails,
+  allEmails: (state: SpamFilterState) => state.emails,
+  getWhiteList: (state: SpamFilterState) => state.whitelist,
 };
 
 const actions = {
@@ -28,11 +42,34 @@ const actions = {
       commit('SetSpamFilter', ResponseData);
     }
   },
+  async GetWhiteList({ commit, rootState }: CommitRootStateFunction<RootState>) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const response = await instance.get('/spam-filter/whitelist/');
+    if (response.status === 401) {
+      commit('AuthenticationExpired');
+    } else {
+      const ResponseData: string[] = response.data;
+      commit('SetWhitelist', ResponseData);
+    }
+  },
+  async AddNewEntry({ commit, rootState }: CommitRootStateFunction<RootState>) {
+    const instance = GenerateClient(rootState.Auth.token);
+    const response = await instance.post('/spam-filter/whitelist/');
+    if (response.status === 401) {
+      commit('AuthenticationExpired');
+    } else {
+      const ResponseData: string[] = response.data;
+      commit('SetWhitelist', ResponseData);
+    }
+  },
 };
 
 const mutations = {
-  SetSpamFilter(state: { emails: any }, SpamData: SpamFilterData[]): void {
+  SetSpamFilter(state: SpamFilterState, SpamData: SpamFilterData[]): void {
     state.emails = SpamData;
+  },
+  SetWhitelist(state: SpamFilterState, whitelist: string[]): void {
+    state.whitelist = whitelist;
   },
 };
 
