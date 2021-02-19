@@ -1,4 +1,4 @@
-d# Cultisk Data Security Toolkit
+# Cultisk Data Security Toolkit
 
 ## NYP DSF1901 Year 2 Semester 2 Group Project
 
