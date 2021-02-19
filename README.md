@@ -47,3 +47,4 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
  ### VirusTotal API key Setup
  * Sign up for a virustotal account (https://www.virustotal.com/gui/join-us)
  * Set the API key as an environment variable
+   * VT_API_KEY=api_key
