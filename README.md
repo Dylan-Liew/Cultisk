@@ -45,6 +45,7 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
    * VT_API_KEY=api_key
   
 ### Run the application 
+# NOTES: Cultisk-Server must be running before the following steps
 * Run the application by running the following commands in the order as stated in different instance
   * `py cultiskpy\main.py` under cultiskpy directory
   * `npm run electron:serve`
