@@ -47,6 +47,7 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
 ### Run the application 
 # NOTES: Cultisk-Server must be running before the following steps
 * Run the application by running the following commands in the order as stated in different instance
+  * `py cultiskpy\av.py` under cultiskpy directory
   * `py cultiskpy\main.py` under cultiskpy directory
   * `npm run electron:serve`
  
