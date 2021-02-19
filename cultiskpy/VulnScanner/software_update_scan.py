@@ -90,10 +90,10 @@ def worker(software):
 
 
 def software_update_scan():
-    # software_list = get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + \
-    #                 get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY) + \
-    #                 get_software_list(winreg.HKEY_CURRENT_USER, 0)
-    software_list = get_software_list(winreg.HKEY_CURRENT_USER, 0)
+    software_list = get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_32KEY) + \
+                    get_software_list(winreg.HKEY_LOCAL_MACHINE, winreg.KEY_WOW64_64KEY) + \
+                    get_software_list(winreg.HKEY_CURRENT_USER, 0)
+    # software_list = get_software_list(winreg.HKEY_CURRENT_USER, 0)
     pool_size = 3
     pool = Pool(pool_size)
     for software in software_list:
