@@ -31,6 +31,8 @@ print("========== LOGS ==========")
 # usb_detector.start()
 # download.start()
 # scheduling.start()
+url_detect = MaliciousUrlDetect()
+url_detect.start()
 
 s = zerorpc.Server(CultiskRPC(), pool_size=7, heartbeat=10000)
 s.bind("tcp://0.0.0.0:4242")
