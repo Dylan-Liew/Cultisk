@@ -19,7 +19,6 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 
 ### Technologies:
 * Python > 3.8
-* Flask Restx 
 * Electron ~ 11.0.0
 * VueJS ~ 2
 
@@ -34,18 +33,19 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
   [Wireshark](https://www.wireshark.org/download.html),
   [Visual Studio](https://visualstudio.microsoft.com/downloads/)
    
- ### VirusTotal API key Setup
- * Sign up for a virustotal account (https://www.virustotal.com/gui/join-us)
- * Set the API key as an environment variable
-   * VT_API_KEY=api_key
-  
 * Install required packages for Electron App
   * Run `npm install` in the project root folder to install necessary packages
   
 * Install required modules for Cultisk Py
   * Run `pip install -r requirements.txt`
   
-* Run the application by running the following commands in the order as stated and different terminal
+ ### VirusTotal API key Setup
+ * Sign up for a virustotal account (https://www.virustotal.com/gui/join-us)
+ * Set the API key as an environment variable
+   * VT_API_KEY=api_key
+  
+### Run the application 
+* Run the application by running the following commands in the order as stated in different instance
   * `py cultiskpy\main.py` under cultiskpy directory
   * `npm run electron:serve`
  
