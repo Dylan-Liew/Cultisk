@@ -33,7 +33,12 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
   [Git](https://git-scm.com/downloads),
   [Wireshark](https://www.wireshark.org/download.html),
   [Visual Studio](https://visualstudio.microsoft.com/downloads/)
-    
+   
+ ### VirusTotal API key Setup
+ * Sign up for a virustotal account (https://www.virustotal.com/gui/join-us)
+ * Set the API key as an environment variable
+   * VT_API_KEY=api_key
+  
 * Install required packages for Electron App
   * Run `npm install` in the project root folder to install necessary packages
   
@@ -44,7 +49,3 @@ Pycharm Professional (30 days trial available [here](https://www.jetbrains.com/p
   * `py cultiskpy\main.py` under cultiskpy directory
   * `npm run electron:serve`
  
- ### VirusTotal API key Setup
- * Sign up for a virustotal account (https://www.virustotal.com/gui/join-us)
- * Set the API key as an environment variable
-   * VT_API_KEY=api_key
