@@ -218,8 +218,7 @@ class Scanner:
     def __init__(self):
         # self.directory = "C:\\Users\\willi\\Downloads\\controlled_test"
         self.directory = self.get_download_path() + '\\controlled_test'
-        # self.vt_api_key = config("VT_API_KEY")
-        self.vt_api_key = "***REMOVED***"
+        self.vt_api_key = os.environ["VT_API_KEY"]
         self.toaster = ToastNotifier()
         self.malicious_index = 10
 
