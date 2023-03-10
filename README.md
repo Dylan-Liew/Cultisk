@@ -13,7 +13,7 @@ Communication between Electron App and Python backend is achieved using a JSON-R
 
 * [Dylan](https://github.com/Dylan-Liew)
 * [Joel](https://github.com/j041)
-* [William](https://github.com/willy00)
+* [William](https://github.com/c0dn)
 * [Kent](https://github.com/kentlow2002)
 * [Cassandra](https://github.com/Cassandra-Fu)
 
